@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AERO-PASS | 無人航空機操縦士（一等・二等）オールインワン実践シミュレーター</title>
+  <meta name="description" content="教則第5版完全対応。無人航空機操縦士の学科CBT模試、一等計算ビジュアライザー、実地試験（机上試験マップ・口述試験・飛行日誌）を網羅したオールインワン学習プラットフォーム。" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Cockpit Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <span class="brand-badge">AERO-PASS</span>
+        <h1 class="brand-title">無人航空機操縦士 オールインワン実践シミュレーター</h1>
+        <span class="edition-tag">教則第5版 (2026.7改正) 準拠</span>
+      </div>
+
+      <div class="header-actions">
+        <!-- User Tier Simulator (Free / B2C Pass / B2B School Admin) -->
+        <div class="tier-switcher" role="group" aria-label="表示モード切替">
+          <button id="tier-free" onclick="setAccessTier('free')">無料体験枠</button>
+          <button id="tier-pass" class="active" onclick="setAccessTier('pass')">一等・合格パス (¥2,980)</button>
+          <button id="tier-b2b" onclick="setAccessTier('b2b')">B2Bスクール管理画面</button>
+        </div>
+        <button id="btn-open-paywall" class="btn btn-amber" onclick="openPaywallModal()">
+          👑 合格パス・スクール診断
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Module Navigation -->
+  <nav class="nav-bar" aria-label="学習モジュール選択">
+    <div class="nav-inner">
+      <button id="nav-kijo" class="nav-tab active" onclick="switchModule('kijo')">
+        🗺️ ① 実地：机上試験マップ演習 <span class="nav-pill">20点満点</span>
+      </button>
+      <button id="nav-oral" class="nav-tab" onclick="switchModule('oral')">
+        🎙️ ② 実地：口述＆飛行日誌チェッカー <span class="nav-pill">減点防止</span>
+      </button>
+      <button id="nav-calc" class="nav-tab" onclick="switchModule('calc')">
+        📐 ③ 一等：計算ビジュアライザー＆無限ドリル <span class="nav-pill">物理図解</span>
+      </button>
+      <button id="nav-cbt" class="nav-tab" onclick="switchModule('cbt')">
+        💻 ④ 学科：CBT模試 × 教則第5版差分 <span class="nav-pill">新旧比較</span>
+      </button>
+      <button id="nav-monetize" class="nav-tab" onclick="switchModule('monetize')">
+        🏫 ⑤ スクール送客・B2B LMS管理 <span class="nav-pill">収益エンジン</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="main-container">
+
+    <!-- =====================================================================
+         MODULE 1: 実地試験 — 机上試験（飛行計画マップ＆用紙B 4問20点演習）
+         ===================================================================== -->
+    <section id="mod-kijo" class="grid-12">
+      <div class="col-7 card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📄 用紙A：飛行計画書・飛行経路マップ検証</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <select id="kijo-scenario-select" class="form-control" style="width:auto;" onchange="loadKijoScenario(this.value)">
+              <option value="0">演習1: 橋梁点検（強風・高圧線RTH不備）</option>
+              <option value="1">演習2: 工業専用地域での夜間農薬散布（第5版特例）</option>
+              <option value="2">演習3: 市街地空撮（緊急着陸地点・補助者配置不備）</option>
+            </select>
+            <span id="kijo-timer-badge" class="mono" style="background:var(--bg-subtle); padding:0.35rem 0.65rem; border-radius:6px; font-weight:700; border:1px solid var(--border-color);">
+              ⏱️ 04:00
+            </span>
+            <button id="btn-kijo-timer" class="btn" onclick="resetKijoTimer()">タイマー開始</button>
+          </div>
+        </div>
+
+        <!-- Interactive SVG Map -->
+        <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:0.75rem;">
+          <svg id="kijo-map-svg" viewBox="0 0 560 220" style="width:100%; height:auto; display:block;"></svg>
+        </div>
+
+        <!-- Flight Plan Specification Table -->
+        <div class="metric-grid">
+          <div class="metric-item">
+            <div class="metric-label">使用機体・耐風速上限</div>
+            <div id="kijo-spec-drone" class="metric-value" style="font-size:0.9rem;">最大耐風速 10m/s / IPX0</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">飛行日時・気象予報</div>
+            <div id="kijo-spec-weather" class="metric-value" style="font-size:0.9rem;">18:30(日没後) / 風速12m/s</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">自動飛行(RTH)高度設定</div>
+            <div id="kijo-spec-rth" class="metric-value" style="font-size:0.9rem;">RTH 25m (障害物最高35m)</div>
+          </div>
+        </div>
+
+        <div id="kijo-hotspot-alert" class="feedback-box" style="margin-top:0.85rem;">
+          💡 <strong>操作方法：</strong> マップ上の赤枠・黄枠エリアをクリックすると、飛行計画（用紙A）に潜む法令違反・安全不備の詳細を検証できます。
+        </div>
+      </div>
+
+      <!-- Right Column: 用紙B 4問解答フォーム -->
+      <div class="col-5 card">
+        <div class="card-header">
+          <div class="card-title">📝 用紙B：机上試験 4問解答（各5点・計20点）</div>
+          <span id="kijo-total-score" class="mono" style="font-weight:800; color:var(--brand-primary); font-size:1rem;">未採点 / 20点</span>
+        </div>
+
+        <div id="kijo-questions-container" style="display:flex; flex-direction:column; gap:0.85rem;"></div>
+
+        <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+          <button id="btn-grade-kijo" class="btn btn-primary" style="flex:1;" onclick="gradeKijoExam()">
+            ✅ 用紙Bを採点する（20点満点）
+          </button>
+        </div>
+
+        <div id="kijo-grade-feedback" class="feedback-box hidden"></div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MODULE 2: 実地試験 — 口述試験AIロールプレイ ＆ 飛行日誌チェッカー
+         ===================================================================== -->
+    <section id="mod-oral" class="grid-12 hidden">
+      <!-- Left: Oral Exam Simulator -->
+      <div class="col-6 card">
+        <div class="card-header">
+          <div class="card-title">🎙️ 口述試験（飛行前点検・異常事態・事故報告）</div>
+          <span id="oral-points-badge" class="mono" style="background:var(--status-success-bg); color:var(--status-success); padding:0.25rem 0.65rem; border-radius:6px; font-weight:800;">
+            残り持ち点: 100 / 100点
+          </span>
+        </div>
+
+        <div style="margin-bottom:0.85rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <button class="btn" onclick="loadOralStage(0)">場面①：飛行前点検（機体・周囲）</button>
+          <button class="btn" onclick="loadOralStage(1)">場面②：飛行中の異常・立入侵入</button>
+          <button class="btn" onclick="loadOralStage(2)">場面③：事故・重大インシデント報告</button>
+        </div>
+
+        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:1rem; margin-bottom:0.85rem;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.35rem;" id="oral-stage-label"></div>
+          <p id="oral-examiner-q" style="font-weight:700; font-size:0.95rem;"></p>
+        </div>
+
+        <div id="oral-choices-box" class="choice-list"></div>
+
+        <div id="oral-result-box" class="feedback-box">
+          👆 試験官の質問に対する口頭回答を選択してください。模範発声フレーズと減点判定を表示します。
+        </div>
+      </div>
+
+      <!-- Right: Flight Log (飛行日誌 3様式) Defect Inspector -->
+      <div class="col-6 card">
+        <div class="card-header">
+          <div class="card-title">📋 飛行日誌（日常点検・飛行記録・点検整備）不備チェッカー</div>
+          <span class="nav-pill">実地試験・減点頻出</span>
+        </div>
+
+        <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:0.85rem;">
+          実地試験の最後に行われる「飛行記録・日常点検記録の記入」では、記載漏れや単位ミスが即減点となります。以下の記入例から<strong>不備がある行をクリックして修正</strong>してください。
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>項目（飛行記録・日常点検記録）</th>
+              <th>受験者の記入内容</th>
+              <th>判定・修正アクション</th>
+            </tr>
+          </thead>
+          <tbody id="flight-log-tbody"></tbody>
+        </table>
+
+        <div id="flight-log-feedback" class="feedback-box" style="margin-top:0.85rem;">
+          💡 表の中の「⚠️ 検証する」ボタンを押して、飛行日誌の減点ポイントを確認しましょう。
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MODULE 3: 一等学科 — 計算ビジュアライザー ＆ 無限ランダム生成ドリル
+         ===================================================================== -->
+    <section id="mod-calc" class="grid-12 hidden">
+      <!-- Left: Interactive Physics Visualizer -->
+      <div class="col-7 card">
+        <div class="card-header">
+          <div class="card-title">📐 一等・飛行性能の物理ビジュアライザー</div>
+          <div style="display:flex; gap:0.4rem;">
+            <button id="viz-btn-turn" class="btn btn-primary" onclick="setCalcVisualizer('turn')">① 定常旋回・荷重倍数</button>
+            <button id="viz-btn-fresnel" class="btn" onclick="setCalcVisualizer('fresnel')">② 第1フレネルゾーン</button>
+            <button id="viz-btn-glide" class="btn" onclick="setCalcVisualizer('glide')">③ 揚抗比・水平到達距離</button>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
+              <span id="calc-s1-label">飛行速度 v (m/s)</span>
+              <strong id="calc-s1-val" class="mono">10 m/s</strong>
+            </div>
+            <input id="calc-s1" type="range" min="5" max="25" step="1" value="10" style="width:100%;" oninput="renderCalcVisualizer()" />
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
+              <span id="calc-s2-label">バンク角 θ (度)</span>
+              <strong id="calc-s2-val" class="mono">45°</strong>
+            </div>
+            <input id="calc-s2" type="range" min="15" max="60" step="15" value="45" style="width:100%;" oninput="renderCalcVisualizer()" />
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:0.75rem;">
+          <svg id="calc-viz-svg" viewBox="0 0 540 185" style="width:100%; height:auto; display:block;"></svg>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-item">
+            <div id="calc-m1-label" class="metric-label">旋回半径 r</div>
+            <div id="calc-m1-val" class="metric-value mono">10.2 m</div>
+          </div>
+          <div class="metric-item">
+            <div id="calc-m2-label" class="metric-label">荷重倍数 n (= 1/cosθ)</div>
+            <div id="calc-m2-val" class="metric-value mono">1.41 G</div>
+          </div>
+          <div class="metric-item">
+            <div id="calc-m3-label" class="metric-label">公式・比例関係</div>
+            <div id="calc-m3-val" class="metric-value mono" style="font-size:0.88rem;">速度2倍で半径4倍</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Infinite Random Drill + Built-in CBT Calculator -->
+      <div class="col-5 card">
+        <div class="card-header">
+          <div class="card-title">🎲 数値ランダム生成ドリル（無限演習）</div>
+          <button class="btn btn-primary" onclick="generateNewDrill()">🔄 数値を変えて新規出題</button>
+        </div>
+
+        <div id="drill-stem" style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; font-weight:600; margin-bottom:0.85rem;"></div>
+
+        <div id="drill-choices" class="choice-list"></div>
+
+        <div id="drill-feedback" class="feedback-box">
+          💡 解答を選ぶと、途中式と解説を表示し、左のビジュアライザーに問題の数値を自動反映します。
+        </div>
+
+        <!-- Mini CBT Calculator -->
+        <div style="margin-top:1rem; padding-top:0.85rem; border-top:1px solid var(--border-color);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <span style="font-size:0.78rem; font-weight:700; color:var(--text-secondary);">🧮 CBT画面内 簡易電卓（ルート・四則演算）</span>
+            <button class="btn" style="padding:0.2rem 0.5rem; font-size:0.72rem;" onclick="clearMiniCalc()">クリア (C)</button>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <input id="mini-calc-input" type="text" class="form-control mono" placeholder="例: (14*14)/(9.8*1.73)" />
+            <button class="btn btn-primary" onclick="evalMiniCalc()">＝ 計算</button>
+            <button class="btn" onclick="sqrtMiniCalc()">√ ルート</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MODULE 4: 学科CBT完全再現モック × 教則第5版スマート差分ビューア
+         ===================================================================== -->
+    <section id="mod-cbt" class="grid-12 hidden">
+      <!-- Left: Prometric CBT Mock -->
+      <div class="col-7 card">
+        <div class="card-header">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span id="cbt-q-title" class="card-title">問 1 / 5</span>
+            <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.82rem; cursor:pointer;">
+              <input type="checkbox" id="cbt-flag-chk" onchange="toggleFlagCurrent()" />
+              🚩 後で見直す
+            </label>
+          </div>
+          <div id="cbt-palette" style="display:flex; gap:0.35rem;"></div>
+        </div>
+
+        <div style="margin-bottom:0.65rem;">
+          <span id="cbt-badge-cat" class="nav-pill" style="font-weight:700;"></span>
+        </div>
+
+        <p id="cbt-question-text" style="font-size:0.98rem; font-weight:700; margin-bottom:1rem; line-height:1.6;"></p>
+
+        <div id="cbt-choice-container" class="choice-list"></div>
+
+        <div id="cbt-answer-feedback" class="feedback-box">
+          選択肢をクリックすると正誤判定を行い、右側の「教則第5版スマート差分ビューア」の該当条文をハイライトします。
+        </div>
+      </div>
+
+      <!-- Right: 5th Edition Smart Textbook Diff Viewer -->
+      <div class="col-5 card">
+        <div class="card-header">
+          <div class="card-title">📖 教則第5版 スマート差分ビューア</div>
+          <span id="cbt-ref-badge" class="mono" style="font-size:0.78rem; color:var(--text-secondary);"></span>
+        </div>
+
+        <div class="diff-box-old">
+          <div style="font-weight:700; color:var(--status-danger); margin-bottom:0.25rem;">❌ 旧・教則第4版までの規定（誤答トラップ）</div>
+          <div id="cbt-diff-old" style="text-decoration:line-through; opacity:0.85;"></div>
+        </div>
+
+        <div class="diff-box-new">
+          <div style="font-weight:700; color:var(--status-success); margin-bottom:0.25rem;">✅ 教則第5版（2026年7月14日適用・現行基準）</div>
+          <div id="cbt-diff-new"></div>
+        </div>
+
+        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; font-size:0.84rem;">
+          <div style="font-weight:700; margin-bottom:0.3rem;">🎯 試験対策・暗記ポイント</div>
+          <p id="cbt-diff-tip" style="color:var(--text-secondary);"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         MODULE 5: 収益化エンジン（個人買い切り ＋ スクール送客 ＋ B2B LMS管理画面）
+         ===================================================================== -->
+    <section id="mod-monetize" class="grid-12 hidden">
+      <!-- Left: Cost & Pass Rate Simulator -> School Lead Gen Funnel -->
+      <div class="col-6 card">
+        <div class="card-header">
+          <div class="card-title">🏫 【送客エンジン】一発試験 vs 登録講習機関（スクール）診断</div>
+          <span class="nav-pill" style="background:var(--status-warning-bg); color:var(--status-warning); font-weight:700;">成果報酬 ¥10,000/件</span>
+        </div>
+
+        <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:0.9rem;">
+          机上・口述シミュレーターで減点を経験した独学受験者に対し、「指定試験機関での一発試験（再受験リスク込み）」と「登録講習機関（実地試験免除）」の費用・時間・合格率を比較提示し、自然にスクール資料請求へ送客します。
+        </p>
+
+        <div class="slider-row">
+          <div>
+            <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:0.25rem;">取得目標の資格区分</label>
+            <select id="lead-license-type" class="form-control" onchange="updateSchoolComparison()">
+              <option value="nitou_basic">二等無人航空機操縦士（基本）</option>
+              <option value="nitou_full">二等（基本＋夜間・目視外限定解除）</option>
+              <option value="ittou_basic">一等無人航空機操縦士（基本）</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.78rem; font-weight:600; display:block; margin-bottom:0.25rem;">現在の操縦経験・練習環境</label>
+            <select id="lead-exp-level" class="form-control" onchange="updateSchoolComparison()">
+              <option value="beginner">未経験・ATTIモード練習環境なし</option>
+              <option value="hobby">空撮経験あり（GPSモードのみ）</option>
+              <option value="pro">業務経験・練習コートあり</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="school-comparison-box" style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.95rem; margin-bottom:0.9rem;"></div>
+
+        <!-- Lead Gen Form -->
+        <div style="border-top:1px solid var(--border-color); padding-top:0.9rem;">
+          <div style="font-weight:700; font-size:0.88rem; margin-bottom:0.5rem;">📩 実地試験免除の登録講習機関（無料説明会・補助金対象校）を一括検索</div>
+          <div style="display:flex; gap:0.5rem;">
+            <select id="lead-pref" class="form-control" style="max-width:160px;">
+              <option value="東京都">東京都</option>
+              <option value="神奈川県">神奈川県</option>
+              <option value="大阪府">大阪府</option>
+              <option value="愛知県">愛知県</option>
+              <option value="福岡県">福岡県</option>
+              <option value="全国オンライン学科対応">全国（オンライン学科）</option>
+            </select>
+            <button class="btn btn-amber" style="flex:1;" onclick="submitSchoolLead()">
+              🎁 提携スクールのパンフ請求（AERO-PASS合格パス無料特典付）
+            </button>
+          </div>
+          <div id="lead-submit-msg" class="feedback-box hidden"></div>
+        </div>
+      </div>
+
+      <!-- Right: Future B2B School LMS Multi-Tenant Dashboard -->
+      <div class="col-6 card">
+        <div class="card-header">
+          <div class="card-title">🏢 【B2B拡張】登録講習機関向け 受講生進捗管理 (LMS)</div>
+          <span class="nav-pill" style="font-weight:700;">月額 ¥24,800 / 校</span>
+        </div>
+
+        <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:0.9rem;">
+          個人向け（B2C）で蓄積した問題・シミュレーター資産をそのまま活かし、全国のドローンスクールへ<strong>「受講生の学科・机上・口述対策クラウド」</strong>としてOEM提供できます。
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>受講生名（11月期 二等・一等）</th>
+              <th>区分</th>
+              <th>学科CBT模試</th>
+              <th>机上・口述演習</th>
+              <th>修了審査判定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>佐藤 健太</strong></td>
+              <td>二等・夜間目視外</td>
+              <td class="mono">92% (46/50)</td>
+              <td class="mono">20 / 20点</td>
+              <td><span style="color:var(--status-success); font-weight:700;">● 受験許可OK</span></td>
+            </tr>
+            <tr>
+              <td><strong>高橋 美咲</strong></td>
+              <td>一等・基本</td>
+              <td class="mono">84% (59/70)</td>
+              <td class="mono">15 / 20点</td>
+              <td><span style="color:var(--status-warning); font-weight:700;">▲ 計算・RTH要補習</span></td>
+            </tr>
+            <tr>
+              <td><strong>鈴木 翔太</strong></td>
+              <td>二等・基本</td>
+              <td class="mono">68% (34/50)</td>
+              <td class="mono">10 / 20点</td>
+              <td><span style="color:var(--status-danger); font-weight:700;">× 第5版改訂箇所未達</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="metric-grid">
+          <div class="metric-item">
+            <div class="metric-label">個人買い切り (月150名)</div>
+            <div class="metric-value mono" style="font-size:0.95rem;">¥372,000 /月</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">スクール送客 (月25件)</div>
+            <div class="metric-value mono" style="font-size:0.95rem;">¥250,000 /月</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">B2B LMS契約 (20校)</div>
+            <div class="metric-value mono" style="font-size:0.95rem;">¥496,000 /月</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Paywall & Pricing Modal -->
+  <div id="paywall-modal" class="modal-backdrop hidden" onclick="closePaywallModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="card-header">
+        <div class="card-title">👑 AERO-PASS 合格パスポート（個人買い切り ＆ スクール特典）</div>
+        <button class="btn" onclick="closePaywallModal()">✕ 閉じる</button>
+      </div>
+
+      <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1rem;">
+        サブスク解約忘れの心配がない<strong>「1回買い切り型」</strong>。さらに提携ドローンスクール（登録講習機関）の無料説明会・資料請求をされた方は、合格パスが<strong>完全無料（¥0）</strong>でアンロックされます。
+      </p>
+
+      <div class="grid-12" style="gap:0.85rem;">
+        <div class="col-6" style="border:1px solid var(--border-color); border-radius:8px; padding:1rem;">
+          <div style="font-weight:700; font-size:0.95rem;">二等・完全合格パック</div>
+          <div class="mono" style="font-size:1.4rem; font-weight:800; color:var(--brand-primary); margin:0.35rem 0;">¥1,980 <span style="font-size:0.75rem; font-weight:500; color:var(--text-secondary);">（税込・買い切り）</span></div>
+          <ul style="font-size:0.8rem; color:var(--text-secondary); padding-left:1.1rem; margin-bottom:0.85rem; line-height:1.6;">
+            <li>教則第5版対応 二等CBT模擬試験（無制限）</li>
+            <li>実地：机上試験マップ演習（全15シナリオ）</li>
+            <li>実地：口述試験＆飛行日誌減点チェッカー</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;" onclick="activatePass('nitou')">Stripe決済で今すぐ解放</button>
+        </div>
+
+        <div class="col-6" style="border:2px solid var(--brand-primary); border-radius:8px; padding:1rem; background:var(--brand-primary-soft);">
+          <div style="font-weight:800; font-size:0.95rem; color:var(--brand-primary);">一等＆二等 オールインワンパック</div>
+          <div class="mono" style="font-size:1.4rem; font-weight:800; color:var(--brand-primary); margin:0.35rem 0;">¥2,980 <span style="font-size:0.75rem; font-weight:500; color:var(--text-secondary);">（税込・買い切り）</span></div>
+          <ul style="font-size:0.8rem; color:var(--text-main); padding-left:1.1rem; margin-bottom:0.85rem; line-height:1.6;">
+            <li><strong>二等パックの全機能</strong>に加え、一等70問模試</li>
+            <li><strong>一等：計算ビジュアライザー＆無限ランダム生成</strong></li>
+            <li>カテゴリーⅢ飛行・リスク評価（SAIL/OSO）特訓</li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;" onclick="activatePass('ittou')">一番人気：一等パックを解放</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
