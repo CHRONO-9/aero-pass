@@ -1,5 +1,10 @@
 // ============================================================================
-// AERO-PASS All-in-One MVP Application Logic
+// AERO-PASS All-in-One Integrated Application Controller
+// Integrates:
+//  - window.AERO_EXAM_BANK (data/exam_bank.js)
+//  - window.AERO_PHYSICS_ENGINE (modules/physics_engine.js)
+//  - window.AERO_MONETIZE_LMS (modules/b2b_monetize.js)
+//  - window.AERO_GROWTH_FUNNEL (modules/growth_funnel.js)
 // ============================================================================
 
 let currentModule = 'kijo';
@@ -8,9 +13,10 @@ let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
 function switchModule(mod) {
   currentModule = mod;
   const mods = ['kijo', 'oral', 'calc', 'cbt', 'monetize'];
-  mods.forEach(m => {
+  mods.forEach((m) => {
     const sec = document.getElementById('mod-' + m);
     const tab = document.getElementById('nav-' + m);
+    if (!sec || !tab) return;
     if (m === mod) {
       sec.classList.remove('hidden');
       tab.classList.add('active');
@@ -21,16 +27,33 @@ function switchModule(mod) {
   });
   if (mod === 'calc') {
     renderCalcVisualizer();
+  } else if (mod === 'monetize') {
+    renderPersonalAnalytics();
+    updateSchoolComparison();
+    renderMatchedSchools();
+    renderB2bTable();
   }
 }
 
 function setAccessTier(tier) {
   currentAccessTier = tier;
-  ['free', 'pass', 'b2b'].forEach(t => {
+  ['free', 'pass', 'b2b'].forEach((t) => {
     const btn = document.getElementById('tier-' + t);
+    if (!btn) return;
     if (t === tier) btn.classList.add('active');
     else btn.classList.remove('active');
   });
+
+  if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.passManager) {
+    if (tier === 'free') {
+      window.AERO_MONETIZE_LMS.passManager.setPlanDirect('free');
+    } else if (tier === 'pass') {
+      window.AERO_MONETIZE_LMS.passManager.setPlanDirect('ittou_pass');
+    } else if (tier === 'b2b') {
+      window.AERO_MONETIZE_LMS.passManager.setPlanDirect('b2b_student');
+    }
+  }
+
   if (tier === 'b2b') {
     switchModule('monetize');
   } else if (tier === 'free') {
@@ -39,171 +62,67 @@ function setAccessTier(tier) {
 }
 
 function openPaywallModal() {
-  document.getElementById('paywall-modal').classList.remove('hidden');
+  const modal = document.getElementById('paywall-modal');
+  if (modal) modal.classList.remove('hidden');
 }
 
 function closePaywallModal() {
-  document.getElementById('paywall-modal').classList.add('hidden');
+  const modal = document.getElementById('paywall-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function activatePass(grade) {
+  const planId = grade === 'ittou' ? 'ittou_pass' : 'nitou_pass';
+  let msg = '';
+  if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.passManager) {
+    const res = window.AERO_MONETIZE_LMS.passManager.simulateStripeCheckout(planId);
+    msg = res.message;
+  } else {
+    const label = grade === 'ittou' ? '一等＆二等 オールインワン合格パス (¥2,980)' : '二等・完全合格パス (¥1,980)';
+    msg = `✅ ${label} が有効化されました！全シナリオ・無限計算ドリルが利用可能です。`;
+  }
   setAccessTier('pass');
   closePaywallModal();
-  const label = grade === 'ittou' ? '一等＆二等 オールインワン合格パス (¥2,980)' : '二等・完全合格パス (¥1,980)';
-  alert(`✅ ${label} が有効化されました！全シナリオ・無限計算ドリルが利用可能です。`);
+  alert(msg);
 }
 
 // ============================================================================
-// MODULE 1: 実地試験 — 机上試験（飛行計画マップ＆用紙B 4問20点演習）
+// MODULE 1: 実地試験 — 机上試験（飛行計画マップ＆用紙B 4問20点演習・全6シナリオ）
 // ============================================================================
-const kijoScenarios = [
-  {
-    title: '演習1: 橋梁点検（強風・高圧線RTH不備）',
-    specDrone: '最大耐風速 10m/s / 防水なし (IPX0)',
-    specWeather: '18:30 (日没後・夜間) / 予報風速 12m/s',
-    specRth: 'RTH高度 25m (経路上の高圧送電線 35m)',
-    zoneLabel: '人口集中地区 (住宅地DID)',
-    hotspots: {
-      rth: '⚠️ 【危機回避設定の不備】経路上に高さ35mの高圧送電線が存在するのに、自動帰還(RTH)高度が25mに設定されており、帰還時に衝突する危険があります。',
-      dist: '⚠️ 【第三者物件との距離・立入管理】病院・一般道路から15m（30m未満）を飛行する計画ですが、立入管理措置や補助者配置が計画されていません。',
-      wind: '⚠️ 【機体の限界事項超過】当日の予報風速(12m/s)が、使用機体の最大耐風速(10m/s)を超過しているため、飛行を中止・延期する必要があります。'
-    },
-    questions: [
-      {
-        label: '問1 [航空法の法令遵守 (5点)] 本飛行計画における特定飛行の許可・承認の要否として正しいものは？',
-        options: [
-          { text: '住宅地DIDの上空かつ日没後・第三者物件から15mの飛行であるため、DID許可および夜間・30m未満の承認が必要', correct: true },
-          { text: '二等無人航空機操縦士の技能証明を保有していれば、立入管理措置なしでも許可・承認ともに不要', correct: false },
-          { text: '橋梁点検は公共性が高いため、航空法の特定飛行の規制対象外となる', correct: false }
-        ]
-      },
-      {
-        label: '問2 [安全確保の措置 (5点)] 第三者建物および一般道路（距離15m）付近を飛行する際の安全措置として適切なものは？',
-        options: [
-          { text: '第三者の立入りを制限する立入管理区画を設定し、補助者を配置して監視・誘導を行う', correct: true },
-          { text: '飛行速度を最大に上げて短時間で通過すれば、立入管理区画や補助者は不要である', correct: false },
-          { text: 'スピーカーで警告音を鳴らせば第三者の真上をそのまま飛行してよい', correct: false }
-        ]
-      },
-      {
-        label: '問3 [機体の仕様・限界事項 (5点)] 当日の気象条件（予報風速12m/s）に対する判断として最も適切なものは？',
-        options: [
-          { text: '使用機体の最大耐風速（10m/s）を超えているため、飛行を中止または気象回復まで延期する', correct: true },
-          { text: 'GNSSを切ってATTIモードに切り替えれば、耐風速10m/sを超えていても安全に飛行できる', correct: false },
-          { text: '離陸重量を重くするためにバラストを積載して計画通り飛行する', correct: false }
-        ]
-      },
-      {
-        label: '問4 [自動飛行・危機回避機能 (5点)] リターン・トゥ・ホーム（RTH）高度の設定に関する判断として適切なものは？',
-        options: [
-          { text: '経路上の最高障害物である高圧送電線（高さ35m）との衝突を防ぐため、35mに安全マージンを加えた高度（例: 45〜50m）へ変更する', correct: true },
-          { text: 'バッテリー消費を抑えるため、現在設定されている25mのまま変更せずに飛行する', correct: false },
-          { text: 'すべての障害物を避けるため、RTH高度を地表から160mに設定変更する', correct: false }
-        ]
-      }
-    ]
-  },
-  {
-    title: '演習2: 工業専用地域での夜間農薬散布（教則第5版特例）',
-    specDrone: '農薬散布機 (最大耐風速 8m/s / IP54防滴)',
-    specWeather: '20:00 (夜間) / 風速 4m/s / 視程良好',
-    specRth: 'RTH高度 15m (周囲障害物 最高8m)',
-    zoneLabel: '都市計画法「工業専用地域」内の農地・緑地',
-    hotspots: {
-      rth: '✅ 【教則第5版・重要改訂】都市計画法上の「工業専用地域」内の区域では、国勢調査のDIDに含まれていてもDID飛行許可手続きが不要となりました。',
-      dist: '✅ 【教則第5版・農薬散布の特例】一定の要件（立入管理措置等）を満たす農薬等の空中散布では、夜間・目視外・30m未満・危険物輸送・物件投下の5つの承認手続きが不要となります。',
-      wind: '⚠️ 【補助者なし物件投下の高度制限】補助者を配置せずに農薬散布（物件投下）を行う場合、原則として高度1m以内（または立入管理措置の要件遵守）が求められます。'
-    },
-    questions: [
-      {
-        label: '問1 [航空法の遵守・教則第5版 (5点)] 都市計画法の「工業専用地域」内で飛行させる場合のDID許可について正しいものは？',
-        options: [
-          { text: '教則第5版に基づき、工業専用地域内の区域での飛行はDIDに係る飛行許可手続きが不要である', correct: true },
-          { text: '工業専用地域であっても、DIDに該当する場合は必ず国土交通大臣の許可が必要である', correct: false },
-          { text: '工業地域および準工業地域もすべてDID許可が不要となる', correct: false }
-        ]
-      },
-      {
-        label: '問2 [農薬散布の特例・教則第5版 (5点)] 航空法施行規則の要件を満たして農薬の空中散布を行う場合に不要となる手続きは？',
-        options: [
-          { text: '夜間飛行・目視外飛行・第三者から30m以内の飛行・危険物輸送・物件投下に係る「承認」手続きが不要となる', correct: true },
-          { text: '空港周辺や150m以上の空域における「許可」も含めてすべての手続きが不要となる', correct: false },
-          { text: '機体登録およびリモートIDの搭載義務が不要となる', correct: false }
-        ]
-      },
-      {
-        label: '問3 [機体の仕様・限界事項 (5点)] 散布機体の耐風速8m/sに対し、当日風速4m/s・小雨の予報である。確認すべき事項は？',
-        options: [
-          { text: '風速は限界内であり機体はIP54防滴仕様だが、送信機（プロポ）側の防水性能および農薬飛散（ドリフト）基準を満たすか確認する', correct: true },
-          { text: '機体が防滴であれば、送信機が非防水でも雨天でそのまま使用して問題ない', correct: false },
-          { text: '農薬を規定濃度より2倍濃くして短時間で散布を終える', correct: false }
-        ]
-      },
-      {
-        label: '問4 [自動飛行・フェイルセーフ (5点)] 農薬タンク積載時のバッテリー電圧低下に対する危機回避設定として適切なものは？',
-        options: [
-          { text: '満載時は消費電力が大きくなるため、余裕をもった残量閾値で自動帰還または着陸する設定とし、緊急着陸地点を事前設定する', correct: true },
-          { text: 'バッテリー残量0%まで散布を継続できるよう、低電圧アラームを無効化する', correct: false },
-          { text: '電波ロスト時はその場で農薬を全量投棄する設定にする', correct: false }
-        ]
-      }
-    ]
-  },
-  {
-    title: '演習3: 市街地イベント空撮（催し場所・緊急着陸地点不備）',
-    specDrone: '空撮機 900g (最大耐風速 10m/s)',
-    specWeather: '13:00 (昼間) / 風速 6m/s / 晴天',
-    specRth: '緊急着陸地点の未設定・催し場所上空通過',
-    zoneLabel: '屋外フェスティバル会場 (多数の者の集合する催し)',
-    hotspots: {
-      rth: '⚠️ 【催し場所上空の飛行規制】多数の者の集合する催し場所の上空飛行は、特定の許可要件（飛行経路下の立入禁止区画設定や係留等）を満たさなければ飛行できません。',
-      dist: '⚠️ 【緊急着陸地点の未設定】飛行経路上に、機体トラブル時に第三者へ危害を与えずに着陸できる「緊急着陸地点」が確保されていません。',
-      wind: '⚠️ 【小型無人機等飛行禁止法（第5版）】対象施設の敷地・区域から周囲おおむね1000mの周辺地域では、同意や通報等の所定手続きが必要です。'
-    },
-    questions: [
-      {
-        label: '問1 [航空法・他法令の遵守 (5点)] 多数の者が集合する催し場所の上空での飛行に関する記述として正しいものは？',
-        options: [
-          { text: '特定飛行（空域の許可対象）に該当し、観客の頭上を避ける立入禁止区画の設定など厳格な安全措置と国土交通大臣の許可が必要', correct: true },
-          { text: '主催者の口頭同意さえあれば、航空法上の許可申請なしで観客の真上を飛行できる', correct: false },
-          { text: '昼間の目視内飛行であれば、催し場所上空でも特定飛行には当たらない', correct: false }
-        ]
-      },
-      {
-        label: '問2 [安全確保措置 (5点)] 飛行計画の作成時に必ず設定・確認すべき安全上の場所として適切なものは？',
-        options: [
-          { text: '不測の事態（機体不具合や気象急変等）が発生した際に安全に降下できる「緊急着陸地点」を事前に確認・設定しておく', correct: true },
-          { text: '催し会場のステージ中央を緊急着陸地点に設定する', correct: false },
-          { text: '高度100m以上でホバリングし続ければ緊急着陸地点の設定は不要である', correct: false }
-        ]
-      },
-      {
-        label: '問3 [機体の仕様・ペイロード (5点)] 風対策として機体に外付けのプロペラガードを装着した場合の注意点として正しいものは？',
-        options: [
-          { text: '総重量および空気抵抗が増加するため、飛行可能時間の短縮や耐風性能の変化を考慮して飛行計画を見直す', correct: true },
-          { text: 'プロペラガードを装着すると揚力が増えるため、最大飛行時間が長くなる', correct: false },
-          { text: '外付け装備を追加しても重心位置や最大離陸重量の確認は不要である', correct: false }
-        ]
-      },
-      {
-        label: '問4 [自動飛行・GNSS環境 (5点)] ビルや大型テントに囲まれた会場で自動飛行を行う際のリスク管理として適切なものは？',
-        options: [
-          { text: 'マルチパスやGNSS受信感度低下により位置保持が不安定になるおそれがあるため、いつでも手動操縦（ATTI等）へ切り替えられる体制をとる', correct: true },
-          { text: 'GNSSはビル陰でも絶対に誤差が生じないため、プロポから手を離して自動飛行に任せる', correct: false },
-          { text: 'コンパスエラーが出た場合はキャリブレーションを行わずにそのまま離陸する', correct: false }
-        ]
-      }
-    ]
-  }
-];
-
 let currentKijoIdx = 0;
 let kijoTimerInterval = null;
-let kijoRemainingSec = 240; // 4 minutes
+let kijoRemainingSec = 600; // 実地机上試験標準 10分 (600秒)
+
+function getKijoScenarios() {
+  if (window.AERO_EXAM_BANK && Array.isArray(window.AERO_EXAM_BANK.kijoScenarios)) {
+    return window.AERO_EXAM_BANK.kijoScenarios;
+  }
+  return [];
+}
+
+function initKijoScenarioSelect() {
+  const scenarios = getKijoScenarios();
+  const sel = document.getElementById('kijo-scenario-select');
+  if (!sel || scenarios.length === 0) return;
+  sel.innerHTML = '';
+  scenarios.forEach((sc, idx) => {
+    const opt = document.createElement('option');
+    opt.value = String(idx);
+    opt.textContent = sc.title;
+    sel.appendChild(opt);
+  });
+}
 
 function loadKijoScenario(idxStr) {
-  currentKijoIdx = parseInt(idxStr, 10);
-  const sc = kijoScenarios[currentKijoIdx];
+  const scenarios = getKijoScenarios();
+  if (scenarios.length === 0) return;
+  currentKijoIdx = Math.max(0, Math.min(scenarios.length - 1, parseInt(idxStr, 10) || 0));
+  const sc = scenarios[currentKijoIdx];
+
+  const sel = document.getElementById('kijo-scenario-select');
+  if (sel && sel.value !== String(currentKijoIdx)) {
+    sel.value = String(currentKijoIdx);
+  }
 
   document.getElementById('kijo-spec-drone').textContent = sc.specDrone;
   document.getElementById('kijo-spec-weather').textContent = sc.specWeather;
@@ -211,7 +130,15 @@ function loadKijoScenario(idxStr) {
   document.getElementById('kijo-total-score').textContent = '未採点 / 20点';
   document.getElementById('kijo-grade-feedback').classList.add('hidden');
 
-  // Render Map SVG
+  const hRthTitle = sc.hotspots && sc.hotspots.rth && sc.hotspots.rth.title ? sc.hotspots.rth.title : '経路上の高度・RTH・通信検証';
+  const hDistTitle = sc.hotspots && sc.hotspots.dist && sc.hotspots.dist.title ? sc.hotspots.dist.title : '立入管理区画・離隔・特例検証';
+  const hWindTitle = sc.hotspots && sc.hotspots.wind && sc.hotspots.wind.title ? sc.hotspots.wind.title : '気象限界・法令区分・SORA検証';
+
+  const shortZone = sc.zoneLabel.length > 40 ? sc.zoneLabel.slice(0, 40) + '…' : sc.zoneLabel;
+  const shortRth = hRthTitle.length > 22 ? hRthTitle.slice(0, 22) + '…' : hRthTitle;
+  const shortDist = hDistTitle.length > 22 ? hDistTitle.slice(0, 22) + '…' : hDistTitle;
+  const shortWind = hWindTitle.length > 22 ? hWindTitle.slice(0, 22) + '…' : hWindTitle;
+
   const svg = document.getElementById('kijo-map-svg');
   svg.innerHTML = `
     <g stroke="#cbd5e1" stroke-width="1" opacity="0.5">
@@ -225,37 +152,38 @@ function loadKijoScenario(idxStr) {
     </g>
 
     <!-- Zone Box -->
-    <rect x="16" y="14" width="215" height="82" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="5 3" />
-    <text x="26" y="36" font-size="12" font-weight="700" fill="#0369a1">📍 ${sc.zoneLabel}</text>
-    <text x="26" y="56" font-size="11" fill="#334155">クリックして空域・特例要件を確認</text>
+    <rect x="14" y="12" width="238" height="76" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="5 3" />
+    <text x="22" y="34" font-size="11.5" font-weight="800" fill="#0369a1">📍 空域・現場条件 (${sc.id || '用紙A'})</text>
+    <text x="22" y="54" font-size="10.5" fill="#0f172a">${shortZone}</text>
+    <text x="22" y="72" font-size="10" fill="#0369a1">区分: ${sc.grade === 'ittou' ? '一等実地（カテゴリーⅢ・SORA）' : '二等/共通実地（特定飛行・安全管理）'}</text>
 
     <!-- Hotspot 1: RTH / Obstacle -->
     <g style="cursor:pointer;" onclick="showKijoHotspot('rth')">
-      <rect x="255" y="18" width="175" height="64" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2" />
-      <text x="266" y="40" font-size="12" font-weight="700" fill="#991b1b">⚡ 経路上の重要チェック点①</text>
-      <text x="266" y="60" font-size="11" fill="#7f1d1d">${sc.specRth}</text>
+      <rect x="268" y="12" width="278" height="72" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2" />
+      <text x="278" y="34" font-size="11.5" font-weight="800" fill="#991b1b">⚡ 検証ポイント①（クリックで詳細）</text>
+      <text x="278" y="56" font-size="11" font-weight="600" fill="#7f1d1d">${shortRth}</text>
     </g>
 
     <!-- Hotspot 2: Third Party / Distance -->
     <g style="cursor:pointer;" onclick="showKijoHotspot('dist')">
-      <rect x="360" y="125" width="182" height="72" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="2" />
-      <text x="372" y="148" font-size="12" font-weight="700" fill="#92400e">🏥 第三者物件・立入管理チェック②</text>
-      <text x="372" y="168" font-size="11" fill="#78350f">距離15m / 緊急着陸地点・補助者確認</text>
+      <rect x="292" y="132" width="254" height="74" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="2" />
+      <text x="302" y="154" font-size="11.5" font-weight="800" fill="#92400e">🛡️ 検証ポイント②（クリックで詳細）</text>
+      <text x="302" y="176" font-size="11" font-weight="600" fill="#78350f">${shortDist}</text>
     </g>
 
     <!-- Hotspot 3: Weather / Wind -->
     <g style="cursor:pointer;" onclick="showKijoHotspot('wind')">
-      <rect x="16" y="125" width="215" height="72" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2" />
-      <text x="28" y="148" font-size="12" font-weight="700" fill="#991b1b">💨 気象・機体限界チェック③</text>
-      <text x="28" y="168" font-size="11" fill="#7f1d1d">${sc.specWeather}</text>
+      <rect x="14" y="132" width="260" height="74" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="2" />
+      <text x="24" y="154" font-size="11.5" font-weight="800" fill="#991b1b">💨 検証ポイント③（クリックで詳細）</text>
+      <text x="24" y="176" font-size="11" font-weight="600" fill="#7f1d1d">${shortWind}</text>
     </g>
 
     <!-- Flight Path Line -->
-    <polyline points="85,112 185,68 335,55 450,118" fill="none" stroke="#0284c7" stroke-width="3" stroke-dasharray="6 4" />
-    <circle cx="85" cy="112" r="9" fill="#059669" />
-    <text x="100" y="116" font-size="12" font-weight="700" fill="#065f46">離陸地点 (H)</text>
-    <circle cx="450" cy="118" r="8" fill="#0284c7" />
-    <text x="464" y="122" font-size="12" font-weight="700" fill="#0369a1">目的地点</text>
+    <polyline points="75,112 195,96 345,96 470,114" fill="none" stroke="#0284c7" stroke-width="3" stroke-dasharray="6 4" />
+    <circle cx="75" cy="112" r="8" fill="#059669" />
+    <text x="88" y="116" font-size="11.5" font-weight="800" fill="#065f46">離着陸地点 (H)</text>
+    <circle cx="470" cy="114" r="7.5" fill="#0284c7" />
+    <text x="385" y="118" font-size="11.5" font-weight="800" fill="#0369a1">ミッション地点</text>
   `;
 
   // Render 4 Questions
@@ -269,25 +197,36 @@ function loadKijoScenario(idxStr) {
       optsHtml += `<option value="${opt.correct ? 'correct' : 'wrong_' + oIdx}">${opt.text}</option>`;
     });
     block.innerHTML = `
-      <div style="font-weight:700; font-size:0.82rem; margin-bottom:0.4rem;">${q.label}</div>
+      <div style="font-weight:700; font-size:0.82rem; margin-bottom:0.4rem; line-height:1.45;">${q.label}</div>
       <select id="kijo-ans-${qIdx}" class="form-control">
         ${optsHtml}
       </select>
     `;
     qContainer.appendChild(block);
   });
+
+  const alertBox = document.getElementById('kijo-hotspot-alert');
+  alertBox.className = 'feedback-box';
+  alertBox.innerHTML = `💡 <strong>空域・立地条件：</strong> ${sc.zoneLabel}<br/>マップ上の①・②・③の検証ボックスをクリックすると、飛行計画（用紙A）の矛盾点・教則第5版のポイントを確認できます。`;
 }
 
 function showKijoHotspot(key) {
-  const sc = kijoScenarios[currentKijoIdx];
+  const scenarios = getKijoScenarios();
+  const sc = scenarios[currentKijoIdx];
+  if (!sc || !sc.hotspots || !sc.hotspots[key]) return;
+  const h = sc.hotspots[key];
   const box = document.getElementById('kijo-hotspot-alert');
   box.className = 'feedback-box warning';
-  box.innerHTML = `<strong>🔍 マップ検証結果：</strong> ${sc.hotspots[key]}`;
+  if (typeof h === 'object') {
+    box.innerHTML = `<div><strong>🔍 【${h.title}】</strong></div><div style="margin-top:0.25rem;">${h.detail}</div>`;
+  } else {
+    box.innerHTML = `<strong>🔍 マップ検証結果：</strong> ${h}`;
+  }
 }
 
 function resetKijoTimer() {
   if (kijoTimerInterval) clearInterval(kijoTimerInterval);
-  kijoRemainingSec = 240;
+  kijoRemainingSec = 600;
   const badge = document.getElementById('kijo-timer-badge');
   kijoTimerInterval = setInterval(() => {
     kijoRemainingSec--;
@@ -303,10 +242,15 @@ function resetKijoTimer() {
 }
 
 function gradeKijoExam() {
+  const scenarios = getKijoScenarios();
+  const sc = scenarios[currentKijoIdx];
+  if (!sc) return;
+
   let score = 0;
   let unanswered = 0;
   for (let i = 0; i < 4; i++) {
-    const val = document.getElementById('kijo-ans-' + i).value;
+    const el = document.getElementById('kijo-ans-' + i);
+    const val = el ? el.value : '';
     if (!val) unanswered++;
     if (val === 'correct') score += 5;
   }
@@ -317,102 +261,148 @@ function gradeKijoExam() {
 
   if (unanswered > 0) {
     fb.className = 'feedback-box warning';
-    fb.innerHTML = `⚠️ 未回答の設問が ${unanswered} 問あります。すべて選択してから採点してください。`;
+    fb.innerHTML = `⚠️ 未回答の設問が ${unanswered} 問あります。4問すべて選択してから採点してください。`;
     return;
   }
 
   scoreEl.textContent = `${score} / 20点`;
+
+  // 学習履歴（AERO_MONETIZE_LMS.studyTracker）へ記録
+  if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+    window.AERO_MONETIZE_LMS.studyTracker.recordDeskExamScore({
+      scenarioId: sc.id || `KIJO-0${currentKijoIdx + 1}`,
+      score: score,
+      maxScore: 20,
+      weakPoint: sc.title
+    });
+  }
+
   if (score === 20) {
     fb.className = 'feedback-box success';
-    fb.innerHTML = `🎉 <strong>満点合格（20 / 20点）！</strong> 机上試験の4大観点（法令遵守・安全確保措置・機体限界・危機回避RTH設定）をすべて正確に判定できています。`;
+    fb.innerHTML = `🎉 <strong>満点合格（20 / 20点）！</strong> 「${sc.title}」の法令遵守・安全確保措置・機体限界・危機回避設定をすべて正確に判定できています（学習履歴に記録しました）。`;
   } else {
     fb.className = 'feedback-box error';
     fb.innerHTML = `
-      <div>❌ <strong>得点：${score} / 20点（-${20 - score}点の減点）</strong></div>
-      <div style="margin-top:0.35rem;">一発試験（実地）では机上試験の減点が実技の持ち点に直接響きます。実地試験免除の登録講習機関（スクール）との比較も「⑤ スクール送客」タブで確認できます。</div>
+      <div>❌ <strong>得点：${score} / 20点（-${20 - score}点の減点・学習履歴に記録済）</strong></div>
+      <div style="margin-top:0.35rem;">一発試験（実地）では机上試験の減点が実技の持ち点に直接響きます。「⑤ スクール送客・弱点分析」タブで、実地試験100%免除の登録講習機関とのROI比較や弱点トップ3も確認できます。</div>
     `;
   }
 }
 
 // ============================================================================
-// MODULE 2: 実地試験 — 口述試験AIロールプレイ ＆ 飛行日誌チェッカー
+// MODULE 2: 実地試験 — 口述試験AIロールプレイ(全6場面) ＆ 飛行日誌チェッカー(全6項目)
 // ============================================================================
-const oralStages = [
-  {
-    stage: '場面①：飛行前点検（口述試験1）',
-    question: '試験官：「これから離陸します。機体の電源を入れる前、および電源を入れた後に確認すべき『飛行前点検項目』と『周囲の安全確認』を声に出して実施してください。」',
-    choices: [
-      {
-        text: '「プロペラの損傷・緩みよし、機体フレーム・スキッド損傷よし、バッテリー膨張・残量よし、リモートID作動よし、GNSS捕捉数・コンパス異常なし、周囲の第三者・障害物・風速よし！」と指差呼称する',
-        correct: true,
-        feedback: '⭕ 満点回答（減点0）！機体外観（電源ON前）→システム・通信・バッテリー・リモートID（電源ON後）→周囲の気象・立入管理区画の順で指差呼称するのが合格の鉄則です。'
-      },
-      {
-        text: '「バッテリー残量だけ確認しました。異常ないので離陸します」とだけ伝えてスロットルを上げる',
-        correct: false,
-        feedback: '❌ -15点減点！プロペラ取付状態・機体外観・リモートID・GNSS・周囲確認が抜けると大幅減点または試験中止となります。'
-      },
-      {
-        text: '点検は黙って目視だけで行い、試験官には何も発声せずに離陸位置へ移動する',
-        correct: false,
-        feedback: '❌ -20点減点！口述試験では「確認していることを試験官に聞こえるように発声・報告する」ことが採点基準です。'
-      }
-    ]
-  },
-  {
-    stage: '場面②：飛行中の異常事態への対応',
-    question: '試験官：「飛行中、補助者から『立入管理区画内に第三者（歩行者）が侵入した』との報告がありました。操縦者として直ちにどう行動しますか？」',
-    choices: [
-      {
-        text: '直ちに飛行を一時停止（ホバリング）または安全な場所へ退避・着陸させ、第三者が区画外へ退出して安全が再確認されるまで飛行を再開しない',
-        correct: true,
-        feedback: '⭕ 満点回答（減点0）！立入管理区画への第三者侵入時は「直ちにホバリング停止または安全に着陸・退避」が教則上の必須対応です。'
-      },
-      {
-        text: '高度を5mだけ上げて、歩行者の頭上をそのまま通過してミッションを続行する',
-        correct: false,
-        feedback: '❌ 一発不合格（危険行為）！第三者の上空通過は重大な安全違反となり、実地試験では即座に不合格となります。'
-      },
-      {
-        text: 'プロポから手を離して補助者に歩いて注意しに行く',
-        correct: false,
-        feedback: '❌ -20点減点！飛行中に操縦者が送信機から手を離したり機体から目を離すことは厳禁です。'
-      }
-    ]
-  },
-  {
-    stage: '場面③：飛行後の口述試験（事故・重大インシデント報告）',
-    question: '試験官：「飛行中、機体が制御不能となり第三者の店舗看板に衝突して破損させました（負傷者なし）。これは『事故』ですか、『重大インシデント』ですか？また、どのような対応が必要ですか？」',
-    choices: [
-      {
-        text: '第三者の物件損壊があるため「事故」に該当する。直ちに飛行を中止し、危険防止措置を講じた上で、国土交通大臣へ事故報告（DIPS2.0等）を行う',
-        correct: true,
-        feedback: '⭕ 満点回答（減点0）！「人の死傷（重傷以上）」または「第三者物件の損壊」「航空機との衝突・接触」はすべて『事故』です。'
-      },
-      {
-        text: '負傷者がいないため「重大インシデント」に該当し、1ヶ月以内に指定試験機関へメールする',
-        correct: false,
-        feedback: '❌ -20点減点！第三者所有物の損壊は負傷者がいなくても「事故」です（重大インシデントは『制御不能』『バッテリー発火』『航空機との異常接近』等で損壊に至らなかったケース）。'
-      },
-      {
-        text: '看板の弁償さえすれば、航空法上の報告義務は発生しない',
-        correct: false,
-        feedback: '❌ -20点減点！民事上の賠償とは別に、航空法第132条の90に基づく国土交通大臣への事故報告義務（義務違反は罰則対象）があります。'
-      }
-    ]
-  }
-];
-
 let oralRemainingPoints = 100;
+let currentOralIdx = 0;
+
+function getOralStages() {
+  if (window.AERO_EXAM_BANK && Array.isArray(window.AERO_EXAM_BANK.oralStages)) {
+    return window.AERO_EXAM_BANK.oralStages;
+  }
+  return [];
+}
+
+function getOralRoleplayChoices(stageObj, idx) {
+  if (Array.isArray(stageObj.choices) && stageObj.choices.length > 0) {
+    return stageObj.choices;
+  }
+  // Generate interactive roleplay choices from modelAnswer & keyPoints for all 6 stages
+  const distractorsByIdx = [
+    [
+      '「バッテリー残量だけ確認しました。異常ないのでこのまま離陸します」とだけ伝えてスロットルを上げる（機体ON→送信機ONの逆順で投入）',
+      '点検は黙って目視だけで行い、登録記号やリモートID・周囲の安全確認を発声せずに離陸位置へ移動する'
+    ],
+    [
+      '「少々の異音や微振動なら飛行中に収まることが多いので、そのままスクエア飛行の課題へ進みます」と答えて飛行を継続する',
+      '着陸させた後、プロペラが回転しているうちに送信機の電源を先に切ってから機体に手を伸ばす'
+    ],
+    [
+      '「飛行高度を5mだけ上げて、歩行者の頭上を素早く通過してミッションを続行します」と回答する',
+      '飛行中のまま送信機（プロポ）を地面に置いて、操縦者自身が歩いて第三者へ注意しに行く'
+    ],
+    [
+      '「GNSSが切れても自動RTHボタンを押せば元の位置へ正確に戻るので、RTHスイッチを入れてプロポから手を離します」と回答する',
+      '機体が風下に流されるのを防ぐため、ラダー（機首回転）を連続で高速回転させながら最高速度で上昇させる'
+    ],
+    [
+      '「軽傷の負傷者や第三者の看板破損であれば『重大インシデント』にとどまるため、報告義務はありません」と回答する',
+      '「ドローン単体が無人の山林で木に接触してプロペラが折れた場合も、必ず大臣への『事故報告』が必要です」と回答する'
+    ],
+    [
+      '「第一種機体認証機は絶対に墜落しないため、モーターが故障してもパラシュートは開傘させず観客席上空をそのまま飛行させます」と回答する',
+      '「ジオフェンスを逸脱しそうになったら、地上への警報ブザーを鳴らさずに高度150m以上へ急上昇させます」と回答する'
+    ]
+  ];
+  const dPair = distractorsByIdx[idx] || distractorsByIdx[0];
+
+  return [
+    {
+      text: stageObj.modelAnswer,
+      correct: true,
+      feedback: `⭕ 満点回答（減点0）！試験官が求めるキーワード（${(stageObj.keyPoints || []).join(' ／ ')}）をすべて網羅できています。`
+    },
+    {
+      text: dPair[0],
+      correct: false,
+      feedback: `❌ -15点減点！安全確認手順や法令基準から逸脱しています。下の「満点発声スクリプト＆採点官チェックポイント」を声に出して復習しましょう。`
+    },
+    {
+      text: dPair[1],
+      correct: false,
+      feedback: `❌ -20点減点（または試験中止）！実地試験では重大な安全不備とみなされます。必ず模範回答の手順通りに発声・行動してください。`
+    }
+  ];
+}
+
+function initOralStageButtons() {
+  const stages = getOralStages();
+  const btnContainer = document.getElementById('oral-stage-buttons');
+  if (!btnContainer || stages.length === 0) return;
+  btnContainer.innerHTML = '';
+  stages.forEach((st, idx) => {
+    const b = document.createElement('button');
+    b.id = 'oral-btn-' + idx;
+    b.className = idx === 0 ? 'btn btn-primary' : 'btn';
+    b.style.fontSize = '0.78rem';
+    b.textContent = `場面${idx + 1} (${st.id || ''})`;
+    b.title = st.stage;
+    b.onclick = () => loadOralStage(idx);
+    btnContainer.appendChild(b);
+  });
+}
 
 function loadOralStage(idx) {
-  const st = oralStages[idx];
+  const stages = getOralStages();
+  if (stages.length === 0) return;
+  currentOralIdx = Math.max(0, Math.min(stages.length - 1, idx));
+  const st = stages[currentOralIdx];
+
+  stages.forEach((_, i) => {
+    const b = document.getElementById('oral-btn-' + i);
+    if (b) b.className = i === currentOralIdx ? 'btn btn-primary' : 'btn';
+  });
+
   document.getElementById('oral-stage-label').textContent = st.stage;
   document.getElementById('oral-examiner-q').textContent = st.question;
+
+  // Populate Model Answer & Key Points
+  const modelEl = document.getElementById('oral-model-answer');
+  const kpEl = document.getElementById('oral-key-points');
+  if (modelEl) modelEl.textContent = st.modelAnswer || '';
+  if (kpEl) {
+    kpEl.innerHTML = '';
+    (st.keyPoints || []).forEach((pt) => {
+      const li = document.createElement('li');
+      li.textContent = pt;
+      kpEl.appendChild(li);
+    });
+  }
+
+  const choices = getOralRoleplayChoices(st, currentOralIdx);
   const box = document.getElementById('oral-choices-box');
   box.innerHTML = '';
 
-  st.choices.forEach((c, cIdx) => {
+  choices.forEach((c, cIdx) => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.innerHTML = `<strong>[${cIdx + 1}]</strong> <span>${c.text}</span>`;
@@ -422,6 +412,13 @@ function loadOralStage(idx) {
         btn.classList.add('correct');
         res.className = 'feedback-box success';
         res.textContent = c.feedback;
+        if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+          window.AERO_MONETIZE_LMS.studyTracker.recordOralAndLogbook({
+            checkType: `oral_${st.id || currentOralIdx + 1}`,
+            deductionPoints: 0,
+            flawDetected: `${st.stage}（満点クリア）`
+          });
+        }
       } else {
         btn.classList.add('wrong');
         oralRemainingPoints = Math.max(0, oralRemainingPoints - 15);
@@ -431,55 +428,46 @@ function loadOralStage(idx) {
         badge.style.color = 'var(--status-danger)';
         res.className = 'feedback-box error';
         res.textContent = c.feedback;
+        if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+          window.AERO_MONETIZE_LMS.studyTracker.recordOralAndLogbook({
+            checkType: `oral_${st.id || currentOralIdx + 1}`,
+            deductionPoints: 15,
+            flawDetected: st.stage
+          });
+        }
       }
     };
     box.appendChild(btn);
   });
 }
 
-// Flight Log Defect Inspector Data
-const flightLogRows = [
-  {
-    item: '無人航空機の登録記号',
-    val: '未記入（機体シリアル番号のみ記載）',
-    isDefect: true,
-    fixedVal: 'JU1234567890（国交省登録記号を正確に記載）',
-    reason: '⚠️ 減点対象！飛行記録には製造番号ではなく「無人航空機の登録記号（JU〜）」の記載が必須です。'
-  },
-  {
-    item: '離陸・着陸時刻および飛行時間',
-    val: '10:05 離陸 〜 10:12 着陸（飛行時間 7分）',
-    isDefect: false,
-    fixedVal: '10:05 離陸 〜 10:12 着陸（飛行時間 7分 / 総飛行時間も記載）',
-    reason: '✅ 適切です。時刻は24時間表記で秒単位または分単位で試験官の指示通り正確に記入します。'
-  },
-  {
-    item: '飛行の安全に影響のあった事項',
-    val: '空欄（何も書かずに提出）',
-    isDefect: true,
-    fixedVal: '「特になし」（または突風・警告等の具体的事象を記入）',
-    reason: '⚠️ 頻出減点ポイント！異常がなかった場合でも空欄のまま提出すると「記入漏れ」として減点されます。必ず『特になし』等と明記します。'
-  },
-  {
-    item: '日常点検記録（飛行前・飛行後）',
-    val: '飛行前点検のみ「異常なし」と記入（飛行後が未記入）',
-    isDefect: true,
-    fixedVal: '飛行前・飛行後の両方の日常点検結果（異常なし）および実施年月日・氏名を記入',
-    reason: '⚠️ 減点対象！実技飛行が終わった後の「飛行後点検」の記録漏れが試験本番で非常に多く発生します。'
+// Flight Log Defect Inspector (All 6 Cases from AERO_EXAM_BANK.flightLogCases)
+function getFlightLogCases() {
+  if (window.AERO_EXAM_BANK && Array.isArray(window.AERO_EXAM_BANK.flightLogCases)) {
+    return window.AERO_EXAM_BANK.flightLogCases;
   }
-];
+  return [];
+}
 
 function renderFlightLogTable() {
+  const cases = getFlightLogCases();
   const tbody = document.getElementById('flight-log-tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
-  flightLogRows.forEach((r, idx) => {
+
+  cases.forEach((c, idx) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><strong>${r.item}</strong></td>
-      <td id="flog-val-${idx}">${r.val}</td>
       <td>
-        <button class="btn" onclick="inspectFlightLogRow(${idx})">
-          ${r.isDefect ? '⚠️ 検証・修正する' : '✅ 確認する'}
+        <div class="mono" style="font-size:0.72rem; color:var(--brand-primary); font-weight:700;">${c.id} | ${c.formType}</div>
+        <div style="font-weight:700; margin-top:0.15rem;">${c.title}</div>
+      </td>
+      <td id="flog-val-${idx}">
+        <span style="color:var(--status-danger); font-weight:600;">❌ 誤記入例：</span>${c.badExample}
+      </td>
+      <td>
+        <button id="flog-btn-${idx}" class="btn" style="font-size:0.78rem;" onclick="inspectFlightLogRow(${idx})">
+          ⚠️ 検証・修正する
         </button>
       </td>
     `;
@@ -488,228 +476,175 @@ function renderFlightLogTable() {
 }
 
 function inspectFlightLogRow(idx) {
-  const r = flightLogRows[idx];
+  const cases = getFlightLogCases();
+  const c = cases[idx];
+  if (!c) return;
+
   const valTd = document.getElementById('flog-val-' + idx);
+  const btn = document.getElementById('flog-btn-' + idx);
   const fb = document.getElementById('flight-log-feedback');
-  valTd.innerHTML = `<strong style="color:var(--status-success);">${r.fixedVal}</strong>`;
-  fb.className = r.isDefect ? 'feedback-box warning' : 'feedback-box success';
-  fb.textContent = r.reason;
+
+  valTd.innerHTML = `
+    <div style="text-decoration:line-through; color:var(--text-muted); font-size:0.76rem; margin-bottom:0.25rem;">誤：${c.badExample}</div>
+    <div style="color:var(--status-success); font-weight:700;">✅ 正しい記載ルール：${c.correctRule}</div>
+  `;
+  if (btn) {
+    btn.className = 'btn btn-primary';
+    btn.textContent = '✅ 修正完了';
+  }
+  fb.className = 'feedback-box warning';
+  fb.innerHTML = `<strong>📋 【${c.id}：${c.formType}】</strong><br/>${c.deductionRisk}`;
+
+  if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+    window.AERO_MONETIZE_LMS.studyTracker.recordOralAndLogbook({
+      checkType: `logbook_${c.id}`,
+      deductionPoints: 5,
+      flawDetected: c.title
+    });
+  }
 }
 
 // ============================================================================
-// MODULE 3: 一等学科 — 計算ビジュアライザー ＆ 無限ランダム生成ドリル
+// MODULE 3: 一等学科 — 計算ビジュアライザー(全9公式) ＆ 無限ランダム生成ドリル
 // ============================================================================
-let currentCalcViz = 'turn'; // 'turn' | 'fresnel' | 'glide'
+let currentCalcViz = 'turn';
+
+function initCalcFormulaControls() {
+  if (!window.AERO_PHYSICS_ENGINE || !window.AERO_PHYSICS_ENGINE.formulas) return;
+  const formulas = window.AERO_PHYSICS_ENGINE.formulas;
+  const keys = window.AERO_PHYSICS_ENGINE.formulaKeys || Object.keys(formulas);
+
+  const sel = document.getElementById('calc-formula-select');
+  const btnBox = document.getElementById('calc-formula-buttons');
+  if (sel) sel.innerHTML = '';
+  if (btnBox) btnBox.innerHTML = '';
+
+  keys.forEach((key) => {
+    const f = formulas[key];
+    if (sel) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = f.title;
+      sel.appendChild(opt);
+    }
+    if (btnBox) {
+      const b = document.createElement('button');
+      b.id = 'viz-btn-' + key;
+      b.className = key === currentCalcViz ? 'btn btn-primary' : 'btn';
+      b.style.fontSize = '0.76rem';
+      b.style.padding = '0.35rem 0.65rem';
+      b.textContent = f.shortLabel;
+      b.onclick = () => setCalcVisualizer(key);
+      btnBox.appendChild(b);
+    }
+  });
+}
 
 function setCalcVisualizer(mode) {
+  if (!window.AERO_PHYSICS_ENGINE || !window.AERO_PHYSICS_ENGINE.formulas) return;
+  const formulas = window.AERO_PHYSICS_ENGINE.formulas;
+  if (!formulas[mode]) mode = 'turn';
   currentCalcViz = mode;
-  ['turn', 'fresnel', 'glide'].forEach(m => {
-    const btn = document.getElementById('viz-btn-' + m);
-    if (m === mode) btn.className = 'btn btn-primary';
-    else btn.className = 'btn';
+
+  const f = formulas[mode];
+  const sel = document.getElementById('calc-formula-select');
+  if (sel && sel.value !== mode) sel.value = mode;
+
+  Object.keys(formulas).forEach((k) => {
+    const btn = document.getElementById('viz-btn-' + k);
+    if (btn) {
+      btn.className = k === mode ? 'btn btn-primary' : 'btn';
+    }
   });
+
+  document.getElementById('calc-formula-title').textContent = f.title;
+  document.getElementById('calc-formula-eq').textContent = f.equation;
+  document.getElementById('calc-formula-desc').textContent = f.description;
 
   const s1 = document.getElementById('calc-s1');
   const s2 = document.getElementById('calc-s2');
   const l1 = document.getElementById('calc-s1-label');
   const l2 = document.getElementById('calc-s2-label');
 
-  if (mode === 'turn') {
-    l1.textContent = '飛行速度 v (m/s)';
-    s1.min = 5; s1.max = 25; s1.step = 1; s1.value = 10;
-    l2.textContent = 'バンク角 θ (度)';
-    s2.min = 15; s2.max = 60; s2.step = 15; s2.value = 45;
-  } else if (mode === 'fresnel') {
-    l1.textContent = '送受信間距離 d (m)';
-    s1.min = 100; s1.max = 1200; s1.step = 100; s1.value = 400;
-    l2.textContent = '周波数帯 (1=2.4GHz, 2=5.7GHz)';
-    s2.min = 1; s2.max = 2; s2.step = 1; s2.value = 1;
-  } else {
-    l1.textContent = '飛行高度 H (m)';
-    s1.min = 20; s1.max = 150; s1.step = 10; s1.value = 60;
-    l2.textContent = '揚抗比 L/D';
-    s2.min = 3; s2.max = 12; s2.step = 1; s2.value = 5;
-  }
+  l1.textContent = f.slider1.label;
+  s1.min = f.slider1.min;
+  s1.max = f.slider1.max;
+  s1.step = f.slider1.step;
+  s1.value = f.slider1.defaultValue;
+
+  l2.textContent = f.slider2.label;
+  s2.min = f.slider2.min;
+  s2.max = f.slider2.max;
+  s2.step = f.slider2.step;
+  s2.value = f.slider2.defaultValue;
+
   renderCalcVisualizer();
 }
 
 function renderCalcVisualizer() {
+  if (!window.AERO_PHYSICS_ENGINE) return;
   const v1 = parseFloat(document.getElementById('calc-s1').value);
   const v2 = parseFloat(document.getElementById('calc-s2').value);
-  const svg = document.getElementById('calc-viz-svg');
 
-  if (currentCalcViz === 'turn') {
-    const v = v1;
-    const deg = v2;
-    const rad = (deg * Math.PI) / 180;
-    const g = 9.8;
-    const r = (v * v) / (g * Math.tan(rad));
-    const loadFactor = 1 / Math.cos(rad);
+  const res = window.AERO_PHYSICS_ENGINE.computeFormula(currentCalcViz, v1, v2);
+  const svgHtml = window.AERO_PHYSICS_ENGINE.renderFormulaSvg(currentCalcViz, v1, v2);
 
-    document.getElementById('calc-s1-val').textContent = `${v} m/s`;
-    document.getElementById('calc-s2-val').textContent = `${deg}°`;
-    document.getElementById('calc-m1-label').textContent = '旋回半径 r = v²/(g·tanθ)';
-    document.getElementById('calc-m1-val').textContent = `${r.toFixed(1)} m`;
-    document.getElementById('calc-m2-label').textContent = '荷重倍数 n = 1/cosθ';
-    document.getElementById('calc-m2-val').textContent = `${loadFactor.toFixed(2)} G`;
-    document.getElementById('calc-m3-label').textContent = '失速速度の変化 (√n 倍)';
-    document.getElementById('calc-m3-val').textContent = `${Math.sqrt(loadFactor).toFixed(2)} 倍に上昇`;
+  document.getElementById('calc-s1-val').textContent = res.s1Display;
+  document.getElementById('calc-s2-val').textContent = res.s2Display;
+  document.getElementById('calc-m1-label').textContent = res.m1Label;
+  document.getElementById('calc-m1-val').textContent = res.m1Val;
+  document.getElementById('calc-m2-label').textContent = res.m2Label;
+  document.getElementById('calc-m2-val').textContent = res.m2Val;
+  document.getElementById('calc-m3-label').textContent = res.m3Label;
+  document.getElementById('calc-m3-val').textContent = res.m3Val;
 
-    const circleR = Math.min(68, Math.max(16, r * 1.25));
-    svg.innerHTML = `
-      <!-- Left: Force Vector Diagram -->
-      <g transform="translate(135, 102)">
-        <line x1="-95" y1="0" x2="95" y2="0" stroke="#94a3b8" stroke-dasharray="4 3" />
-        <line x1="0" y1="-80" x2="0" y2="65" stroke="#94a3b8" stroke-dasharray="4 3" />
-        <!-- Gravity -->
-        <line x1="0" y1="0" x2="0" y2="52" stroke="#dc2626" stroke-width="3" />
-        <text x="8" y="50" font-size="11" font-weight="700" fill="#991b1b">重力 mg</text>
-        <!-- Centripetal force -->
-        <line x1="0" y1="0" x2="${Math.min(85, 52 * Math.tan(rad))}" y2="0" stroke="#d97706" stroke-width="3" />
-        <text x="16" y="-8" font-size="11" font-weight="700" fill="#92400e">向心力 L·sinθ</text>
-        <!-- Banked Drone -->
-        <g transform="rotate(${deg})">
-          <line x1="-45" y1="0" x2="45" y2="0" stroke="#0f172a" stroke-width="5" stroke-linecap="round" />
-          <circle cx="-45" cy="-5" r="6" fill="#0284c7" />
-          <circle cx="45" cy="-5" r="6" fill="#0284c7" />
-          <line x1="0" y1="0" x2="0" y2="-64" stroke="#059669" stroke-width="3" />
-          <text x="-22" y="-68" font-size="11" font-weight="700" fill="#065f46">揚力 L</text>
-        </g>
-      </g>
-      <!-- Right: Top-down Turning Circle -->
-      <g transform="translate(405, 92)">
-        <circle cx="0" cy="0" r="${circleR}" fill="#e0f2fe" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="5 3" />
-        <line x1="0" y1="0" x2="${circleR}" y2="0" stroke="#0284c7" stroke-width="2" />
-        <circle cx="${circleR}" cy="0" r="6" fill="#059669" />
-        <text x="-48" y="${circleR + 18}" font-size="12" font-weight="700" fill="#0369a1">旋回半径 r = ${r.toFixed(1)} m</text>
-      </g>
-    `;
-  } else if (currentCalcViz === 'fresnel') {
-    const d = v1;
-    const freqGHz = v2 === 1 ? 2.4 : 5.7;
-    const c = 3e8;
-    const f = freqGHz * 1e9;
-    const r1 = 0.5 * Math.sqrt((c * d) / f);
-    const r60 = r1 * 0.6;
-
-    document.getElementById('calc-s1-val').textContent = `${d} m`;
-    document.getElementById('calc-s2-val').textContent = `${freqGHz} GHz`;
-    document.getElementById('calc-m1-label').textContent = '第1フレネル半径 r₁';
-    document.getElementById('calc-m1-val').textContent = `${r1.toFixed(2)} m`;
-    document.getElementById('calc-m2-label').textContent = '確保すべき60%クリアランス';
-    document.getElementById('calc-m2-val').textContent = `${r60.toFixed(2)} m`;
-    document.getElementById('calc-m3-label').textContent = '波長 λ (= c/f)';
-    document.getElementById('calc-m3-val').textContent = `${((c / f) * 100).toFixed(1)} cm`;
-
-    const ry = Math.min(62, Math.max(16, r1 * 8));
-    svg.innerHTML = `
-      <g transform="translate(270, 92)">
-        <ellipse cx="0" cy="0" rx="205" ry="${ry}" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" />
-        <ellipse cx="0" cy="0" rx="205" ry="${ry * 0.6}" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="5 3" />
-        <line x1="-205" y1="0" x2="205" y2="0" stroke="#475569" stroke-width="1.5" />
-        <circle cx="-205" cy="0" r="8" fill="#d97706" />
-        <text x="-235" y="26" font-size="12" font-weight="700" fill="#92400e">送信機 (プロポ)</text>
-        <circle cx="205" cy="0" r="8" fill="#059669" />
-        <text x="175" y="26" font-size="12" font-weight="700" fill="#065f46">無人航空機</text>
-        <line x1="0" y1="0" x2="0" y2="${-ry}" stroke="#0284c7" stroke-width="2.5" />
-        <text x="8" y="${-ry / 2}" font-size="12" font-weight="700" fill="#0369a1">最大半径 r₁ = ${r1.toFixed(2)} m</text>
-      </g>
-    `;
-  } else {
-    const H = v1;
-    const ld = v2;
-    const dist = H * ld;
-
-    document.getElementById('calc-s1-val').textContent = `高度 ${H} m`;
-    document.getElementById('calc-s2-val').textContent = `揚抗比 ${ld}`;
-    document.getElementById('calc-m1-label').textContent = '無風時の水平到達距離 D';
-    document.getElementById('calc-m1-val').textContent = `${dist} m`;
-    document.getElementById('calc-m2-label').textContent = '公式 D = H × (L/D)';
-    document.getElementById('calc-m2-val').textContent = `${H} × ${ld}`;
-    document.getElementById('calc-m3-label').textContent = '滑空角 tanγ (= D/L)';
-    document.getElementById('calc-m3-val').textContent = `${(1 / ld).toFixed(2)}`;
-
-    svg.innerHTML = `
-      <g transform="translate(65, 30)">
-        <!-- Ground & Height -->
-        <line x1="0" y1="125" x2="420" y2="125" stroke="#475569" stroke-width="2" />
-        <line x1="20" y1="15" x2="20" y2="125" stroke="#0284c7" stroke-width="2.5" />
-        <text x="28" y="70" font-size="12" font-weight="700" fill="#0369a1">高度 H = ${H}m</text>
-        <!-- Glide Path -->
-        <line x1="20" y1="15" x2="375" y2="125" stroke="#059669" stroke-width="3" stroke-dasharray="6 3" />
-        <circle cx="20" cy="15" r="7" fill="#0284c7" />
-        <circle cx="375" cy="125" r="7" fill="#059669" />
-        <text x="155" y="145" font-size="12" font-weight="700" fill="#065f46">水平到達距離 D = ${dist} m (揚抗比 ${ld})</text>
-      </g>
-    `;
+  const stepBox = document.getElementById('calc-step-box');
+  if (stepBox) {
+    stepBox.textContent = `📝 リアルタイム途中式： ${res.stepByStep}`;
   }
+
+  const svg = document.getElementById('calc-viz-svg');
+  if (svg) svg.innerHTML = svgHtml;
 }
 
-// Random Calculation Drill Generator
-function generateNewDrill() {
-  const types = ['turn', 'fresnel', 'glide'];
-  const pick = types[Math.floor(Math.random() * types.length)];
+// Infinite Random Calculation Drill Generator (All 9 Formulas)
+function generateNewDrill(formulaKey) {
+  if (!window.AERO_PHYSICS_ENGINE) return;
+  const drill = window.AERO_PHYSICS_ENGINE.generateRandomDrill(formulaKey || 'all');
+
+  const tagEl = document.getElementById('drill-formula-tag');
   const stemEl = document.getElementById('drill-stem');
   const choicesEl = document.getElementById('drill-choices');
   const fbEl = document.getElementById('drill-feedback');
+
+  if (tagEl) tagEl.textContent = `📐 出題公式：${drill.title}`;
+  stemEl.textContent = drill.stem;
   choicesEl.innerHTML = '';
 
-  let options = [];
-
-  if (pick === 'turn') {
-    const vList = [7, 10, 14, 20];
-    const bList = [
-      { deg: 30, tan: 0.58 },
-      { deg: 45, tan: 1.0 },
-      { deg: 60, tan: 1.73 }
-    ];
-    const v = vList[Math.floor(Math.random() * vList.length)];
-    const b = bList[Math.floor(Math.random() * bList.length)];
-    const r = (v * v) / (9.8 * b.tan);
-    const ans = r.toFixed(1);
-
-    stemEl.textContent = `【一等・定常旋回の計算】飛行速度 ${v} m/s、バンク角 ${b.deg}° で定常水平旋回を行う場合の旋回半径 r として最も近いものはどれか。（重力加速度 g = 9.8 m/s²、tan${b.deg}° = ${b.tan} とする）`;
-    options = [
-      { text: `約 ${ans} m`, correct: true, exp: `⭕ 正解！ r = v² / (g·tanθ) = ${v}² / (9.8 × ${b.tan}) = ${v * v} / ${(9.8 * b.tan).toFixed(2)} ≈ ${ans} m です。`, sync: () => { setCalcVisualizer('turn'); document.getElementById('calc-s1').value = v; document.getElementById('calc-s2').value = b.deg; renderCalcVisualizer(); } },
-      { text: `約 ${(r * 2).toFixed(1)} m`, correct: false, exp: `❌ 不正解。正しくは r = ${v}² / (9.8 × ${b.tan}) ≈ ${ans} m です。`, sync: () => {} },
-      { text: `約 ${(v / (9.8 * b.tan)).toFixed(1)} m`, correct: false, exp: `❌ 不正解。速度 v を2乗(v²)する必要があります。正しくは約 ${ans} m です。`, sync: () => {} }
-    ];
-  } else if (pick === 'fresnel') {
-    const dList = [200, 400, 600, 800];
-    const d = dList[Math.floor(Math.random() * dList.length)];
-    const r1 = 0.5 * Math.sqrt((3e8 * d) / 2.4e9);
-    const ans = r1.toFixed(2);
-
-    stemEl.textContent = `【一等・電波とフレネルゾーン】周波数 2.4 GHz（波長 λ = 0.125 m）、送信機と無人航空機の距離 d = ${d} m のとき、第1フレネルゾーンの最大半径 r₁ として最も近いものはどれか。（r₁ = 1/2 √(λ·d) とする）`;
-    options = [
-      { text: `約 ${ans} m`, correct: true, exp: `⭕ 正解！ r₁ = 0.5 × √(0.125 × ${d}) = 0.5 × √${(0.125 * d).toFixed(1)} ≈ ${ans} m です。`, sync: () => { setCalcVisualizer('fresnel'); document.getElementById('calc-s1').value = d; document.getElementById('calc-s2').value = 1; renderCalcVisualizer(); } },
-      { text: `約 ${(r1 * 2).toFixed(2)} m`, correct: false, exp: `❌ 不正解。1/2 を掛け忘れています。正しくは約 ${ans} m です。`, sync: () => {} },
-      { text: `約 ${(0.125 * d * 0.5).toFixed(2)} m`, correct: false, exp: `❌ 不正解。平方根（ルート）を取る必要があります。正しくは約 ${ans} m です。`, sync: () => {} }
-    ];
-  } else {
-    const hList = [40, 60, 80, 100];
-    const ldList = [4, 5, 6, 8];
-    const h = hList[Math.floor(Math.random() * hList.length)];
-    const ld = ldList[Math.floor(Math.random() * ldList.length)];
-    const ans = h * ld;
-
-    stemEl.textContent = `【一等・揚抗比と水平到達距離】無風状態において、高度 ${h} m から揚抗比（L/D）が ${ld} の固定翼無人航空機が推力なしで滑空した場合、地上に到達するまでの水平距離として正しいものはどれか。`;
-    options = [
-      { text: `${ans} m`, correct: true, exp: `⭕ 正解！ 水平到達距離 D = 高度 H × 揚抗比(L/D) = ${h} × ${ld} = ${ans} m です。`, sync: () => { setCalcVisualizer('glide'); document.getElementById('calc-s1').value = h; document.getElementById('calc-s2').value = ld; renderCalcVisualizer(); } },
-      { text: `${(h / ld).toFixed(1)} m`, correct: false, exp: `❌ 不正解。高度に揚抗比を掛けます（${h} × ${ld} = ${ans} m）。`, sync: () => {} },
-      { text: `${ans * 2} m`, correct: false, exp: `❌ 不正解。正しくは ${h} × ${ld} = ${ans} m です。`, sync: () => {} }
-    ];
-  }
-
-  options.sort(() => Math.random() - 0.5);
-  options.forEach((o, i) => {
+  drill.options.forEach((o, i) => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn mono';
     btn.innerHTML = `<strong>(${i + 1})</strong> <span>${o.text}</span>`;
     btn.onclick = () => {
+      btn.classList.add(o.correct ? 'correct' : 'wrong');
       fbEl.className = o.correct ? 'feedback-box success' : 'feedback-box error';
       fbEl.textContent = o.exp;
-      o.sync();
+
+      // Sync left visualizer to match the drill parameters
+      setCalcVisualizer(drill.formulaKey);
+      if (o.slider1Val !== undefined) document.getElementById('calc-s1').value = o.slider1Val;
+      if (o.slider2Val !== undefined) document.getElementById('calc-s2').value = o.slider2Val;
+      renderCalcVisualizer();
+
+      // Record to studyTracker
+      if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+        window.AERO_MONETIZE_LMS.studyTracker.recordCalcDrill({
+          drillType: drill.formulaKey,
+          isCorrect: o.correct,
+          timeSpentSec: 45,
+          topic: drill.title
+        });
+      }
     };
     choicesEl.appendChild(btn);
   });
@@ -740,90 +675,79 @@ function sqrtMiniCalc() {
 }
 
 // ============================================================================
-// MODULE 4: 学科CBT完全再現モック × 教則第5版スマート差分ビューア
+// MODULE 4: 学科CBT完全再現モック(全18問フィルタ付) × 教則第5版差分 ＋ チートシート
 // ============================================================================
-const cbtBank = [
-  {
-    cat: '教則第5版 改訂箇所（都市計画法・工業専用地域）',
-    ref: '教則第5版 第3章 3.1.2(2)1)',
-    q: '人口集中地区（DID）における無人航空機の飛行許可に関する記述として、教則（第5版）に照らし最も適切なものはどれか。',
-    choices: [
-      '都市計画法に規定する工業地域および準工業地域内の区域で飛行させる場合は、DIDに係る許可手続きが不要となる。',
-      '都市計画法第8条第1項第1号に規定する「工業専用地域」内の区域で飛行させる場合は、DIDに係る許可手続き等が不要となる。',
-      '人口集中地区（DID）は10年ごとの国勢調査の結果から設定されるため、工場地帯でもすべて許可が必要である。'
-    ],
-    ans: 1,
-    oldRule: '第4版まで：人口集中地区（DID）上空での飛行は、都市計画法の用途地域にかかわらず原則として国土交通大臣の許可が必要。',
-    newRule: '第5版（現行）：都市計画法の<span class="marker-yellow">「工業専用地域」内の区域で飛行させる場合は、DIDに係る飛行許可手続きが不要</span>となった。',
-    tip: '「工業地域」「準工業地域」は除外されません。「工業専用地域」のみがDID許可不要となる点、および国勢調査は「5年ごと」である点が頻出ポイントです。'
-  },
-  {
-    cat: '教則第5版 改訂箇所（農薬等の空中散布の特例）',
-    ref: '教則第5版 第3章 3.1.2(2)3)',
-    q: '航空法施行規則第236条の82第1項第2号の要件を満たして農薬等の空中散布を行う場合の手続きについて、教則（第5版）の内容として正しいものはどれか。',
-    choices: [
-      '夜間飛行・目視外飛行・第三者から30m以内の飛行・危険物輸送・物件投下に係る承認手続きが不要となる。',
-      '危険物輸送と物件投下の承認のみ不要となり、夜間飛行や目視外飛行の承認手続きは引き続き必要である。',
-      '空港周辺の空域や地表から150m以上の空域における飛行許可手続きも含めてすべて不要となる。'
-    ],
-    ans: 0,
-    oldRule: '第4版まで：農薬散布は「危険物輸送」「物件投下」等に該当し、飛行方法ごとに個別の承認申請が必要。',
-    newRule: '第5版（現行）：一定の要件を満たす農薬等の空中散布では、<span class="marker-yellow">夜間・目視外・第三者30m未満・危険物輸送・物件投下の5つの「承認」手続きが不要</span>。',
-    tip: '不要になるのは飛行方法の「承認」です。空域の「許可」（空港周辺・150m以上・催し場所上空など）まで不要になるわけではありません。'
-  },
-  {
-    cat: '教則第5版 改訂箇所（技能証明の更新申請期間）',
-    ref: '教則第5版 第3章 3.1.2(5)3)',
-    q: '無人航空機操縦者技能証明の有効期間および更新申請の期間について、教則（第5版）の内容として正しいものはどれか。',
-    choices: [
-      '有効期間は3年であり、更新は有効期間が満了する日の6月前から満了日当日までの間に申請する。',
-      '有効期間は3年であり、更新は有効期間が満了する日の6月前から1月前までの間に申請する。',
-      '有効期間は5年であり、更新は有効期間が満了する日の6月前から1月前までの間に申請する。'
-    ],
-    ans: 1,
-    oldRule: '第4版まで：技能証明の更新は、有効期間が満了する日以前「6月以内」に申請する。',
-    newRule: '第5版（現行）：技能証明の有効期間（3年）が満了する日の<span class="marker-yellow">「6月前から1月前までの間」に更新を申請</span>する。',
-    tip: '第4版対応の古い問題集やアプリでは「満了日以前6月以内」が正解になっているため、独学受験者が最も引っかかりやすい改訂項目です。'
-  },
-  {
-    cat: '教則第5版 改訂箇所（小型無人機等飛行禁止法）',
-    ref: '教則第5版 第3章 3.2.1',
-    q: '小型無人機等飛行禁止法における対象施設周辺地域の範囲について、教則（第5版）の記述として正しいものはどれか。',
-    choices: [
-      '対象施設の敷地・区域の上空および周囲おおむね100mの地域',
-      '対象施設の敷地・区域の上空および周囲おおむね300m（一部対象施設ではおおむね1,000m）の地域',
-      'すべての対象施設において一律に周囲5,000mの地域'
-    ],
-    ans: 1,
-    oldRule: '第4版まで：対象施設の敷地または区域およびその周囲おおむね300mの地域のみを記載。',
-    newRule: '第5版（現行）：法改正を反映し、<span class="marker-yellow">周囲おおむね300m（防衛関係施設等の一部対象施設では周囲おおむね1,000m）</span>の地域へと記載が更新された。',
-    tip: '教則第5版（第3章 3.2.1）で「おおむね1,000m」の対象拡大が明記されました。数字のひっかけに注意しましょう。'
-  },
-  {
-    cat: '教則第5版 重要頻出（補助者なし物件投下の高度）',
-    ref: '教則第5版 第3章・第4章',
-    q: '投下場所に補助者を配置しないで無人航空機から物件投下を行う場合の高度について、教則（第5版）に示されているものはどれか。',
-    choices: [
-      '原則として高度 10m 以内',
-      '原則として高度 5m 以内',
-      '原則として高度 1m 以内'
-    ],
-    ans: 2,
-    oldRule: '旧基準との混同注意：立入管理や農薬散布の高度目安と混同して「5m」や「10m」を選びやすい。',
-    newRule: '第5版（現行）：補助者を配置しないで物件投下を行うときの高度は<span class="marker-yellow">「原則 1m 以内」</span>と明記されている。',
-    tip: '「補助者なし物件投下＝原則1m以内」は二等・一等ともに超頻出の数値問題です。'
-  }
-];
-
+let currentCbtFilter = 'all'; // 'all' | 'fifth' | 'nitou' | 'ittou'
+let filteredCbtQuestions = [];
 let cbtIndex = 0;
-const cbtFlags = [false, false, false, false, false];
+const cbtFlagsById = {};
+
+function getFilteredCbtQuestions() {
+  const all = (window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.cbtQuestions) || [];
+  if (currentCbtFilter === 'fifth') {
+    return all.filter((q) => q.isFifthEd === true);
+  }
+  if (currentCbtFilter === 'nitou') {
+    return all.filter((q) => q.grade === 'nitou');
+  }
+  if (currentCbtFilter === 'ittou') {
+    return all.filter((q) => q.grade === 'ittou');
+  }
+  return all;
+}
+
+function setCbtFilter(filterKey) {
+  currentCbtFilter = filterKey;
+  ['all', 'fifth', 'nitou', 'ittou'].forEach((k) => {
+    const b = document.getElementById('cbt-filter-' + k);
+    if (b) b.className = k === filterKey ? 'btn btn-primary' : 'btn';
+  });
+  filteredCbtQuestions = getFilteredCbtQuestions();
+  cbtIndex = 0;
+  renderCbtQuestion(0);
+}
+
+function prevCbtQuestion() {
+  if (filteredCbtQuestions.length === 0) return;
+  const nextIdx = (cbtIndex - 1 + filteredCbtQuestions.length) % filteredCbtQuestions.length;
+  renderCbtQuestion(nextIdx);
+}
+
+function nextCbtQuestion() {
+  if (filteredCbtQuestions.length === 0) return;
+  const nextIdx = (cbtIndex + 1) % filteredCbtQuestions.length;
+  renderCbtQuestion(nextIdx);
+}
+
+function mapQuestionToCategoryId(item) {
+  if (item.isFifthEd) return 'cat_4';
+  if (item.grade === 'ittou' && item.id === 'CBT-1ST-18') return 'cat_calc';
+  if (item.category && (item.category.includes('システム') || item.category.includes('電波') || item.category.includes('バッテリー'))) {
+    return 'cat_2';
+  }
+  if (item.category && (item.category.includes('義務') || item.category.includes('飲酒'))) {
+    return 'cat_3';
+  }
+  if (item.category && (item.category.includes('気象') || item.category.includes('リスク評価') || item.category.includes('SAIL'))) {
+    return 'cat_4';
+  }
+  return 'cat_1';
+}
 
 function renderCbtQuestion(idx) {
-  cbtIndex = idx;
-  const item = cbtBank[idx];
-  document.getElementById('cbt-q-title').textContent = `問 ${idx + 1} / ${cbtBank.length}`;
-  document.getElementById('cbt-flag-chk').checked = cbtFlags[idx];
-  document.getElementById('cbt-badge-cat').textContent = item.cat;
+  if (filteredCbtQuestions.length === 0) {
+    filteredCbtQuestions = getFilteredCbtQuestions();
+  }
+  if (filteredCbtQuestions.length === 0) return;
+
+  cbtIndex = Math.max(0, Math.min(filteredCbtQuestions.length - 1, idx));
+  const item = filteredCbtQuestions[cbtIndex];
+  const qId = item.id || `Q-${cbtIndex + 1}`;
+
+  document.getElementById('cbt-q-title').textContent = `問 ${cbtIndex + 1} / ${filteredCbtQuestions.length}`;
+  document.getElementById('cbt-flag-chk').checked = Boolean(cbtFlagsById[qId]);
+  document.getElementById('cbt-badge-id').textContent = qId;
+  document.getElementById('cbt-badge-cat').textContent = item.category || item.cat || '';
   document.getElementById('cbt-question-text').textContent = item.q;
   document.getElementById('cbt-ref-badge').textContent = item.ref;
   document.getElementById('cbt-diff-old').innerHTML = item.oldRule;
@@ -833,11 +757,13 @@ function renderCbtQuestion(idx) {
   // Render Palette
   const pal = document.getElementById('cbt-palette');
   pal.innerHTML = '';
-  cbtBank.forEach((_, i) => {
+  filteredCbtQuestions.forEach((qItem, i) => {
+    const idKey = qItem.id || `Q-${i + 1}`;
     const b = document.createElement('button');
-    b.className = i === idx ? 'btn btn-primary mono' : 'btn mono';
-    b.style.padding = '0.25rem 0.55rem';
-    b.textContent = `${i + 1}${cbtFlags[i] ? '🚩' : ''}`;
+    b.className = i === cbtIndex ? 'btn btn-primary mono' : 'btn mono';
+    b.style.padding = '0.22rem 0.5rem';
+    b.style.fontSize = '0.75rem';
+    b.textContent = `${i + 1}${cbtFlagsById[idKey] ? '🚩' : ''}`;
     b.onclick = () => renderCbtQuestion(i);
     pal.appendChild(b);
   });
@@ -850,15 +776,26 @@ function renderCbtQuestion(idx) {
     btn.className = 'choice-btn';
     btn.innerHTML = `<strong>(${cIdx + 1})</strong> <span>${cText}</span>`;
     btn.onclick = () => {
+      const isCorrect = cIdx === item.ans;
       const fb = document.getElementById('cbt-answer-feedback');
-      if (cIdx === item.ans) {
+      if (isCorrect) {
         btn.classList.add('correct');
         fb.className = 'feedback-box success';
-        fb.innerHTML = `⭕ <strong>正解（選択肢 ${cIdx + 1}）！</strong> 右側の「教則第5版スマート差分ビューア」で旧第4版との違いを確認してください。`;
+        fb.innerHTML = `⭕ <strong>正解（選択肢 ${cIdx + 1}）！</strong> 右側の「教則第5版スマート差分ビューア」で根拠条文と暗記ポイントを確認してください。`;
       } else {
         btn.classList.add('wrong');
         fb.className = 'feedback-box error';
-        fb.innerHTML = `❌ <strong>不正解。正解は (${item.ans + 1}) です。</strong> 旧第4版の規定と混同していないか右パネルを確認しましょう。`;
+        fb.innerHTML = `❌ <strong>不正解。正解は (${item.ans + 1}) です。</strong> 旧第4版の規定や誤答トラップと混同していないか右パネルを確認しましょう。`;
+      }
+
+      if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
+        window.AERO_MONETIZE_LMS.studyTracker.recordCbtAnswer({
+          questionId: qId,
+          categoryId: mapQuestionToCategoryId(item),
+          isCorrect: isCorrect,
+          isFifthEd: Boolean(item.isFifthEd),
+          topic: item.category || item.cat
+        });
       }
     };
     cBox.appendChild(btn);
@@ -866,64 +803,371 @@ function renderCbtQuestion(idx) {
 }
 
 function toggleFlagCurrent() {
-  cbtFlags[cbtIndex] = document.getElementById('cbt-flag-chk').checked;
+  if (filteredCbtQuestions.length === 0) return;
+  const item = filteredCbtQuestions[cbtIndex];
+  const qId = item.id || `Q-${cbtIndex + 1}`;
+  cbtFlagsById[qId] = document.getElementById('cbt-flag-chk').checked;
   renderCbtQuestion(cbtIndex);
 }
 
-// ============================================================================
-// MODULE 5: スクール送客シミュレーター ＆ リード獲得
-// ============================================================================
-function updateSchoolComparison() {
-  const lic = document.getElementById('lead-license-type').value;
-  const exp = document.getElementById('lead-exp-level').value;
-  const box = document.getElementById('school-comparison-box');
+// Cheat Sheet Sub-view in Module 4
+let currentCheatSheetTab = 'diff'; // 'diff' | 'num' | 'form'
 
-  let oneShotPassRate = '約 15〜25%';
-  let expectedRetakes = '平均 2〜3回（再受験料＋会場交通費がかさむ）';
-  let recText = 'ATTIモード（GNSSオフ）での8の字飛行やスクエア飛行は独学での合格率が極めて低く、実地試験免除の「登録講習機関」の受講が圧倒的に安全です。';
+function scrollToCheatSheet() {
+  const el = document.getElementById('cbt-cheatsheet-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
 
-  if (lic === 'ittou_basic') {
-    oneShotPassRate = '約 5〜10% 未満';
-    expectedRetakes = '一等実地の一発試験は極めて高難度（機体持込・補助者手配も必要）';
-    recText = '一等の実地試験は指定試験機関での一発合格が極めて困難なため、95%以上の合格者が登録講習機関（教育訓練給付金・助成金対象校あり）を利用しています。';
-  } else if (exp === 'pro') {
-    oneShotPassRate = '約 45〜55%';
-    expectedRetakes = '机上・口述・日誌の減点対策を徹底すれば一発合格圏内';
-    recText = '操縦技術がある方でも「机上試験・口述試験・飛行日誌」の減点で落ちるケースが多発しています。AERO-PASSの合格パスで減点対策を固めましょう。';
+function setCheatSheetTab(tab) {
+  currentCheatSheetTab = tab;
+  ['diff', 'num', 'form'].forEach((t) => {
+    const b = document.getElementById('cs-tab-' + t);
+    if (b) b.className = t === tab ? 'btn btn-primary' : 'btn';
+  });
+  renderCheatSheet();
+}
+
+function renderCheatSheet() {
+  if (!window.AERO_GROWTH_FUNNEL || !window.AERO_GROWTH_FUNNEL.searchCheatSheet) return;
+  const query = (document.getElementById('cheatsheet-search-input') || {}).value || '';
+  const data = window.AERO_GROWTH_FUNNEL.searchCheatSheet(query);
+  const container = document.getElementById('cheatsheet-body');
+  if (!container) return;
+
+  if (currentCheatSheetTab === 'diff') {
+    let rowsHtml = '';
+    data.diffs.forEach((d) => {
+      rowsHtml += `
+        <tr>
+          <td>
+            <div style="font-weight:800; color:var(--brand-primary);">${d.topic}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.2rem;">${d.chapter} | 重要度: ${d.importance}</div>
+          </td>
+          <td style="background:#fef2f2; color:#7f1d1d;">${d.oldEdition4}</td>
+          <td style="background:#ecfdf5; color:#065f46; font-weight:600;">${d.newEdition5}</td>
+          <td><span style="font-size:0.78rem; color:#92400e;">⚠️ ${d.examTrapPoint}</span></td>
+        </tr>
+      `;
+    });
+    container.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:24%;">改訂テーマ・該当章</th>
+            <th style="width:24%;">❌ 旧・教則第4版まで</th>
+            <th style="width:28%;">✅ 教則第5版（2026.7.14現行）</th>
+            <th style="width:24%;">🎯 試験のひっかけ対策</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml || '<tr><td colspan="4">該当する項目がありません</td></tr>'}</tbody>
+      </table>
+    `;
+  } else if (currentCheatSheetTab === 'num') {
+    let cardsHtml = '';
+    data.numbers.forEach((c) => {
+      cardsHtml += `
+        <div style="border:1px solid var(--border-color); border-radius:8px; padding:0.85rem; background:var(--bg-subtle);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <span class="mono" style="background:var(--brand-primary); color:#fff; font-weight:800; padding:0.15rem 0.5rem; border-radius:4px; font-size:0.84rem;">${c.numberKey}</span>
+            <span style="font-size:0.73rem; font-weight:700; color:var(--text-secondary);">${c.category}</span>
+          </div>
+          <div style="font-weight:700; font-size:0.84rem; margin-bottom:0.35rem;">Q. ${c.frontQuestion}</div>
+          <div style="font-size:0.82rem; color:#065f46; background:#ecfdf5; padding:0.5rem; border-radius:6px; font-weight:600; margin-bottom:0.35rem;">A. ${c.backAnswer}</div>
+          <div style="font-size:0.76rem; color:#92400e;">${c.trapAlert}</div>
+        </div>
+      `;
+    });
+    container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:0.75rem;">${cardsHtml}</div>`;
+  } else {
+    let formHtml = '';
+    data.formulas.forEach((f) => {
+      formHtml += `
+        <div style="border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; background:var(--bg-subtle);">
+          <div style="font-weight:800; color:var(--brand-primary); font-size:0.9rem;">${f.title}</div>
+          <div class="mono" style="background:#fff; border:1px solid var(--border-strong); padding:0.45rem 0.65rem; border-radius:6px; font-weight:800; margin:0.4rem 0; font-size:0.84rem;">${f.formulaText}</div>
+          <div style="font-size:0.76rem; color:var(--text-secondary); margin-bottom:0.35rem;">${f.variables}</div>
+          <div style="font-size:0.82rem; font-weight:600; color:#065f46; margin-bottom:0.25rem;">${f.quickRule}</div>
+          <div class="mono" style="font-size:0.78rem; color:#0369a1;">${f.exampleCalc}</div>
+        </div>
+      `;
+    });
+    container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); gap:0.75rem;">${formHtml}</div>`;
+  }
+}
+
+// ============================================================================
+// MODULE 5: スクール送客・個人弱点トップ3分析・B2B LMS管理画面
+// ============================================================================
+function renderPersonalAnalytics() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.studyTracker) return;
+  const summary = window.AERO_MONETIZE_LMS.studyTracker.getAnalyticsSummary();
+
+  document.getElementById('study-prob-val').textContent = `${summary.estimatedPassProbability}%`;
+  document.getElementById('study-5th-val').textContent = `${summary.fifthEdMasteryRate}%`;
+  document.getElementById('study-calc-val').textContent = `${summary.calcAccuracyRate}%`;
+  document.getElementById('study-desk-val').textContent = `${summary.latestDeskExamScore}点`;
+
+  const verdictEl = document.getElementById('study-pass-verdict');
+  verdictEl.textContent = summary.passVerdictLabel;
+  if (summary.estimatedPassProbability >= 85) {
+    verdictEl.style.background = 'var(--status-success-bg)';
+    verdictEl.style.color = 'var(--status-success)';
+  } else if (summary.estimatedPassProbability >= 75) {
+    verdictEl.style.background = 'var(--status-warning-bg)';
+    verdictEl.style.color = 'var(--status-warning)';
+  } else {
+    verdictEl.style.background = 'var(--status-danger-bg)';
+    verdictEl.style.color = 'var(--status-danger)';
   }
 
+  const top3Box = document.getElementById('study-weakness-top3');
+  if (top3Box) {
+    top3Box.innerHTML = '';
+    summary.top3Weaknesses.forEach((w) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'border:1px solid var(--border-color); border-radius:8px; padding:0.65rem; background:var(--bg-subtle); font-size:0.78rem;';
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+          <strong style="color:var(--status-danger);">弱点 #${w.rank}：${w.title}</strong>
+          <span class="mono" style="font-weight:700;">正答率 ${w.currentAccuracy}% (目標${w.targetAccuracy}%)</span>
+        </div>
+        <div style="color:var(--text-secondary); line-height:1.45;">${w.actionableAdvice}</div>
+      `;
+      top3Box.appendChild(card);
+    });
+  }
+}
+
+function resetPersonalStudyData() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.studyTracker) return;
+  window.AERO_MONETIZE_LMS.studyTracker.resetStudyData();
+  renderPersonalAnalytics();
+}
+
+function updateSchoolComparison() {
+  if (!window.AERO_GROWTH_FUNNEL || !window.AERO_GROWTH_FUNNEL.calculateExamROI) return;
+  const lic = document.getElementById('lead-license-type').value;
+  const exp = document.getElementById('lead-exp-level').value;
+  const subEl = document.getElementById('lead-subsidy-type');
+  const sub = subEl ? subEl.value : 'kyufukin';
+
+  const roi = window.AERO_GROWTH_FUNNEL.calculateExamROI({
+    licenseType: lic,
+    expLevel: exp,
+    subsidyType: sub
+  });
+
+  const box = document.getElementById('school-comparison-box');
   box.innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; font-size:0.83rem;">
-      <div style="background:#fef2f2; border:1px solid #fca5a5; padding:0.7rem; border-radius:6px;">
-        <div style="font-weight:700; color:#991b1b;">⚠️ 指定試験機関での「一発試験」</div>
-        <div style="margin-top:0.25rem;">推定一発合格率：<strong>${oneShotPassRate}</strong></div>
-        <div style="color:#7f1d1d; font-size:0.78rem; margin-top:0.2rem;">${expectedRetakes}</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; font-size:0.82rem;">
+      <div style="background:#fef2f2; border:1px solid #fca5a5; padding:0.75rem; border-radius:6px;">
+        <div style="font-weight:800; color:#991b1b;">⚠️ ${roi.directExam.routeName}</div>
+        <div style="margin-top:0.3rem;">推定一発合格率：<strong class="mono">${roi.directExam.estimatedPassRate}%</strong> (平均再受験 ${roi.directExam.expectedRetakes}回)</div>
+        <div style="margin-top:0.2rem;">想定総費用（再受験・練習機・コート込）：<strong class="mono" style="font-size:0.95rem; color:#991b1b;">¥${roi.directExam.totalEstimatedCost.toLocaleString()}</strong></div>
+        <div style="color:#7f1d1d; font-size:0.75rem; margin-top:0.25rem;">期間目安：${roi.directExam.estimatedDuration}</div>
       </div>
-      <div style="background:#ecfdf5; border:1px solid #6ee7b7; padding:0.7rem; border-radius:6px;">
-        <div style="font-weight:700; color:#065f46;">✅ 登録講習機関（実地試験免除）</div>
-        <div style="margin-top:0.25rem;">修了審査合格率：<strong>約 95% 以上</strong></div>
-        <div style="color:#065f46; font-size:0.78rem; font-top:0.2rem;">国家試験の実地試験が100%免除！</div>
+      <div style="background:#ecfdf5; border:1px solid #6ee7b7; padding:0.75rem; border-radius:6px;">
+        <div style="font-weight:800; color:#065f46;">✅ ${roi.registeredSchool.routeName}</div>
+        <div style="margin-top:0.3rem;">修了審査合格率：<strong class="mono">${roi.registeredSchool.passRate}%</strong> (実地試験100%免除)</div>
+        <div style="margin-top:0.2rem;">給付金適用後 実質負担：<strong class="mono" style="font-size:0.95rem; color:#065f46;">¥${roi.registeredSchool.netSelfBurden.toLocaleString()}</strong> <span style="font-size:0.72rem;">(-¥${roi.registeredSchool.subsidyAmount.toLocaleString()}還付)</span></div>
+        <div style="color:#065f46; font-size:0.75rem; margin-top:0.25rem;">期間目安：${roi.registeredSchool.estimatedDuration}</div>
       </div>
     </div>
-    <p style="margin-top:0.65rem; font-size:0.82rem; color:var(--text-main); font-weight:600;">💡 診断アドバイス：${recText}</p>
+    <div style="margin-top:0.65rem; font-size:0.82rem; color:var(--brand-primary); font-weight:800;">${roi.comparisonSummary.recommendationHeadline}</div>
+    <p style="margin-top:0.25rem; font-size:0.79rem; color:var(--text-secondary); line-height:1.5;">${roi.comparisonSummary.recommendationDetail}</p>
   `;
+
+  renderMatchedSchools();
+}
+
+function renderMatchedSchools() {
+  if (!window.AERO_GROWTH_FUNNEL || !window.AERO_GROWTH_FUNNEL.searchSchools) return;
+  const pref = document.getElementById('lead-pref').value;
+  const lic = document.getElementById('lead-license-type').value;
+  const listEl = document.getElementById('matched-schools-list');
+  if (!listEl) return;
+
+  const schools = window.AERO_GROWTH_FUNNEL.searchSchools({
+    prefecture: pref,
+    licenseType: lic
+  }).slice(0, 3);
+
+  listEl.innerHTML = '';
+  schools.forEach((s) => {
+    const item = document.createElement('div');
+    item.style.cssText = 'border:1px solid var(--border-color); border-radius:6px; padding:0.6rem 0.75rem; background:#fff; font-size:0.79rem;';
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+        <strong style="color:var(--text-main);">${s.name}</strong>
+        <span class="mono" style="font-size:0.73rem; background:var(--status-success-bg); color:var(--status-success); padding:0.1rem 0.45rem; border-radius:4px; font-weight:700;">合格率 ${s.passRate}% | ¥${s.tuitionFrom.toLocaleString()}〜</span>
+      </div>
+      <div style="color:var(--text-secondary); font-size:0.75rem; margin-top:0.2rem;">${s.tagline}</div>
+      <div style="font-size:0.72rem; color:var(--brand-primary); margin-top:0.2rem; font-weight:600;">${s.subsidyBadges.join(' ／ ')}</div>
+    `;
+    listEl.appendChild(item);
+  });
 }
 
 function submitSchoolLead() {
   const pref = document.getElementById('lead-pref').value;
+  const lic = document.getElementById('lead-license-type').value;
+  const exp = document.getElementById('lead-exp-level').value;
+  const subEl = document.getElementById('lead-subsidy-type');
+  const sub = subEl ? subEl.value : 'kyufukin';
+
   const msg = document.getElementById('lead-submit-msg');
   msg.classList.remove('hidden');
   msg.className = 'feedback-box success';
-  msg.innerHTML = `🎉 <strong>【送客リード記録完了（${pref}）】</strong> 提携ドローンスクール3校の資料＆無料体験案内を送信し、特典として「AERO-PASS 一等・二等合格パス」を無料アンロックしました！（運営側に成果報酬 ¥10,000 が計上されます）`;
+
+  if (window.AERO_GROWTH_FUNNEL && window.AERO_GROWTH_FUNNEL.submitLead) {
+    const res = window.AERO_GROWTH_FUNNEL.submitLead({
+      prefecture: pref,
+      licenseType: lic,
+      expLevel: exp,
+      subsidyType: sub
+    });
+
+    if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.passManager) {
+      window.AERO_MONETIZE_LMS.passManager.unlockViaSchoolGift({
+        schoolName: (res.matchedSchools[0] && res.matchedSchools[0].name) || '提携登録講習機関',
+        targetLicense: lic
+      });
+    }
+
+    const cpaPill = document.getElementById('cpa-revenue-pill');
+    if (cpaPill) {
+      cpaPill.textContent = `累計送客報酬 ¥${res.affiliateMetrics.cumulativeRevenueYen.toLocaleString()} (${res.affiliateMetrics.cumulativeLeads}件)`;
+    }
+
+    msg.innerHTML = `
+      <div><strong>${res.dualOffer.message}</strong></div>
+      <div class="mono" style="margin-top:0.3rem; font-size:0.76rem;">受付ID: ${res.leadId} | 特典トークン: ${res.unlockToken} | 今回CPA成果報酬: +¥${res.affiliateMetrics.cpaEarnedYen.toLocaleString()}</div>
+    `;
+  } else {
+    msg.innerHTML = `🎉 <strong>【送客リード記録完了（${pref}）】</strong> 提携ドローンスクールの資料を送信し、「AERO-PASS 合格パス」を無料アンロックしました！`;
+  }
 }
 
-// Initialize all modules on page load
+// B2B School LMS Console Functions
+function initB2bTenantSelect() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.b2bConsole) return;
+  const tenants = window.AERO_MONETIZE_LMS.b2bConsole.getTenants();
+  const sel = document.getElementById('b2b-tenant-select');
+  if (!sel) return;
+  sel.innerHTML = '';
+  tenants.forEach((t) => {
+    const opt = document.createElement('option');
+    opt.value = t.tenantId;
+    opt.textContent = t.schoolName;
+    sel.appendChild(opt);
+  });
+}
+
+function changeB2bTenant(tenantId) {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.b2bConsole) return;
+  window.AERO_MONETIZE_LMS.b2bConsole.setActiveTenant(tenantId);
+  renderB2bTable();
+}
+
+function renderB2bTable() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.b2bConsole) return;
+  const b2b = window.AERO_MONETIZE_LMS.b2bConsole;
+  const summary = b2b.getCohortSummary();
+
+  const metaEl = document.getElementById('b2b-tenant-meta');
+  if (metaEl) {
+    metaEl.innerHTML = `<span>${summary.tenant.registrationCode}</span><span>${summary.tenant.auditorName}</span>`;
+  }
+
+  const kpiEl = document.getElementById('b2b-kpi-summary');
+  if (kpiEl) {
+    kpiEl.innerHTML = `
+      <div class="metric-item" style="padding:0.5rem;">
+        <div class="metric-label">受験許可OK / 総数</div>
+        <div class="metric-value mono" style="font-size:0.95rem; color:var(--status-success);">${summary.okCount} / ${summary.totalStudents}名 (${summary.clearanceRate}%)</div>
+      </div>
+      <div class="metric-item" style="padding:0.5rem;">
+        <div class="metric-label">要補習 / 第5版未達</div>
+        <div class="metric-value mono" style="font-size:0.95rem; color:var(--status-warning);">▲${summary.warnCount}名 / ×${summary.ngCount}名</div>
+      </div>
+      <div class="metric-item" style="padding:0.5rem;">
+        <div class="metric-label">全体平均 (CBT/計算)</div>
+        <div class="metric-value mono" style="font-size:0.95rem;">${summary.averageCbtScore}点 / ${summary.averageCalcMastery}%</div>
+      </div>
+    `;
+  }
+
+  const statusKey = (document.getElementById('b2b-status-filter') || {}).value || 'ALL';
+  const searchQuery = (document.getElementById('b2b-search-input') || {}).value || '';
+  const students = b2b.getStudents({ statusKey, searchQuery });
+
+  const tbody = document.getElementById('b2b-students-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  students.forEach((st) => {
+    let colorStyle = 'color:var(--status-success);';
+    if (st.clearance.statusKey === 'WARN_REMEDIAL') colorStyle = 'color:var(--status-warning);';
+    if (st.clearance.statusKey === 'NG_FIFTH_ED') colorStyle = 'color:var(--status-danger);';
+
+    const tr = document.createElement('tr');
+    tr.title = st.clearance.auditorNote;
+    tr.innerHTML = `
+      <td>
+        <strong>${st.name}</strong>
+        <div class="mono" style="font-size:0.7rem; color:var(--text-muted);">${st.studentId}</div>
+      </td>
+      <td style="font-size:0.76rem;">${st.targetClass}</td>
+      <td class="mono">${st.cbtScore}点</td>
+      <td class="mono">${st.calcMastery}%</td>
+      <td class="mono">${st.deskOralScore}点 / ${st.fifthEdRthScore}%</td>
+      <td><span style="${colorStyle} font-weight:700; font-size:0.78rem;">${st.clearance.badgeText}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function syncMyScoreToB2b() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.b2bConsole) return;
+  window.AERO_MONETIZE_LMS.b2bConsole.syncCurrentUserToCohort('あなた（現在演習中の受講生）');
+  renderB2bTable();
+}
+
+function downloadB2bCsv() {
+  if (!window.AERO_MONETIZE_LMS || !window.AERO_MONETIZE_LMS.b2bConsole) return;
+  const statusKey = (document.getElementById('b2b-status-filter') || {}).value || 'ALL';
+  const searchQuery = (document.getElementById('b2b-search-input') || {}).value || '';
+  const csv = window.AERO_MONETIZE_LMS.b2bConsole.exportCohortCsv({ statusKey, searchQuery }, true);
+
+  const previewBox = document.getElementById('b2b-csv-preview-box');
+  if (previewBox) {
+    previewBox.classList.remove('hidden');
+    previewBox.className = 'feedback-box success';
+    const lineCount = csv.trim().split('\n').length;
+    previewBox.innerHTML = `📥 <strong>監査台帳CSVをダウンロードしました（全 ${lineCount - 1} 名分・UTF-8 BOM付）</strong>`;
+  }
+}
+
+// ============================================================================
+// Initialize all 5 modules on page load
+// ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
+  initKijoScenarioSelect();
   loadKijoScenario(0);
+
+  initOralStageButtons();
   loadOralStage(0);
   renderFlightLogTable();
-  renderCalcVisualizer();
-  generateNewDrill();
-  renderCbtQuestion(0);
+
+  initCalcFormulaControls();
+  setCalcVisualizer('turn');
+  generateNewDrill('all');
+
+  setCbtFilter('all');
+  renderCheatSheet();
+
+  initB2bTenantSelect();
+  renderPersonalAnalytics();
   updateSchoolComparison();
+  renderB2bTable();
 });
