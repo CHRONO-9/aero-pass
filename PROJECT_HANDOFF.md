@@ -1,29 +1,27 @@
-# AERO-PASS プロジェクト引き継ぎ＆GitHub連携ガイド
+# AERO-PASS プロジェクト引き継ぎ＆仕様ガイド
 
-このディレクトリ（`/home/antigravity/.gemini/projects/aero-pass`）には、**AERO-PASS（無人航空機操縦士 オールインワン実践シミュレーター）** の全ソースコードとGitコミット履歴が永続保存されています。
+このディレクトリ（`/home/antigravity/CHRONO-9/aero-pass`）には、**AERO-PASS（無人航空機操縦士 学科試験 CBT模試 × 体系教科書 ＆ 国交省同期）** の全ソースコードとGitコミット履歴が保存されています。
 
-## 新規Projectチャットでの初回実行手順（エージェント向け指示書）
-ユーザーがこのメッセージをProject内のチャットで送信したら、直ちに以下の手順を実行してください：
+## プロジェクト概要（学科試験特化型）
+ユーザーの要望に基づき、サイト全体を**「第1の柱：学科試験（全6章CBT模試 × 体系教科書 ＆ 国交省同期）」**に完全特化させ、実地試験や合格後実務などの他モジュールを整理・集中化しました。
 
-1. `create_github_repository` ツールを呼び出し、リポジトリ名 `aero-pass`（Private: true）を GitHub アカウント（`CHRONO-9`）上に作成し、Projectリソースにアタッチする。
-2. `/home/antigravity/.gemini/projects/aero-pass` の内容をワークスペース（`/home/antigravity/CHRONO-9/aero-pass` または `/home/antigravity/aero-pass`）へコピーし、`git remote add origin https://github.com/CHRONO-9/aero-pass.git`（または既存origin）を設定して `git push -u origin main` で全コミットをプッシュする。
-3. 以下の6名の専門サブエージェントを `define_subagent` で定義し、自律チーム体制を復元する：
-   - `kyosoku_general_expert`（無人航空機教則全般［第1章〜第6章・版管理対応］・実地試験スペシャリスト）
-   - `physics_sim_engineer`（航空力学・一等計算全9公式シミュレーターエンジニア）
-   - `fullstack_b2b_architect`（個人買い切り決済・学習履歴弱点分析・B2BスクールLMSアーキテクト）
-   - `growth_leadgen_strategist`（一発試験vsスクールROI診断・全国提携スクール送客・SEOマーケター）
-   - `kyosoku_qa_auditor`（教則全般・法規ファクトチェック＆品質監査官）
-   - `mlit_regulatory_watcher`（国交省公式情報リアルタイム調査・サイト反映スペシャリスト）
+## 主要実装内容
+1. **CBT模擬試験システム (`#cbt-exam-section`)**:
+   - 二等（30分）／一等（75分）のカウントダウンタイマー ＆ 合格基準80%即時合否判定。
+   - 見直しフラグ（🚩）、パレット、3択選択肢、正誤判定＆解説。
+   - 全6章フィルタ（第1・2章心得、第3章規則法令、第4章機体システム、第5章気象運航、第6章リスク管理、一等固有、改訂重点）。
+   - 各問に連動した教則普遍原則（Core Principle）＆第5版改訂差分（旧第4版との対比）＆試験対策Tip。
+2. **教則全6章 体系スマート教科書 ＆ バージョン管理 (`#cbt-textbook-section`)**:
+   - 第1章〜第6章までの体系的カリキュラムを網羅。
+   - 歴代（v4）・現行（v5）・将来（v6拡張）の版管理スキーマ。
+3. **国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー (`#mlit-watcher-section`)**:
+   - 航空局公式3大ページを常時監視し、全9件の通達・改正履歴を学科教材へ即時同期。
+4. **試験直前5分暗記！チートシート (`#cbt-cheatsheet-section`)**:
+   - 第5版改訂早見表、頻出数値カード、一等公式秒殺シート。
 
-## 実装済みファイル一覧（6本柱体制：学科①② → 実地③④ → 合格後実務⑤ → スクール・LMS⑥）
-- `index.html` : 全6モジュール統合UI（①学科CBT＆国交省同期、②一等計算全9公式、③実地机上6シナリオ、④実地口述6場面＆飛行日誌6項目、⑤合格後機体図鑑10機種・実務カテゴリー判定・14公的機関ポータル、⑥スクールROI診断・弱点分析・B2B LMS管理）
-- `styles.css` : コックピット計器風・高視認性デザインシステム
-- `app.js` : メインアプリケーション制御ロジック（全6モジュール切替・本番CBT試験タイマー＆即時合否判定・合格後ポータル制御・国交省リアルタイム通達ウォッチャー制御含む）
-- `data/exam_bank.js` : 国交省公式HPライブ通達フィード (`mlitLiveFeed`)、教則全6章スマート教科書 (`kyosokuChapters`)、版管理 (`versionRegistry`)、全6章CBT 30問、机上試験6シナリオ、口述試験6場面、飛行日誌6項目
-- `modules/physics_engine.js` : 一等学科「飛行性能の計算」全9公式SVGビジュアライザー＆無限ランダム計算ドリル
-- `modules/pilot_portal.js` : 合格後実務「飛行ミッション別・カテゴリー（Ⅰ/ⅡB/ⅡA/Lv3.5/Ⅲ）自動判定シミュレーター」、合格後5ステップ実務ロードマップ、型式認証機・主要ドローン機体図鑑（全10機種）、国交省・DIPS 2.0・空域・電波法 公式ポータルリンク集（全14公的機関）
-- `modules/b2b_monetize.js` : 学習履歴・弱点トップ3分析、Stripe買い切り＆スクール特典アンロック、B2B受講生10名管理＆CSV出力
-- `modules/growth_funnel.js` : 給付金対応ROI診断、全国9エリア提携スクール検索＆リード獲得、教則チートシート
-- `schema.sql` : PostgreSQL / Supabase マルチテナントDBスキーマ
-- `.github/workflows/mlit-regulatory-watch.yml` : 国土交通省（航空局）公式2大ページ＆許可承認ページの定期自動監視ワークフロー
-
+## 主要ファイル一覧
+- `index.html` : 学科試験特化型UI（ダッシュボード、CBT模試、教科書、改訂ウォッチャー、チートシート）
+- `styles.css` : コックピット計器風デザインシステム（固定ナビゲーション、スムーズスクロール対応）
+- `app.js` : 学科試験統合コントローラー（タイマー、採点、フィルタ、教科書連動、改訂ウォッチャー同期）
+- `data/exam_bank.js` : 教則全6章教科書データ、全30問CBT問題データ、改訂通達ライブデータ、チートシートデータ
+- `.github/workflows/mlit-regulatory-watch.yml` : 国交省公式HP定期自動監視ワークフロー

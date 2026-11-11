@@ -8,46 +8,66 @@
 //  - window.AERO_PILOT_PORTAL (modules/pilot_portal.js)
 // ============================================================================
 
-let currentModule = 'home';
-let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
+let currentModule = 'cbt';
+let currentAccessTier = 'pass'; // 'free' | 'pass'
 
-function switchModule(mod) {
-  currentModule = mod;
-  const mods = ['home', 'cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
-  mods.forEach((m) => {
-    const sec = document.getElementById('mod-' + m);
-    const tab = document.getElementById('nav-' + m);
-    if (sec) {
-      if (m === mod) sec.classList.remove('hidden');
-      else sec.classList.add('hidden');
-    }
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  updateNavTabs(id);
+}
+
+function updateNavTabs(targetId) {
+  const navMap = {
+    'academic-dashboard': 'nav-dash',
+    'cbt-exam-section': 'nav-cbt',
+    'cbt-textbook-section': 'nav-textbook',
+    'mlit-watcher-section': 'nav-watcher',
+    'cbt-cheatsheet-section': 'nav-cheatsheet'
+  };
+  Object.entries(navMap).forEach(([secId, tabId]) => {
+    const tab = document.getElementById(tabId);
     if (tab) {
-      if (m === mod) tab.classList.add('active');
+      if (secId === targetId) tab.classList.add('active');
       else tab.classList.remove('active');
     }
   });
+}
 
-  // Scroll to top of page cleanly when navigating between pillars
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function initSectionScrollTracking() {
+  const sections = [
+    'academic-dashboard',
+    'mlit-watcher-section',
+    'cbt-exam-section',
+    'cbt-textbook-section',
+    'cbt-cheatsheet-section'
+  ];
+  window.addEventListener('scroll', () => {
+    const scrollPos = window.scrollY + 140;
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const sec = document.getElementById(sections[i]);
+      if (sec && sec.offsetTop <= scrollPos) {
+        updateNavTabs(sections[i]);
+        break;
+      }
+    }
+  }, { passive: true });
+}
 
-  if (mod === 'calc') {
-    renderCalcVisualizer();
-  } else if (mod === 'portal') {
-    updatePortalMissionSim();
-    renderPortalRoadmap();
-    renderPortalDroneCatalog();
-    renderPortalDirectory();
-  } else if (mod === 'monetize') {
-    renderPersonalAnalytics();
-    updateSchoolComparison();
-    renderMatchedSchools();
-    renderB2bTable();
-  }
+function switchModule(mod) {
+  if (mod === 'cbt') scrollToSection('cbt-exam-section');
+  else if (mod === 'home' || mod === 'dash') scrollToSection('academic-dashboard');
+  else if (mod === 'textbook') scrollToSection('cbt-textbook-section');
+  else if (mod === 'watcher') scrollToSection('mlit-watcher-section');
+  else if (mod === 'cheatsheet') scrollToSection('cbt-cheatsheet-section');
+  else scrollToSection('cbt-exam-section');
 }
 
 function setAccessTier(tier) {
   currentAccessTier = tier;
-  ['free', 'pass', 'b2b'].forEach((t) => {
+  ['free', 'pass'].forEach((t) => {
     const btn = document.getElementById('tier-' + t);
     if (!btn) return;
     if (t === tier) btn.classList.add('active');
@@ -59,14 +79,10 @@ function setAccessTier(tier) {
       window.AERO_MONETIZE_LMS.passManager.setPlanDirect('free');
     } else if (tier === 'pass') {
       window.AERO_MONETIZE_LMS.passManager.setPlanDirect('ittou_pass');
-    } else if (tier === 'b2b') {
-      window.AERO_MONETIZE_LMS.passManager.setPlanDirect('b2b_student');
     }
   }
 
-  if (tier === 'b2b') {
-    switchModule('monetize');
-  } else if (tier === 'free') {
+  if (tier === 'free') {
     openPaywallModal();
   }
 }
@@ -1032,8 +1048,7 @@ function openKyosokuChapterForCurrentQ() {
 
 function filterCbtByChapterFromTextbook(chId) {
   setCbtFilter(chId);
-  const modEl = document.getElementById('mod-cbt');
-  if (modEl) modEl.scrollIntoView({ behavior: 'smooth' });
+  scrollToSection('cbt-exam-section');
 }
 
 function selectKyosokuTab(tabKey) {
@@ -1518,9 +1533,7 @@ function downloadB2bCsv() {
 let currentMlitFeedCategory = 'all';
 
 function openMlitWatcherFromAnywhere() {
-  switchModule('cbt');
-  const sec = document.getElementById('mlit-watcher-section');
-  if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+  scrollToSection('mlit-watcher-section');
 }
 
 function setMlitFeedFilter(cat) {
@@ -1944,32 +1957,12 @@ function renderPortalDirectory() {
 }
 
 // ============================================================================
-// Initialize all 6 modules on page load
+// Initialize Academic Exam Simulator on page load
 // ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
-  initKijoScenarioSelect();
-  loadKijoScenario(0);
-
-  initOralStageButtons();
-  loadOralStage(0);
-  renderFlightLogTable();
-
-  initCalcFormulaControls();
-  setCalcVisualizer('turn');
-  generateNewDrill('all');
-
   renderMlitLiveFeed();
   setCbtFilter('all');
   renderKyosokuTextbook();
   renderCheatSheet();
-
-  updatePortalMissionSim();
-  renderPortalRoadmap();
-  renderPortalDroneCatalog();
-  renderPortalDirectory();
-
-  initB2bTenantSelect();
-  renderPersonalAnalytics();
-  updateSchoolComparison();
-  renderB2bTable();
+  initSectionScrollTracking();
 });

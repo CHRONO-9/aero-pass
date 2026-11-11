@@ -27,6 +27,10 @@
   --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.07);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -137,6 +141,13 @@ body {
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 48px;
+  z-index: 35;
+}
+
+section[id] {
+  scroll-margin-top: 105px;
 }
 
 .nav-inner {

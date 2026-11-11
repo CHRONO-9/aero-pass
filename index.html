@@ -3,526 +3,164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AERO-PASS | 国家資格ドローン操縦士 合格＆実務ナビ（一等・二等・教則第5版完全準拠）</title>
-  <meta name="description" content="国土交通省「無人航空機の飛行の安全に関する教則」全6章体系＆版管理（現行：第5版）完全対応。①全6章学科CBT＆国交省同期、②一等計算ビジュアライザー全9公式、③実地机上試験マップ6シナリオ、④口述＆飛行日誌チェッカー、⑤合格後機体図鑑10機種・実務カテゴリー判定・14公的機関ポータル、⑥スクールROI診断・B2B LMS管理の6本柱。" />
+  <title>AERO-PASS | 無人航空機操縦士（一等・二等）学科試験 CBT模擬試験 × 全6章体系教科書 ＆ 国交省同期</title>
+  <meta name="description" content="国土交通省「無人航空機の飛行の安全に関する教則」全6章体系＆版管理（現行：第5版完全準拠）。全6章CBT模擬試験（二等30分／一等75分タイマー・即時合否判定）、普遍原則・版改訂差分スマート教科書、航空局公式HPリアルタイム改訂同期、直前5分暗記チートシートを搭載した学科試験特化プラットフォーム。" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Cockpit Header -->
   <header class="app-header">
     <div class="header-inner">
-      <div class="brand-group" style="cursor:pointer;" onclick="switchModule('home')" title="トップ（6つの柱ポータル）へ戻る">
-        <span class="brand-badge">AERO-PASS</span>
-        <h1 class="brand-title">国家資格ドローン操縦士 合格＆実務ナビ</h1>
-        <span class="edition-tag">教則全6章体系 ＆ 版管理対応（現行：第5版）</span>
-        <button class="btn" style="padding:0.22rem 0.6rem; font-size:0.75rem; background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:800;" onclick="event.stopPropagation(); openMlitWatcherFromAnywhere();" title="国土交通省（航空局）公式HP リアルタイム改訂ウォッチャーを開く">
+      <div class="brand-group">
+        <span class="brand-badge">AERO-PASS 学科試験</span>
+        <h1 class="brand-title">無人航空機操縦士 学科試験 CBT模試 × 体系教科書</h1>
+        <span class="edition-tag">教則全6章体系 ＆ 版管理（現行：第5版完全準拠）</span>
+        <button class="btn" style="padding:0.22rem 0.6rem; font-size:0.75rem; background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:800;" onclick="scrollToSection('mlit-watcher-section')" title="国土交通省（航空局）公式HP リアルタイム改訂ウォッチャーへジャンプ">
           📡 国交省HP同期済 (<span id="header-mlit-verified-date">2026-11-11</span>)
         </button>
       </div>
 
       <div class="header-actions">
-        <!-- User Tier Simulator (Free / B2C Pass / B2B School Admin) -->
+        <!-- User Tier Simulator (Free / B2C Pass) -->
         <div class="tier-switcher" role="group" aria-label="表示モード切替">
           <button id="tier-free" onclick="setAccessTier('free')">無料体験枠</button>
-          <button id="tier-pass" class="active" onclick="setAccessTier('pass')">一等・合格パス (¥2,980)</button>
-          <button id="tier-b2b" onclick="setAccessTier('b2b')">B2Bスクール管理画面</button>
+          <button id="tier-pass" class="active" onclick="setAccessTier('pass')">合格パス (¥2,980)</button>
         </div>
         <button id="btn-open-paywall" class="btn btn-amber" onclick="openPaywallModal()">
-          👑 合格パス・スクール特典
+          👑 合格パス特典
         </button>
       </div>
     </div>
   </header>
 
+  <!-- Main Academic Navigation -->
+  <nav class="nav-bar" aria-label="学科試験機能ナビゲーション">
+    <div class="nav-inner">
+      <button id="nav-dash" class="nav-tab active nav-tab-home" onclick="scrollToSection('academic-dashboard')">
+        🏠 学科ダッシュボード
+      </button>
+      <button id="nav-cbt" class="nav-tab" onclick="scrollToSection('cbt-exam-section')">
+        💻 ① CBT模擬試験 <span class="nav-pill">全30問・合否判定</span>
+      </button>
+      <button id="nav-textbook" class="nav-tab" onclick="scrollToSection('cbt-textbook-section')">
+        📖 ② 全6章スマート教科書 <span class="nav-pill">第1〜6章+版管理</span>
+      </button>
+      <button id="nav-watcher" class="nav-tab" onclick="scrollToSection('mlit-watcher-section')">
+        📡 ③ 国交省HP改訂ウォッチャー <span class="nav-pill">全9件同期</span>
+      </button>
+      <button id="nav-cheatsheet" class="nav-tab" onclick="scrollToSection('cbt-cheatsheet-section')">
+        ⚡ ④ 直前5分チートシート <span class="nav-pill">暗記カード</span>
+      </button>
+    </div>
+  </nav>
+
   <!-- Main Workspace -->
   <main class="main-container">
 
     <!-- =====================================================================
-         HOME PORTAL: トップページ — 核となる「6つの柱」タイルポータル
+         0. 学科試験 総合ダッシュボード（Hero Banner & Stats & Quick Action）
          ===================================================================== -->
-    <section id="mod-home">
+    <section id="academic-dashboard" class="home-hero" style="margin-bottom:1.5rem;">
+      <div class="home-hero-badge">
+        <span>🚁 国家資格（一等・二等）学科試験 特化型シミュレーター</span>
+        <span>● 国交省HP同期済（教則第5版完全準拠）</span>
+      </div>
+      <h2 class="home-hero-title">
+        無人航空機操縦士 学科試験 CBT模試 × 全6章体系教科書 ＆ 国交省同期
+      </h2>
+      <p class="home-hero-subtitle">
+        国土交通省「無人航空機の飛行の安全に関する教則」（現行：第5版）全6章に完全準拠。二等（30分）／一等（75分）カウントダウンタイマー付き本番CBT模擬試験、教則条文・普遍的原則（Core Principle）＆版改訂差分を網羅したスマート教科書、航空局公式HPリアルタイム改訂ウォッチャー、直前暗記チートシートで学科試験の一発合格を強力にサポートします。
+      </p>
 
-
-      <!-- 6-Pillar Heading -->
-      <div class="pillar-section-heading">
-        <div class="pillar-section-title">
-          <span>🏛️ AERO-PASS を構成する「6つの柱」</span>
+      <div class="home-hero-stats">
+        <div class="home-stat-item" style="cursor:pointer;" onclick="scrollToSection('cbt-exam-section')">
+          <span class="home-stat-val">全30問 CBT</span>
+          <span class="home-stat-lbl">二等30分 / 一等75分タイマー＆80%即時合否判定</span>
         </div>
-        <span style="font-size:0.82rem; color:var(--text-secondary);">
-          各タイルをクリックすると、専用の演習・シミュレーター画面へ移動します
-        </span>
+        <div class="home-stat-item" style="cursor:pointer;" onclick="scrollToSection('cbt-textbook-section')">
+          <span class="home-stat-val">教則全6章</span>
+          <span class="home-stat-lbl">体系スマート教科書 ＆ v4/v5/v6版管理</span>
+        </div>
+        <div class="home-stat-item" style="cursor:pointer;" onclick="scrollToSection('mlit-watcher-section')">
+          <span class="home-stat-val">公式通達9件</span>
+          <span class="home-stat-lbl">国交省航空局HPリアルタイム常時同期</span>
+        </div>
+        <div class="home-stat-item" style="cursor:pointer;" onclick="scrollToSection('cbt-cheatsheet-section')">
+          <span class="home-stat-val">直前3種</span>
+          <span class="home-stat-lbl">第5版改訂早見表・頻出数値・公式チートシート</span>
+        </div>
       </div>
 
-      <!-- 6-Pillar Tile Grid -->
-      <div class="pillar-grid">
-
-        <!-- Pillar 1 Tile -->
-        <div class="pillar-tile pillar-accent-blue" onclick="switchModule('cbt')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">💻</div>
-            <span class="pillar-num-badge">第1の柱・入口最重要</span>
-          </div>
-          <h3 class="pillar-title">① 学科：全6章CBT模試 ＆ スマート教科書</h3>
-          <p class="pillar-desc">
-            二等（30分）／一等（75分）の本番カウントダウン模試と即時合否判定。国交省HPリアルタイム改訂ウォッチャーおよび教則全6章の条文解説・版改訂（第4版／第5版）差分を網羅。
-          </p>
-          <ul class="pillar-features">
-            <li>全6章網羅 30問CBT模擬試験（見直しフラグ対応）</li>
-            <li>二等（30分）／一等（75分）タイマー＆80%即時合否判定</li>
-            <li>国交省公式HPリアルタイム通達同期（全9件）</li>
-            <li>教則第4版・第5版・第6版拡張の版管理ビューア</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>学科CBT演習をはじめる</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Pillar 2 Tile -->
-        <div class="pillar-tile pillar-accent-cyan" onclick="switchModule('calc')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">📐</div>
-            <span class="pillar-num-badge">第2の柱・一等最難関</span>
-          </div>
-          <h3 class="pillar-title">② 一等学科：計算ビジュアライザー ＆ 無限ドリル</h3>
-          <p class="pillar-desc">
-            一等学科最大の難関「飛行性能の計算」全9公式をインタラクティブSVGで視覚化。数値を毎回ランダム生成する無限計算ドリルと途中式ステップ解説で完全攻略。
-          </p>
-          <ul class="pillar-features">
-            <li>揚力・荷重倍数・失速速度など全9公式SVG物理モデル</li>
-            <li>リアルタイムスライダー連動＆パラメータ同期</li>
-            <li>乱数シードによる無限ランダム計算問題生成</li>
-            <li>途中式・誤答トラップ解説＆CBT画面内電卓完備</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>計算シミュレーターを開く</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Pillar 3 Tile -->
-        <div class="pillar-tile pillar-accent-amber" onclick="switchModule('kijo')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">🗺️</div>
-            <span class="pillar-num-badge">第3の柱・実地減点防止</span>
-          </div>
-          <h3 class="pillar-title">③ 実地：机上試験マップ演習（全6シナリオ）</h3>
-          <p class="pillar-desc">
-            実地試験の最初に行われる「用紙A（飛行計画書・飛行経路マップ）」の矛盾点検証と「用紙B（4問20点）」の解答演習。橋梁・農薬・進入表面・一等SORAまで完全収録。
-          </p>
-          <ul class="pillar-features">
-            <li>二等〜一等（SORA/GRC含む）全6シナリオ収録</li>
-            <li>SVGインタラクティブ飛行経路マップ上のホットスポット検証</li>
-            <li>10分カウントダウンタイマー＆用紙B（20点）自動採点</li>
-            <li>RTH高度・送電線・離隔距離・気象限界の判定</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>机上マップ演習を開始する</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Pillar 4 Tile -->
-        <div class="pillar-tile pillar-accent-violet" onclick="switchModule('oral')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">🎙️</div>
-            <span class="pillar-num-badge">第4の柱・口頭試問即応</span>
-          </div>
-          <h3 class="pillar-title">④ 実地：口述試験ロールプレイ ＆ 飛行日誌</h3>
-          <p class="pillar-desc">
-            試験官との問答を100点減点方式でシミュレートする全6場面ロールプレイと、実地試験で減点頻出の「飛行日誌（様式1・2・3）全6ケース」不備チェッカー。
-          </p>
-          <ul class="pillar-features">
-            <li>日常点検・フェイルセーフ・事故報告など全6場面ロールプレイ</li>
-            <li>減点スコア追跡＆試験本番用満点発声スクリプト</li>
-            <li>飛行日誌様式1・2・3の60進法計算ミス即時判定</li>
-            <li>日常点検記録と点検整備記録の連動不備検証</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>口述＆日誌チェッカーを開く</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Pillar 5 Tile -->
-        <div class="pillar-tile pillar-accent-emerald" onclick="switchModule('portal')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">🚁</div>
-            <span class="pillar-num-badge">第5の柱・合格後実務NEW</span>
-          </div>
-          <h3 class="pillar-title">⑤ 合格後：実務カテゴリー判定・機体図鑑 ＆ 公的ポータル</h3>
-          <p class="pillar-desc">
-            試験合格後の現場で役立つ実践ポータル。飛行ミッション別のカテゴリー（Ⅰ/Ⅱ/Ⅲ/Lv3.5）自動判定、第一種・第二種型式認証機を含む全10機種図鑑、国交省等14公的ポータル。
-          </p>
-          <ul class="pillar-features">
-            <li>ライセンス×機体×空域の飛行カテゴリー・手続き自動判定</li>
-            <li>合格後のDIPS 2.0・運航実務5ステップロードマップ</li>
-            <li>型式認証機・産業主力機全10機種スペック＆法規メリット</li>
-            <li>国交省航空局・DIPS2.0・空域マップなど公式14機関リンク</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>合格後ポータルへ進む</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
-        <!-- Pillar 6 Tile -->
-        <div class="pillar-tile pillar-accent-rose" onclick="switchModule('monetize')">
-          <div class="pillar-tile-top">
-            <div class="pillar-icon-box">🏫</div>
-            <span class="pillar-num-badge">第6の柱・送客＆スクール</span>
-          </div>
-          <h3 class="pillar-title">⑥ スクール送客ROI診断 ＆ B2B受講生LMS管理</h3>
-          <p class="pillar-desc">
-            一発試験と登録講習機関（実地免除）の総費用・合格率・給付金を比較するROI診断シミュレーター、全国提携スクール送客、および登録講習機関向け受講生10名管理コンソール。
-          </p>
-          <ul class="pillar-features">
-            <li>学習履歴・推定合格確率＆弱点トップ3自動分析</li>
-            <li>教育訓練給付金・人材開発助成金対応のROI比較診断</li>
-            <li>全国9エリア提携ドローンスクール検索＆資料請求</li>
-            <li>B2Bスクール受講生進捗管理・要補習判定・監査CSV出力</li>
-          </ul>
-          <div class="pillar-cta">
-            <span>ROI診断・スクール管理を見る</span>
-            <span class="pillar-cta-arrow">→</span>
-          </div>
-        </div>
-
+      <div style="margin-top:1.25rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <button class="btn btn-primary" style="padding:0.6rem 1.2rem; font-size:0.9rem; font-weight:800;" onclick="scrollToSection('cbt-exam-section')">
+          💻 CBT模擬試験を開始する
+        </button>
+        <button class="btn" style="padding:0.6rem 1.2rem; font-size:0.9rem; font-weight:700; background:#ffffff;" onclick="scrollToSection('cbt-textbook-section')">
+          📖 教則全6章教科書を読む
+        </button>
+        <button class="btn" style="padding:0.6rem 1.2rem; font-size:0.9rem; font-weight:700; background:#ffffff;" onclick="scrollToSection('mlit-watcher-section')">
+          📡 国交省改訂通達を確認
+        </button>
+        <button class="btn btn-amber" style="padding:0.6rem 1.2rem; font-size:0.9rem; font-weight:800;" onclick="scrollToSection('cbt-cheatsheet-section')">
+          ⚡ 直前5分チートシートを開く
+        </button>
       </div>
     </section>
 
     <!-- =====================================================================
-         MODULE 3 (Pillar 3): 実地試験 — 机上試験（飛行計画マップ＆用紙B 4問20点演習・全6シナリオ）
+         1. 📡 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー
          ===================================================================== -->
-    <section id="mod-kijo" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">🗺️ 第3の柱：実地試験 — 机上試験マップ演習（用紙A/B 全6シナリオ）</span>
-        </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#fef3c7; color:#92400e; font-weight:700;">用紙B 20点満点</span>
-          <span class="nav-pill">全6シナリオ</span>
-        </div>
-      </div>
-
-      <div class="col-7 card">
-        <div class="card-header">
-          <div class="card-title">
-            <span>📄 用紙A：飛行計画書・飛行経路マップ検証（全6シナリオ）</span>
+    <section id="mlit-watcher-section" class="card" style="border:2px solid #0284c7; background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); margin-bottom:1.5rem;">
+      <div class="card-header" style="margin-bottom:0.65rem;">
+        <div>
+          <div class="card-title" style="color:#0369a1; font-size:1rem;">
+            📡 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー ＆ 学科試験反映ステータス
           </div>
-          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-            <select id="kijo-scenario-select" class="form-control" style="width:auto; max-width:340px;" onchange="loadKijoScenario(this.value)">
-              <option value="0">シナリオ①：河川橋梁の赤外線点検（強風・高圧線RTH不備）</option>
-              <option value="1">シナリオ②：工業専用地域隣接の夜間農薬散布（第5版特例）</option>
-              <option value="2">シナリオ③：市街地公園フェスティバル空撮（催し場所・離隔）</option>
-              <option value="3">シナリオ④：地方空港周辺での造成地写真測量（進入表面75m）</option>
-              <option value="4">シナリオ⑤：山間部集落への目視外物資配送（フレネル・投下1m）</option>
-              <option value="5">シナリオ⑥：【一等】都市部カテゴリーⅢ医薬品輸送（SORA/GRC）</option>
-            </select>
-            <span id="kijo-timer-badge" class="mono" style="background:var(--bg-subtle); padding:0.35rem 0.65rem; border-radius:6px; font-weight:700; border:1px solid var(--border-color);">
-              ⏱️ 10:00
-            </span>
-            <button id="btn-kijo-timer" class="btn" onclick="resetKijoTimer()">タイマー開始</button>
-          </div>
+          <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+            航空局「無人航空機の飛行ルール」「無人航空機操縦者技能証明等」「飛行許可・承認手続」の一次情報（教則第5版・実地試験実施基準・審査要領・更新講習等）を常時監視し、学科試験への影響を即座に教材へ同期しています。
+          </p>
         </div>
-
-        <!-- Interactive SVG Map -->
-        <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:0.75rem;">
-          <svg id="kijo-map-svg" viewBox="0 0 560 220" style="width:100%; height:auto; display:block;"></svg>
-        </div>
-
-        <!-- Flight Plan Specification Table -->
-        <div class="metric-grid">
-          <div class="metric-item">
-            <div class="metric-label">使用機体・耐風速上限</div>
-            <div id="kijo-spec-drone" class="metric-value" style="font-size:0.84rem; line-height:1.4;"></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">飛行日時・気象条件</div>
-            <div id="kijo-spec-weather" class="metric-value" style="font-size:0.84rem; line-height:1.4;"></div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">高度・RTH・フェイルセーフ設定</div>
-            <div id="kijo-spec-rth" class="metric-value" style="font-size:0.84rem; line-height:1.4;"></div>
-          </div>
-        </div>
-
-        <div id="kijo-hotspot-alert" class="feedback-box" style="margin-top:0.85rem;">
-          💡 <strong>操作方法：</strong> マップ上の3つの検証ボックス（①経路・高度・RTH / ②立入管理・離隔・特例 / ③気象・限界・リスク評価）をクリックすると、飛行計画（用紙A）の矛盾点を検証できます。
-        </div>
-      </div>
-
-      <!-- Right Column: 用紙B 4問解答フォーム -->
-      <div class="col-5 card">
-        <div class="card-header">
-          <div class="card-title">📝 用紙B：机上試験 4問解答（各5点・計20点）</div>
-          <span id="kijo-total-score" class="mono" style="font-weight:800; color:var(--brand-primary); font-size:1rem;">未採点 / 20点</span>
-        </div>
-
-        <div id="kijo-questions-container" style="display:flex; flex-direction:column; gap:0.85rem;"></div>
-
-        <div style="margin-top:1rem; display:flex; gap:0.6rem;">
-          <button id="btn-grade-kijo" class="btn btn-primary" style="flex:1;" onclick="gradeKijoExam()">
-            ✅ 用紙Bを採点して学習履歴に記録（20点満点）
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+          <span id="mlit-watcher-status-badge" class="mono nav-pill" style="background:#dcfce7; color:#166534; font-weight:800; padding:0.3rem 0.65rem; border:1px solid #86efac;">
+            ● LIVE SYNC: 最終検証 2026-11-11 (全9件反映済)
+          </span>
+          <button id="btn-mlit-reverify" class="btn btn-primary" style="font-size:0.78rem;" onclick="reverifyMlitFeedIndex()">
+            🔄 最新インデックス再検証
           </button>
         </div>
-
-        <div id="kijo-grade-feedback" class="feedback-box hidden"></div>
       </div>
+
+      <!-- Watched Official Sources Bar -->
+      <div id="mlit-watched-sources-bar" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem; padding:0.55rem 0.75rem; background:#ffffff; border:1px solid var(--border-color); border-radius:6px; font-size:0.76rem;"></div>
+
+      <!-- Category Filters for MLIT Feed -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+        <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+          <span style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">🔍 通達・改訂カテゴリ：</span>
+          <button id="mlit-cat-all" class="btn btn-primary" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('all')">すべて (9)</button>
+          <button id="mlit-cat-kyosoku" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyosoku')">📘 教則・学科試験</button>
+          <button id="mlit-cat-jicchi" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('jicchi')">🗺️ 実地試験基準</button>
+          <button id="mlit-cat-kyoka" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyoka')">✈️ 許可承認・DIPS2.0・レベル3.5/4</button>
+          <button id="mlit-cat-koshin" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('koshin')">🪪 技能証明・更新・身体検査</button>
+        </div>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <a href="https://www.mlit.go.jp/common/002010809.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📄 教則第5版 (公式PDF) ↗</a>
+          <a href="https://www.mlit.go.jp/common/002010810.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📑 第4版→第5版 変更履歴PDF ↗</a>
+          <a href="https://www.mlit.go.jp/koku/content/001971373.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📋 実地試験実施基準PDF ↗</a>
+        </div>
+      </div>
+
+      <div id="mlit-reverify-alert" class="feedback-box hidden" style="margin-bottom:0.75rem;"></div>
+
+      <!-- Feed Cards Grid -->
+      <div id="mlit-live-feed-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:0.75rem;"></div>
     </section>
 
     <!-- =====================================================================
-         MODULE 4 (Pillar 4): 実地試験 — 口述試験AIロールプレイ(全6場面) ＆ 飛行日誌チェッカー(全6項目)
+         2. 💻 CBT模擬試験 ＆ 教則スマート教科書ビューア
          ===================================================================== -->
-    <section id="mod-oral" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">🎙️ 第4の柱：実地試験 — 口述試験ロールプレイ ＆ 飛行日誌チェッカー</span>
-        </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#ede9fe; color:#5b21b6; font-weight:700;">100点減点方式</span>
-          <span class="nav-pill">6場面 × 6日誌</span>
-        </div>
-      </div>
-
-      <!-- Left: Oral Exam Simulator (6 Stages) -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">🎙️ 口述試験ロールプレイ（全6場面：二等・一等対応）</div>
-          <span id="oral-points-badge" class="mono" style="background:var(--status-success-bg); color:var(--status-success); padding:0.25rem 0.65rem; border-radius:6px; font-weight:800;">
-            残り持ち点: 100 / 100点
-          </span>
-        </div>
-
-        <div id="oral-stage-buttons" style="margin-bottom:0.85rem; display:flex; gap:0.4rem; flex-wrap:wrap;"></div>
-
-        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:1rem; margin-bottom:0.85rem;">
-          <div style="font-size:0.76rem; font-weight:700; color:var(--brand-primary); margin-bottom:0.35rem;" id="oral-stage-label"></div>
-          <p id="oral-examiner-q" style="font-weight:700; font-size:0.93rem; line-height:1.55;"></p>
-        </div>
-
-        <div id="oral-choices-box" class="choice-list"></div>
-
-        <div id="oral-result-box" class="feedback-box">
-          👆 試験官の質問に対する口頭回答を選択してください。模範発声フレーズと採点チェックポイントを表示します。
-        </div>
-
-        <!-- Model Voice Script & Key Points Box -->
-        <div id="oral-model-script-box" style="margin-top:0.85rem; background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:0.9rem;">
-          <div style="font-weight:700; font-size:0.82rem; color:var(--text-main); margin-bottom:0.35rem;">🗣️ 試験本番用・満点発声スクリプト ＆ 採点官チェックポイント</div>
-          <p id="oral-model-answer" style="font-size:0.82rem; color:#0f172a; background:#e0f2fe; padding:0.65rem; border-radius:6px; margin-bottom:0.5rem; line-height:1.55;"></p>
-          <ul id="oral-key-points" style="font-size:0.8rem; color:var(--text-secondary); padding-left:1.2rem; line-height:1.55;"></ul>
-        </div>
-      </div>
-
-      <!-- Right: Flight Log (飛行日誌 3様式・全6項目) Defect Inspector -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">📋 飛行日誌（様式1・2・3 全6ケース）不備チェッカー</div>
-          <span class="nav-pill">実地試験・減点頻出</span>
-        </div>
-
-        <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:0.85rem;">
-          実地試験の最後に行われる「飛行日誌（様式1：飛行記録、様式2：日常点検記録、様式3：点検整備記録）」では、60進法の総飛行時間計算ミスや様式間の連動漏れが即減点となります。<strong>全6項目の不備事例をクリックして検証・修正</strong>してください。
-        </p>
-
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width:28%;">様式・点検項目</th>
-              <th style="width:48%;">受験者の誤記入例 → 正しい記載ルール</th>
-              <th style="width:24%;">判定・修正</th>
-            </tr>
-          </thead>
-          <tbody id="flight-log-tbody"></tbody>
-        </table>
-
-        <div id="flight-log-feedback" class="feedback-box" style="margin-top:0.85rem;">
-          💡 表の中の「⚠️ 検証・修正する」ボタンを押して、飛行日誌全6パターンの減点ポイントをマスターしましょう。
-        </div>
-      </div>
-    </section>
-
-    <!-- =====================================================================
-         MODULE 2 (Pillar 2): 一等学科 — 計算ビジュアライザー(全9公式) ＆ 無限ランダム生成ドリル
-         ===================================================================== -->
-    <section id="mod-calc" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">📐 第2の柱：一等学科 — 飛行性能の計算 全9公式ビジュアライザー＆無限ドリル</span>
-        </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#cffafe; color:#0e7490; font-weight:700;">一等学科専用</span>
-          <span class="nav-pill">全9公式SVGモデル</span>
-        </div>
-      </div>
-
-      <!-- Left: Interactive Physics Visualizer (All 9 Formulas) -->
-      <div class="col-7 card">
-        <div class="card-header">
-          <div class="card-title">📐 一等・飛行性能の物理ビジュアライザー（全9公式完全網羅）</div>
-          <select id="calc-formula-select" class="form-control" style="width:auto; max-width:310px; font-weight:700;" onchange="setCalcVisualizer(this.value)"></select>
-        </div>
-
-        <!-- Quick Formula Buttons (All 9 Formulas) -->
-        <div id="calc-formula-buttons" style="display:flex; gap:0.35rem; flex-wrap:wrap; margin-bottom:0.85rem;"></div>
-
-        <!-- Formula Equation & Description Banner -->
-        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.75rem 0.9rem; margin-bottom:0.85rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem;">
-            <strong id="calc-formula-title" style="font-size:0.88rem; color:var(--brand-primary);"></strong>
-            <span id="calc-formula-eq" class="mono" style="background:#ffffff; padding:0.2rem 0.55rem; border-radius:4px; border:1px solid var(--border-strong); font-weight:700; font-size:0.8rem;"></span>
-          </div>
-          <p id="calc-formula-desc" style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.35rem;"></p>
-        </div>
-
-        <div class="slider-row">
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
-              <span id="calc-s1-label">スライダー1</span>
-              <strong id="calc-s1-val" class="mono"></strong>
-            </div>
-            <input id="calc-s1" type="range" min="5" max="25" step="1" value="10" style="width:100%;" oninput="renderCalcVisualizer()" />
-          </div>
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
-              <span id="calc-s2-label">スライダー2</span>
-              <strong id="calc-s2-val" class="mono"></strong>
-            </div>
-            <input id="calc-s2" type="range" min="15" max="60" step="15" value="45" style="width:100%;" oninput="renderCalcVisualizer()" />
-          </div>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid var(--border-color); border-radius:8px; padding:0.75rem;">
-          <svg id="calc-viz-svg" viewBox="0 0 540 185" style="width:100%; height:auto; display:block;"></svg>
-        </div>
-
-        <div class="metric-grid">
-          <div class="metric-item">
-            <div id="calc-m1-label" class="metric-label">指標1</div>
-            <div id="calc-m1-val" class="metric-value mono" style="font-size:1rem;"></div>
-          </div>
-          <div class="metric-item">
-            <div id="calc-m2-label" class="metric-label">指標2</div>
-            <div id="calc-m2-val" class="metric-value mono" style="font-size:1rem;"></div>
-          </div>
-          <div class="metric-item">
-            <div id="calc-m3-label" class="metric-label">指標3</div>
-            <div id="calc-m3-val" class="metric-value mono" style="font-size:0.86rem;"></div>
-          </div>
-        </div>
-
-        <div id="calc-step-box" class="mono" style="margin-top:0.75rem; font-size:0.79rem; background:#f8fafc; border:1px dashed var(--border-strong); padding:0.55rem 0.75rem; border-radius:6px; color:var(--text-secondary);"></div>
-      </div>
-
-      <!-- Right: Infinite Random Drill + Built-in CBT Calculator -->
-      <div class="col-5 card">
-        <div class="card-header">
-          <div class="card-title">🎲 無限ランダム計算ドリル（全9公式連動）</div>
-          <div style="display:flex; gap:0.4rem;">
-            <button class="btn" onclick="generateNewDrill(currentCalcViz)">🎯 選択中の公式で出題</button>
-            <button class="btn btn-primary" onclick="generateNewDrill('all')">🔄 全9公式ランダム出題</button>
-          </div>
-        </div>
-
-        <div id="drill-formula-tag" style="font-size:0.76rem; font-weight:700; color:var(--brand-primary); margin-bottom:0.35rem;"></div>
-        <div id="drill-stem" style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; font-weight:600; margin-bottom:0.85rem; line-height:1.55;"></div>
-
-        <div id="drill-choices" class="choice-list"></div>
-
-        <div id="drill-feedback" class="feedback-box">
-          💡 解答を選ぶと、途中式と誤答トラップ解説を表示し、左の物理ビジュアライザーに問題の数値を自動同期します。
-        </div>
-
-        <!-- Mini CBT Calculator -->
-        <div style="margin-top:1rem; padding-top:0.85rem; border-top:1px solid var(--border-color);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-            <span style="font-size:0.78rem; font-weight:700; color:var(--text-secondary);">🧮 CBT試験画面内 簡易電卓（ルート・四則演算）</span>
-            <button class="btn" style="padding:0.2rem 0.5rem; font-size:0.72rem;" onclick="clearMiniCalc()">クリア (C)</button>
-          </div>
-          <div style="display:flex; gap:0.5rem;">
-            <input id="mini-calc-input" type="text" class="form-control mono" placeholder="例: (14*14)/(9.8*1.73)" />
-            <button class="btn btn-primary" onclick="evalMiniCalc()">＝ 計算</button>
-            <button class="btn" onclick="sqrtMiniCalc()">√ ルート</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =====================================================================
-         MODULE 1 (Pillar 1): 学科CBT完全再現モック(全30問・全6章フィルタ付) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書＆チートシート
-         ===================================================================== -->
-    <section id="mod-cbt" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">💻 第1の柱：学科試験 — 全6章CBT模試 × 体系教科書＆国交省同期</span>
-        </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">教則第5版現行基準</span>
-          <span class="nav-pill">CBT全30問</span>
-        </div>
-      </div>
-
-      <!-- MLIT Live Regulatory Watcher & Sync Status Section -->
-      <div id="mlit-watcher-section" class="col-12 card" style="border:2px solid #0284c7; background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);">
-        <div class="card-header" style="margin-bottom:0.65rem;">
-          <div>
-            <div class="card-title" style="color:#0369a1; font-size:1rem;">
-              📡 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー ＆ AERO-PASS反映ステータス
-            </div>
-            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
-              航空局「無人航空機の飛行ルール」「無人航空機操縦者技能証明等」「飛行許可・承認手続」の一次情報（教則第5版・実地試験実施基準・審査要領・更新講習等）を常時監視し、試験への影響を即座に教材へ同期しています。
-            </p>
-          </div>
-          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-            <span id="mlit-watcher-status-badge" class="mono nav-pill" style="background:#dcfce7; color:#166534; font-weight:800; padding:0.3rem 0.65rem; border:1px solid #86efac;">
-              ● LIVE SYNC: 最終検証 2026-11-11 (全9件反映済)
-            </span>
-            <button id="btn-mlit-reverify" class="btn btn-primary" style="font-size:0.78rem;" onclick="reverifyMlitFeedIndex()">
-              🔄 最新インデックス再検証
-            </button>
-          </div>
-        </div>
-
-        <!-- Watched Official Sources Bar -->
-        <div id="mlit-watched-sources-bar" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem; padding:0.55rem 0.75rem; background:#ffffff; border:1px solid var(--border-color); border-radius:6px; font-size:0.76rem;"></div>
-
-        <!-- Category Filters for MLIT Feed -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
-          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-            <span style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">🔍 通達・改訂カテゴリ：</span>
-            <button id="mlit-cat-all" class="btn btn-primary" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('all')">すべて (9)</button>
-            <button id="mlit-cat-kyosoku" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyosoku')">📘 教則・学科試験</button>
-            <button id="mlit-cat-jicchi" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('jicchi')">🗺️ 実地試験基準</button>
-            <button id="mlit-cat-kyoka" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyoka')">✈️ 許可承認・DIPS2.0・レベル3.5/4</button>
-            <button id="mlit-cat-koshin" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('koshin')">🪪 技能証明・更新・身体検査</button>
-          </div>
-          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <a href="https://www.mlit.go.jp/common/002010809.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📄 教則第5版 (公式PDF) ↗</a>
-            <a href="https://www.mlit.go.jp/common/002010810.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📑 第4版→第5版 変更履歴PDF ↗</a>
-            <a href="https://www.mlit.go.jp/koku/content/001971373.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📋 実地試験実施基準PDF ↗</a>
-          </div>
-        </div>
-
-        <div id="mlit-reverify-alert" class="feedback-box hidden" style="margin-bottom:0.75rem;"></div>
-
-        <!-- Feed Cards Grid -->
-        <div id="mlit-live-feed-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:0.75rem;"></div>
-      </div>
-
-      <!-- Top Filter Bar for CBT Questions (All 30 Questions across 6 Chapters) + Exam Mode Timer & Instant Grading Bar -->
+    <section id="cbt-exam-section" class="grid-12" style="margin-bottom:1.5rem;">
+      <!-- Top Filter Bar for CBT Questions + Exam Mode Timer & Instant Grading Bar -->
       <div id="cbt-filter-bar-card" class="col-12 card" style="padding:0.85rem 1.25rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
@@ -537,7 +175,7 @@
             <button id="cbt-filter-fifth" class="btn" onclick="setCbtFilter('fifth')">🔥 改訂重点(5)</button>
           </div>
           <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <button class="btn" onclick="scrollToKyosokuTextbook()">📖 教則全6章スマート教科書 ＆ 版管理 ↓</button>
+            <button class="btn" onclick="scrollToKyosokuTextbook()">📖 教則全6章スマート教科書 ↓</button>
             <button class="btn btn-amber" onclick="scrollToCheatSheet()">⚡ 直前5分チートシート ↓</button>
           </div>
         </div>
@@ -547,7 +185,7 @@
           <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
             <span style="font-weight:800; font-size:0.82rem; color:var(--brand-primary);">⏱️ 本番CBT試験モード：</span>
             <select id="cbt-exam-mode-select" class="form-control" style="width:auto; font-size:0.8rem; font-weight:700;" onchange="changeCbtExamMode(this.value)">
-              <option value="nitou_30m">二等学科モード［制限30分・計算除外可］</option>
+              <option value="nitou_30m">二等学科モード［制限30分・基本問題］</option>
               <option value="ittou_75m" selected>一等学科フルモード［制限75分・全範囲］</option>
             </select>
             <span id="cbt-timer-display" class="mono" style="background:var(--bg-subtle); padding:0.32rem 0.7rem; border-radius:6px; font-weight:800; font-size:0.9rem; border:1px solid var(--border-strong); color:var(--text-main);">
@@ -602,7 +240,7 @@
       <!-- Right: Universal Core Principle + Version Diff Smart Textbook Viewer -->
       <div class="col-5 card">
         <div class="card-header">
-          <div class="card-title">📖 教則スマート教科書ビューア（普遍的原則 ＆ 版改訂比較）</div>
+          <div class="card-title">📖 教則スマート教科書ビューア（普遍原則 ＆ 版改訂比較）</div>
           <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.74rem;" onclick="openKyosokuChapterForCurrentQ()">📚 この章の体系教科書を開く ↓</button>
         </div>
 
@@ -633,383 +271,91 @@
           <p id="cbt-diff-tip" style="color:var(--text-secondary); line-height:1.55;"></p>
         </div>
       </div>
-
-      <!-- Integrated Full-Width Section: 教則全6章 体系スマート教科書 ＆ バージョン管理機構 (v4/v5/v6拡張) -->
-      <div id="cbt-textbook-section" class="col-12 card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">📚 教則全6章（第1章〜第6章）体系スマート教科書 ＆ バージョン管理（v4 / v5 / v6拡張）</div>
-            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
-              特定の改訂箇所だけでなく、第1章（操縦者の心得）〜第6章（運航リスク管理・SORA）の体系的カリキュラムと、歴代・将来の教則バージョン管理スキーマを網羅しています。
-            </p>
-          </div>
-          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <button id="kyosoku-tab-ch1_2" class="btn btn-primary" onclick="selectKyosokuTab('ch1_2')">第1・2章：心得</button>
-            <button id="kyosoku-tab-ch3" class="btn" onclick="selectKyosokuTab('ch3')">第3章：規則・法令</button>
-            <button id="kyosoku-tab-ch4" class="btn" onclick="selectKyosokuTab('ch4')">第4章：機体システム</button>
-            <button id="kyosoku-tab-ch5" class="btn" onclick="selectKyosokuTab('ch5')">第5章：気象・運航体制</button>
-            <button id="kyosoku-tab-ch6" class="btn" onclick="selectKyosokuTab('ch6')">第6章：リスク管理(SORA)</button>
-            <button id="kyosoku-tab-versions" class="btn btn-amber" onclick="selectKyosokuTab('versions')">🔄 バージョン管理 (v4/v5/v6拡張)</button>
-          </div>
-        </div>
-
-        <div id="kyosoku-textbook-body"></div>
-      </div>
-
-      <!-- Bottom Full-Width Section: SEO & Last-Minute 5-Min Cheat Sheet -->
-      <div id="cbt-cheatsheet-section" class="col-12 card">
-        <div class="card-header">
-          <div class="card-title">⚡ 試験直前5分暗記！「教則改訂一覧表 ＆ 全6章頻出数値・一等公式チートシート」</div>
-          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-            <input id="cheatsheet-search-input" type="text" class="form-control" style="width:240px;" placeholder="キーワード検索 (例: 工業専用, 1000m, 1m)" oninput="renderCheatSheet()" />
-            <button id="cs-tab-diff" class="btn btn-primary" onclick="setCheatSheetTab('diff')">① 第5版 改訂早見表 (6項目)</button>
-            <button id="cs-tab-num" class="btn" onclick="setCheatSheetTab('num')">② 頻出数値カード (10枚)</button>
-            <button id="cs-tab-form" class="btn" onclick="setCheatSheetTab('form')">③ 一等公式秒殺シート (4枚)</button>
-          </div>
-        </div>
-
-        <div id="cheatsheet-body"></div>
-      </div>
     </section>
 
     <!-- =====================================================================
-         MODULE 5 (Pillar 5): 合格後：機体図鑑・実務カテゴリー判定・国交省＆公的機関ポータル
+         3. 📚 教則全6章 体系スマート教科書 ＆ バージョン管理 (v4/v5/v6拡張)
          ===================================================================== -->
-    <section id="mod-portal" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">🚁 第5の柱：合格後実務ポータル — 機体図鑑・飛行カテゴリー判定・公的機関リンク</span>
+    <section id="cbt-textbook-section" class="col-12 card" style="margin-bottom:1.5rem;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">📚 教則全6章（第1章〜第6章）体系スマート教科書 ＆ バージョン管理（v4 / v5 / v6拡張）</div>
+          <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+            特定の改訂箇所だけでなく、第1章（操縦者の心得）〜第6章（運航リスク管理・SORA）の体系的カリキュラムと、歴代・将来の教則バージョン管理スキーマを網羅しています。
+          </p>
         </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#d1fae5; color:#065f46; font-weight:700;">実務・機体選定</span>
-          <span class="nav-pill">10機種 × 14機関</span>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <button id="kyosoku-tab-ch1_2" class="btn btn-primary" onclick="selectKyosokuTab('ch1_2')">第1・2章：心得</button>
+          <button id="kyosoku-tab-ch3" class="btn" onclick="selectKyosokuTab('ch3')">第3章：規則・法令</button>
+          <button id="kyosoku-tab-ch4" class="btn" onclick="selectKyosokuTab('ch4')">第4章：機体システム</button>
+          <button id="kyosoku-tab-ch5" class="btn" onclick="selectKyosokuTab('ch5')">第5章：気象・運航体制</button>
+          <button id="kyosoku-tab-ch6" class="btn" onclick="selectKyosokuTab('ch6')">第6章：リスク管理(SORA)</button>
+          <button id="kyosoku-tab-versions" class="btn btn-amber" onclick="selectKyosokuTab('versions')">🔄 バージョン管理 (v4/v5/v6拡張)</button>
         </div>
       </div>
 
-      <!-- Top Left: 飛行ミッション別・必要手続き＆カテゴリー（Ⅰ/ⅡB/ⅡA/Lv3.5/Ⅲ）自動判定シミュレーター -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">🛫 合格後実務「飛行ミッション別・必要手続き＆カテゴリー（Ⅰ/ⅡB/ⅡA/Lv3.5/Ⅲ）自動判定シミュレーター」</div>
-        </div>
-        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.85rem;">
-          保有する技能証明・使用する機体の型式/機体認証区分・飛行空域と方法の3条件を選択すると、航空法上のカテゴリー区分、DIPS 2.0での飛行許可・承認の要否、必須手続きと現場携行チェックリストをリアルタイム判定します。
-        </p>
-
-        <div class="metric-grid" style="margin-top:0; margin-bottom:0.85rem;">
-          <div style="text-align:left;">
-            <label for="portal-sim-license" style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">① 保有技能証明</label>
-            <select id="portal-sim-license" class="form-control" onchange="updatePortalMissionSim()">
-              <option value="ittou">一等（目視内限定解除済）</option>
-              <option value="nitou" selected>二等（目視内限定解除済）</option>
-              <option value="none">技能証明なし</option>
-            </select>
-          </div>
-          <div style="text-align:left;">
-            <label for="portal-sim-aircraft" style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">② 使用機体区分</label>
-            <select id="portal-sim-aircraft" class="form-control" onchange="updatePortalMissionSim()">
-              <option value="type1">第一種機体認証機</option>
-              <option value="type2" selected>第二種機体認証機（25kg未満）</option>
-              <option value="none_under25">型式認証なし（25kg未満）</option>
-              <option value="none_over25">25kg以上大型機</option>
-            </select>
-          </div>
-          <div style="text-align:left;">
-            <label for="portal-sim-airspace" style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">③ 飛行空域・方法</label>
-            <select id="portal-sim-airspace" class="form-control" onchange="updatePortalMissionSim()">
-              <option value="cat1_normal">カテゴリーⅠ（特定飛行なし）</option>
-              <option value="did_night_bvlos_30m" selected>DID・夜間・目視外・30m未満（立入管理あり）</option>
-              <option value="level3_5">レベル3.5飛行（機上カメラ＋保険＋運航概要宣言書）</option>
-              <option value="airport_150m_event_hazmat">空港周辺・150m以上・催し場所・危険物・物件投下</option>
-              <option value="third_party_overflight_lv4">第三者上空飛行（カテゴリーⅢ・レベル4）</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="portal-sim-result-box"></div>
-      </div>
-
-      <!-- Top Right: 試験合格後のDIPS 2.0・運航実務 5ステップ完全ロードマップ -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">🗺️ 試験合格後のDIPS 2.0・運航実務 5ステップ完全ロードマップ</div>
-          <span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">交付申請〜3年更新・行政処分軽減</span>
-        </div>
-        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.75rem;">
-          指定試験機関（ClassNK）での合格証明書発行から、DIPS 2.0での技能証明書交付、機体登録・リモートID、賠償責任保険・包括/レベル3.5申請、毎日の飛行計画通報・飛行日誌、3年ごとの更新講習までを網羅しています。
-        </p>
-
-        <div id="portal-roadmap-tabs" style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.85rem;"></div>
-        <div id="portal-roadmap-body"></div>
-      </div>
-
-      <!-- Middle Full-Width: 型式認証機・主要実務ドローン機体図鑑（全10機種・スペック＆法規メリット比較） -->
-      <div class="col-12 card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">🚁 型式認証機・主要実務ドローン機体図鑑（全10機種・スペック＆法規メリット比較）</div>
-            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
-              第一種・第二種型式認証機（ACSL PF2-CAT3、イームズ E6150TC、Sony Airpeak S1）から、産業点検主力機（Matrice 350 RTK、Mavic 3 Enterprise）、25kg以上大型物流・農薬散布機（FlyCart 30、FAZER R G2、Agras T25/T50）まで、技能証明保有者が運航する際の航空法上のメリットを比較できます。
-            </p>
-          </div>
-          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-            <input id="portal-drone-search" type="text" class="form-control" style="width:230px;" placeholder="機種名・用途・法規で検索..." oninput="renderPortalDroneCatalog()" />
-          </div>
-        </div>
-
-        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.85rem;">
-          <button id="portal-drone-cat-all" class="btn btn-primary" style="font-size:0.77rem;" onclick="setPortalDroneCategory('all')">すべて(10)</button>
-          <button id="portal-drone-cat-type1_cert" class="btn" style="font-size:0.77rem;" onclick="setPortalDroneCategory('type1_cert')">第一種型式認証</button>
-          <button id="portal-drone-cat-type2_cert" class="btn" style="font-size:0.77rem;" onclick="setPortalDroneCategory('type2_cert')">第二種型式認証</button>
-          <button id="portal-drone-cat-enterprise" class="btn" style="font-size:0.77rem;" onclick="setPortalDroneCategory('enterprise')">産業・点検・測量</button>
-          <button id="portal-drone-cat-agri_logistics" class="btn" style="font-size:0.77rem;" onclick="setPortalDroneCategory('agri_logistics')">大型物流・農薬散布(25kg以上)</button>
-          <button id="portal-drone-cat-training_compact" class="btn" style="font-size:0.77rem;" onclick="setPortalDroneCategory('training_compact')">空撮・講習定番機</button>
-        </div>
-
-        <div id="portal-drone-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:0.85rem;"></div>
-      </div>
-
-      <!-- Bottom Full-Width: 国土交通省（航空局）・DIPS 2.0・空域マップ・電波法 公式ポータルリンク集（全14公的サイト） -->
-      <div class="col-12 card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">🏛️ 国土交通省（航空局）・DIPS 2.0・空域マップ・電波法 公式ポータルリンク集（全14公的サイト）</div>
-            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
-              実務パイロットが日常業務で参照する国交省航空局、DIPS 2.0、日本海事協会、プロメトリック、国土地理院DIDマップ、警察庁・防衛省（小型無人機等飛行禁止法）、AIS JAPAN（NOTAM）、総務省電波利用、運輸安全委員会、気象庁の公式ポータルを網羅。
-            </p>
-          </div>
-          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <button id="portal-dir-cat-all" class="btn btn-primary" style="font-size:0.77rem;" onclick="setPortalDirectoryCategory('all')">すべて(14)</button>
-            <button id="portal-dir-cat-mlit_core" class="btn" style="font-size:0.77rem;" onclick="setPortalDirectoryCategory('mlit_core')">🏛️ 国交省・航空局公式</button>
-            <button id="portal-dir-cat-dips_exam" class="btn" style="font-size:0.77rem;" onclick="setPortalDirectoryCategory('dips_exam')">💻 DIPS 2.0・試験機関</button>
-            <button id="portal-dir-cat-airspace_map" class="btn" style="font-size:0.77rem;" onclick="setPortalDirectoryCategory('airspace_map')">🗺️ 空域・DID・飛行禁止法マップ</button>
-            <button id="portal-dir-cat-radio_safety" class="btn" style="font-size:0.77rem;" onclick="setPortalDirectoryCategory('radio_safety')">📡 電波法・事故調査・気象</button>
-          </div>
-        </div>
-
-        <div id="portal-directory-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(350px, 1fr)); gap:0.85rem;"></div>
-      </div>
+      <div id="kyosoku-textbook-body"></div>
     </section>
 
     <!-- =====================================================================
-         MODULE 6 (Pillar 6): スクール送客・個人弱点トップ3分析・B2B LMS管理画面
+         4. ⚡ 試験直前5分暗記！教則改訂一覧表 ＆ 全6章頻出数値・公式チートシート
          ===================================================================== -->
-    <section id="mod-monetize" class="grid-12 hidden">
-      <!-- Breadcrumb Bar -->
-      <div class="col-12 page-breadcrumb-bar">
-        <div class="page-breadcrumb-left">
-          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
-          <span style="color:var(--border-strong);">/</span>
-          <span class="page-breadcrumb-title">🏫 第6の柱：スクール送客・弱点分析・B2B受講生LMS管理</span>
-        </div>
-        <div style="display:flex; gap:0.4rem; align-items:center;">
-          <span class="nav-pill" style="background:#ffe4e6; color:#9f1239; font-weight:700;">ROI＆LMS</span>
-          <span class="nav-pill">全国9エリア</span>
+    <section id="cbt-cheatsheet-section" class="col-12 card" style="margin-bottom:1.5rem;">
+      <div class="card-header">
+        <div class="card-title">⚡ 試験直前5分暗記！「教則改訂一覧表 ＆ 全6章頻出数値・一等公式チートシート」</div>
+        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+          <input id="cheatsheet-search-input" type="text" class="form-control" style="width:240px;" placeholder="キーワード検索 (例: 工業専用, 1000m, 1m)" oninput="renderCheatSheet()" />
+          <button id="cs-tab-diff" class="btn btn-primary" onclick="setCheatSheetTab('diff')">① 第5版 改訂早見表 (6項目)</button>
+          <button id="cs-tab-num" class="btn" onclick="setCheatSheetTab('num')">② 頻出数値カード (10枚)</button>
+          <button id="cs-tab-form" class="btn" onclick="setCheatSheetTab('form')">③ 一等公式秒殺シート (4枚)</button>
         </div>
       </div>
 
-      <!-- Top Row: Personal Weakness Top 3 & Pass Probability Analytics -->
-      <div class="col-12 card">
-        <div class="card-header">
-          <div class="card-title">📊 【個人AI分析】あなたの推定合格確率 ＆ 最優先で復習すべき弱点トップ3</div>
-          <div style="display:flex; gap:0.5rem; align-items:center;">
-            <span id="study-pass-verdict" class="nav-pill" style="font-size:0.8rem; font-weight:800; padding:0.3rem 0.7rem;"></span>
-            <button class="btn" onclick="resetPersonalStudyData()">🔄 履歴リセット</button>
-          </div>
-        </div>
-
-        <div class="grid-12" style="gap:1rem;">
-          <div class="col-4">
-            <div class="metric-grid" style="grid-template-columns:repeat(2, 1fr); margin-top:0;">
-              <div class="metric-item">
-                <div class="metric-label">現在の推定合格確率</div>
-                <div id="study-prob-val" class="metric-value mono" style="color:var(--brand-primary); font-size:1.35rem;">--%</div>
-              </div>
-              <div class="metric-item">
-                <div class="metric-label">第5版改訂箇所 習熟度</div>
-                <div id="study-5th-val" class="metric-value mono" style="font-size:1.2rem;">--%</div>
-              </div>
-              <div class="metric-item">
-                <div class="metric-label">一等計算ドリル 正答率</div>
-                <div id="study-calc-val" class="metric-value mono" style="font-size:1.1rem;">--%</div>
-              </div>
-              <div class="metric-item">
-                <div class="metric-label">机上・口述 直近スコア</div>
-                <div id="study-desk-val" class="metric-value mono" style="font-size:1.1rem;">--点</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-8">
-            <div style="font-weight:700; font-size:0.84rem; margin-bottom:0.45rem; color:var(--text-secondary);">🚨 最優先で復習すべき弱点トップ3（問題演習結果からリアルタイム算出）</div>
-            <div id="study-weakness-top3" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.65rem;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Left: Cost & Pass Rate ROI Simulator -> School Lead Gen Funnel -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">🏫 【送客エンジン】一発試験 vs 登録講習機関（給付金対応ROI診断）</div>
-          <span id="cpa-revenue-pill" class="nav-pill" style="background:var(--status-warning-bg); color:var(--status-warning); font-weight:700;">累計送客報酬 ¥312,500</span>
-        </div>
-
-        <p style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:0.85rem;">
-          資格区分・現在の操縦経験・利用できる給付金（教育訓練給付金／人材開発支援助成金）を選択すると、「指定試験機関での一発試験（再受験・コート代込）」と「登録講習機関（実地100%免除）」の総費用と合格率を精密比較します。
-        </p>
-
-        <div class="metric-grid" style="margin-top:0; margin-bottom:0.85rem;">
-          <div style="text-align:left;">
-            <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">① 取得目標の資格区分</label>
-            <select id="lead-license-type" class="form-control" onchange="updateSchoolComparison()">
-              <option value="nitou_basic">二等（基本）</option>
-              <option value="nitou_full" selected>二等（基本＋夜間・目視外フル）</option>
-              <option value="ittou_basic">一等（基本）</option>
-              <option value="ittou_full">一等（基本＋夜間・目視外フル）</option>
-            </select>
-          </div>
-          <div style="text-align:left;">
-            <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">② 現在の操縦経験・練習環境</label>
-            <select id="lead-exp-level" class="form-control" onchange="updateSchoolComparison()">
-              <option value="beginner">未経験・ATTI練習環境なし</option>
-              <option value="hobby">空撮経験あり（GPSのみ）</option>
-              <option value="pro">業務経験・練習コートあり</option>
-            </select>
-          </div>
-          <div style="text-align:left;">
-            <label style="font-size:0.75rem; font-weight:700; display:block; margin-bottom:0.25rem;">③ 給付金・助成金の活用</label>
-            <select id="lead-subsidy-type" class="form-control" onchange="updateSchoolComparison()">
-              <option value="kyufukin" selected>教育訓練給付金（個人20〜40%還付）</option>
-              <option value="joseikin">人材開発支援助成金（法人最大75%）</option>
-              <option value="none">利用しない（一般個人）</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="school-comparison-box" style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; margin-bottom:0.9rem;"></div>
-
-        <!-- Area School Directory & Lead Gen Form -->
-        <div style="border-top:1px solid var(--border-color); padding-top:0.85rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.4rem;">
-            <div style="font-weight:700; font-size:0.86rem;">📩 全国エリア別・実地試験免除の登録講習機関を検索＆資料請求</div>
-            <select id="lead-pref" class="form-control" style="width:auto;" onchange="renderMatchedSchools()">
-              <option value="東京都">関東（東京都・神奈川・千葉・埼玉）</option>
-              <option value="神奈川県">神奈川県（横浜・厚木）</option>
-              <option value="千葉県">千葉県・埼玉県（幕張・大宮）</option>
-              <option value="愛知県">中部（愛知県・静岡・長野）</option>
-              <option value="大阪府">関西（大阪府・兵庫・京都）</option>
-              <option value="北海道">北海道・東北（札幌・仙台）</option>
-              <option value="広島県">中国・四国（広島・高松）</option>
-              <option value="福岡県">九州・沖縄（博多・熊本・那覇）</option>
-              <option value="全国オンライン学科対応">全国オンライン学科＋47都道府県実技網</option>
-            </select>
-          </div>
-
-          <div id="matched-schools-list" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.75rem;"></div>
-
-          <button class="btn btn-amber" style="width:100%; padding:0.65rem;" onclick="submitSchoolLead()">
-            🎁 選択エリアの提携スクール資料を一括請求（特典：合格パス ¥2,980 即時無料解放！）
-          </button>
-          <div id="lead-submit-msg" class="feedback-box hidden"></div>
-        </div>
-      </div>
-
-      <!-- Right: B2B School LMS Multi-Tenant Dashboard (10 Students + Filter + CSV Export) -->
-      <div class="col-6 card">
-        <div class="card-header">
-          <div class="card-title">🏢 【B2B LMS管理】登録講習機関向け 受講生10名進捗＆監査台帳出力</div>
-          <div style="display:flex; gap:0.4rem; align-items:center;">
-            <select id="b2b-tenant-select" class="form-control" style="width:auto; font-size:0.78rem;" onchange="changeB2bTenant(this.value)"></select>
-          </div>
-        </div>
-
-        <div id="b2b-tenant-meta" style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.65rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.4rem;"></div>
-
-        <!-- Filter & Action Toolbar -->
-        <div style="display:flex; gap:0.45rem; flex-wrap:wrap; margin-bottom:0.75rem;">
-          <select id="b2b-status-filter" class="form-control" style="width:auto; font-size:0.8rem;" onchange="renderB2bTable()">
-            <option value="ALL">全ステータス表示</option>
-            <option value="OK">● 受験許可OKのみ</option>
-            <option value="WARN_REMEDIAL">▲ 計算・RTH要補習のみ</option>
-            <option value="NG_FIFTH_ED">× 第5版改訂箇所未達のみ</option>
-          </select>
-          <input id="b2b-search-input" type="text" class="form-control" style="width:155px; font-size:0.8rem;" placeholder="氏名・区分で検索..." oninput="renderB2bTable()" />
-          <button class="btn" style="font-size:0.78rem;" onclick="syncMyScoreToB2b()">👤 自分の成績を同期</button>
-          <button class="btn btn-primary" style="font-size:0.78rem;" onclick="downloadB2bCsv()">📥 監査用CSV出力</button>
-        </div>
-
-        <!-- KPI Summary Bar -->
-        <div id="b2b-kpi-summary" class="metric-grid" style="margin-top:0; margin-bottom:0.75rem;"></div>
-
-        <!-- 10 Students Table -->
-        <div style="max-height:340px; overflow-y:auto; border:1px solid var(--border-color); border-radius:6px;">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>受講生名 / ID</th>
-                <th>目標区分</th>
-                <th>学科CBT</th>
-                <th>一等計算</th>
-                <th>机上/第5版</th>
-                <th>修了審査判定</th>
-              </tr>
-            </thead>
-            <tbody id="b2b-students-tbody"></tbody>
-          </table>
-        </div>
-
-        <div id="b2b-csv-preview-box" class="feedback-box hidden" style="margin-top:0.75rem;"></div>
-      </div>
+      <div id="cheatsheet-body"></div>
     </section>
 
   </main>
 
-  <!-- Paywall & Pricing Modal -->
+  <!-- Paywall & Pricing Modal (学科試験特化) -->
   <div id="paywall-modal" class="modal-backdrop hidden" onclick="closePaywallModal(event)">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div class="card-header">
-        <div class="card-title">👑 AERO-PASS 合格パスポート（個人買い切り ＆ スクール資料請求特典）</div>
+        <div class="card-title">👑 AERO-PASS 学科試験 合格パスポート（買い切り）</div>
         <button class="btn" onclick="closePaywallModal()">✕ 閉じる</button>
       </div>
 
       <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom:1rem;">
-        サブスク解約忘れの心配がない<strong>「1回買い切り型」</strong>。さらに提携ドローンスクール（登録講習機関）のパンフレット請求・ROI診断を利用された方は、合格パスが<strong>完全無料（¥0）</strong>で即時アンロックされます。
+        サブスク解約忘れの心配がない<strong>「1回買い切り型」</strong>。全30問CBT模擬試験・教則全6章スマート教科書・国交省リアルタイム同期・直前チートシートを無制限でご利用いただけます。
       </p>
 
       <div class="grid-12" style="gap:0.85rem;">
         <div class="col-6" style="border:1px solid var(--border-color); border-radius:8px; padding:1rem;">
-          <div style="font-weight:700; font-size:0.95rem;">二等・完全合格パック</div>
+          <div style="font-weight:700; font-size:0.95rem;">二等学科・完全合格パック</div>
           <div class="mono" style="font-size:1.4rem; font-weight:800; color:var(--brand-primary); margin:0.35rem 0;">¥1,980 <span style="font-size:0.75rem; font-weight:500; color:var(--text-secondary);">（税込・買い切り）</span></div>
           <ul style="font-size:0.8rem; color:var(--text-secondary); padding-left:1.1rem; margin-bottom:0.85rem; line-height:1.6;">
-            <li>教則第5版対応 二等CBT模擬試験＆差分ビューア</li>
-            <li>実地：机上試験マップ演習（全6シナリオ）</li>
-            <li>実地：口述試験6場面＆飛行日誌6項目チェッカー</li>
+            <li>教則第5版対応 二等CBT模擬試験＆即時合否判定</li>
+            <li>普遍的原則＆第4版/第5版差分教科書</li>
+            <li>直前5分暗記チートシート（改訂早見表・頻出数値）</li>
           </ul>
           <button class="btn btn-primary" style="width:100%;" onclick="activatePass('nitou')">Stripe決済で二等パスを解放</button>
         </div>
 
         <div class="col-6" style="border:2px solid var(--brand-primary); border-radius:8px; padding:1rem; background:var(--brand-primary-soft);">
-          <div style="font-weight:800; font-size:0.95rem; color:var(--brand-primary);">一等＆二等 オールインワンパック</div>
+          <div style="font-weight:800; font-size:0.95rem; color:var(--brand-primary);">一等＆二等 学科マスターパック</div>
           <div class="mono" style="font-size:1.4rem; font-weight:800; color:var(--brand-primary); margin:0.35rem 0;">¥2,980 <span style="font-size:0.75rem; font-weight:500; color:var(--text-secondary);">（税込・買い切り）</span></div>
           <ul style="font-size:0.8rem; color:var(--text-main); padding-left:1.1rem; margin-bottom:0.85rem; line-height:1.6;">
-            <li><strong>二等パックの全機能</strong>に加え、一等固有SORA/OSO問題</li>
-            <li><strong>一等：物理ビジュアライザー全9公式＆無限ドリル</strong></li>
-            <li>個人弱点トップ3分析＆全チートシート無制限閲覧</li>
+            <li><strong>二等パックの全機能</strong>に加え、一等固有SORA/リスク管理問題</li>
+            <li>一等75分本番カウントダウンタイマー＆採点</li>
+            <li>教則全6章体系スマート教科書＆v4/v5/v6版管理</li>
           </ul>
-          <button class="btn btn-primary" style="width:100%;" onclick="activatePass('ittou')">一番人気：一等オールインワンを解放</button>
+          <button class="btn btn-primary" style="width:100%;" onclick="activatePass('ittou')">一番人気：一等＆二等パックを解放</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- External Specialized Modules Loaded Before app.js -->
+  <!-- External Exam Bank Data & Main Controller -->
   <script src="data/exam_bank.js"></script>
-  <script src="modules/physics_engine.js"></script>
-  <script src="modules/b2b_monetize.js"></script>
-  <script src="modules/growth_funnel.js"></script>
-  <script src="modules/pilot_portal.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
