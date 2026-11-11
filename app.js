@@ -8,61 +8,23 @@
 //  - window.AERO_PILOT_PORTAL (modules/pilot_portal.js)
 // ============================================================================
 
-let currentModule = 'cbt';
+let currentModule = 'home';
 let currentAccessTier = 'pass'; // 'free' | 'pass'
 
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  updateNavTabs(id);
-}
-
-function updateNavTabs(targetId) {
-  const navMap = {
-    'academic-dashboard': 'nav-dash',
-    'cbt-exam-section': 'nav-cbt',
-    'cbt-textbook-section': 'nav-textbook',
-    'mlit-watcher-section': 'nav-watcher',
-    'cbt-cheatsheet-section': 'nav-cheatsheet'
-  };
-  Object.entries(navMap).forEach(([secId, tabId]) => {
-    const tab = document.getElementById(tabId);
-    if (tab) {
-      if (secId === targetId) tab.classList.add('active');
-      else tab.classList.remove('active');
-    }
-  });
-}
-
-function initSectionScrollTracking() {
-  const sections = [
-    'academic-dashboard',
-    'mlit-watcher-section',
-    'cbt-exam-section',
-    'cbt-textbook-section',
-    'cbt-cheatsheet-section'
-  ];
-  window.addEventListener('scroll', () => {
-    const scrollPos = window.scrollY + 140;
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const sec = document.getElementById(sections[i]);
-      if (sec && sec.offsetTop <= scrollPos) {
-        updateNavTabs(sections[i]);
-        break;
-      }
-    }
-  }, { passive: true });
-}
+// Tile portal: home + 4 academic subpages
+const ACADEMIC_MODULES = ['home', 'cbt', 'textbook', 'watcher', 'cheatsheet'];
 
 function switchModule(mod) {
-  if (mod === 'cbt') scrollToSection('cbt-exam-section');
-  else if (mod === 'home' || mod === 'dash') scrollToSection('academic-dashboard');
-  else if (mod === 'textbook') scrollToSection('cbt-textbook-section');
-  else if (mod === 'watcher') scrollToSection('mlit-watcher-section');
-  else if (mod === 'cheatsheet') scrollToSection('cbt-cheatsheet-section');
-  else scrollToSection('cbt-exam-section');
+  if (!ACADEMIC_MODULES.includes(mod)) mod = 'home';
+  currentModule = mod;
+  ACADEMIC_MODULES.forEach((m) => {
+    const sec = document.getElementById('mod-' + m);
+    if (!sec) return;
+    if (m === mod) sec.classList.remove('hidden');
+    else sec.classList.add('hidden');
+  });
+  // Scroll to top of page cleanly when navigating between pages
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function setAccessTier(tier) {
@@ -1034,8 +996,7 @@ function toggleFlagCurrent() {
 
 // 教則全6章 体系スマート教科書 ＆ バージョン管理機構 (kyosokuChapters + versionRegistry)
 function scrollToKyosokuTextbook() {
-  const el = document.getElementById('cbt-textbook-section');
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  switchModule('textbook');
 }
 
 function openKyosokuChapterForCurrentQ() {
@@ -1043,12 +1004,12 @@ function openKyosokuChapterForCurrentQ() {
     const chId = filteredCbtQuestions[cbtIndex].chapterId || 'ch1_2';
     selectKyosokuTab(chId);
   }
-  scrollToKyosokuTextbook();
+  switchModule('textbook');
 }
 
 function filterCbtByChapterFromTextbook(chId) {
   setCbtFilter(chId);
-  scrollToSection('cbt-exam-section');
+  switchModule('cbt');
 }
 
 function selectKyosokuTab(tabKey) {
@@ -1193,8 +1154,7 @@ function renderKyosokuTextbook() {
 let currentCheatSheetTab = 'diff'; // 'diff' | 'num' | 'form'
 
 function scrollToCheatSheet() {
-  const el = document.getElementById('cbt-cheatsheet-section');
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  switchModule('cheatsheet');
 }
 
 function setCheatSheetTab(tab) {
@@ -1533,7 +1493,7 @@ function downloadB2bCsv() {
 let currentMlitFeedCategory = 'all';
 
 function openMlitWatcherFromAnywhere() {
-  scrollToSection('mlit-watcher-section');
+  switchModule('watcher');
 }
 
 function setMlitFeedFilter(cat) {
@@ -1964,5 +1924,5 @@ window.addEventListener('DOMContentLoaded', () => {
   setCbtFilter('all');
   renderKyosokuTextbook();
   renderCheatSheet();
-  initSectionScrollTracking();
+  switchModule('home');
 });

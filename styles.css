@@ -295,6 +295,10 @@ section[id] {
   margin-bottom: 2rem;
 }
 
+.pillar-grid.pillar-grid-2x2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 @media (max-width: 1080px) {
   .pillar-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -302,7 +306,8 @@ section[id] {
 }
 
 @media (max-width: 680px) {
-  .pillar-grid {
+  .pillar-grid,
+  .pillar-grid.pillar-grid-2x2 {
     grid-template-columns: 1fr;
   }
 }
