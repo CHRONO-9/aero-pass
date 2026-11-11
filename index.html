@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AERO-PASS | 無人航空機操縦士（一等・二等）オールインワン実践シミュレーター</title>
-  <meta name="description" content="教則第5版（2026年7月14日適用）完全対応。無人航空機操縦士の学科CBT模試18問、一等計算ビジュアライザー全9公式、実地試験（机上試験マップ6シナリオ・口述試験6場面・飛行日誌6項目）、スクールROI診断・B2B LMS管理を網羅したオールインワン学習プラットフォーム。" />
+  <title>AERO-PASS | 無人航空機操縦士（一等・二等）オールインワン実践シミュレーター（教則全6章＆版管理対応）</title>
+  <meta name="description" content="国土交通省「無人航空機の飛行の安全に関する教則」全6章体系＆版管理（現行：第5版 2026年7月14日適用）完全対応。学科CBT模試全30問、全6章スマート教科書、一等計算ビジュアライザー全9公式、実地試験（机上試験マップ6シナリオ・口述試験6場面・飛行日誌6項目）、スクールROI診断・B2B LMS管理を網羅。" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
       <div class="brand-group">
         <span class="brand-badge">AERO-PASS</span>
         <h1 class="brand-title">無人航空機操縦士 オールインワン実践シミュレーター</h1>
-        <span class="edition-tag">教則第5版 (2026.7.14適用) 完全準拠</span>
+        <span class="edition-tag">教則全6章体系 ＆ 版管理対応（現行：第5版）</span>
       </div>
 
       <div class="header-actions">
@@ -44,7 +44,7 @@
         📐 ③ 一等：計算ビジュアライザー＆無限ドリル <span class="nav-pill">全9公式</span>
       </button>
       <button id="nav-cbt" class="nav-tab" onclick="switchModule('cbt')">
-        💻 ④ 学科：CBT模試 × 第5版差分＆チートシート <span class="nav-pill">全18問</span>
+        💻 ④ 学科：教則全6章CBT × 体系教科書＆版管理 <span class="nav-pill">全30問・全6章</span>
       </button>
       <button id="nav-monetize" class="nav-tab" onclick="switchModule('monetize')">
         🏫 ⑤ スクール送客・弱点分析・B2B LMS管理 <span class="nav-pill">ROI＆10名管理</span>
@@ -284,20 +284,27 @@
     </section>
 
     <!-- =====================================================================
-         MODULE 4: 学科CBT完全再現モック(全18問フィルタ付) × 教則第5版差分 ＋ 直前チートシート
+         MODULE 4: 学科CBT完全再現モック(全30問・全6章フィルタ付) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書＆チートシート
          ===================================================================== -->
     <section id="mod-cbt" class="grid-12 hidden">
-      <!-- Top Filter Bar for CBT Questions -->
+      <!-- Top Filter Bar for CBT Questions (All 30 Questions across 6 Chapters) -->
       <div class="col-12 card" style="padding:0.85rem 1.25rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
-          <div style="display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap;">
-            <span style="font-weight:700; font-size:0.85rem;">📚 出題カテゴリ切替：</span>
-            <button id="cbt-filter-all" class="btn btn-primary" onclick="setCbtFilter('all')">全て（全18問）</button>
-            <button id="cbt-filter-fifth" class="btn" onclick="setCbtFilter('fifth')">🔥 教則第5版改訂（5問）</button>
-            <button id="cbt-filter-nitou" class="btn" onclick="setCbtFilter('nitou')">二等・共通頻出（8問）</button>
-            <button id="cbt-filter-ittou" class="btn" onclick="setCbtFilter('ittou')">👑 一等固有・SORAリスク評価（5問）</button>
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+            <span style="font-weight:700; font-size:0.84rem;">📚 教則全6章フィルタ：</span>
+            <button id="cbt-filter-all" class="btn btn-primary" onclick="setCbtFilter('all')">全30問</button>
+            <button id="cbt-filter-ch1_2" class="btn" onclick="setCbtFilter('ch1_2')">第1・2章：心得(4)</button>
+            <button id="cbt-filter-ch3" class="btn" onclick="setCbtFilter('ch3')">第3章：規則・法令(10)</button>
+            <button id="cbt-filter-ch4" class="btn" onclick="setCbtFilter('ch4')">第4章：機体システム(6)</button>
+            <button id="cbt-filter-ch5" class="btn" onclick="setCbtFilter('ch5')">第5章：気象・運航(4)</button>
+            <button id="cbt-filter-ch6" class="btn" onclick="setCbtFilter('ch6')">第6章：リスク管理(6)</button>
+            <button id="cbt-filter-ittou" class="btn" onclick="setCbtFilter('ittou')">👑 一等固有(6)</button>
+            <button id="cbt-filter-fifth" class="btn" onclick="setCbtFilter('fifth')">🔥 改訂重点(5)</button>
           </div>
-          <button class="btn btn-amber" onclick="scrollToCheatSheet()">⚡ 試験直前5分！第5版改訂＆頻出数値チートシートへ移動 ↓</button>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <button class="btn" onclick="scrollToKyosokuTextbook()">📖 教則全6章スマート教科書 ＆ 版管理 ↓</button>
+            <button class="btn btn-amber" onclick="scrollToCheatSheet()">⚡ 直前5分チートシート ↓</button>
+          </div>
         </div>
       </div>
 
@@ -305,7 +312,7 @@
       <div class="col-7 card">
         <div class="card-header">
           <div style="display:flex; align-items:center; gap:0.75rem;">
-            <span id="cbt-q-title" class="card-title">問 1 / 18</span>
+            <span id="cbt-q-title" class="card-title">問 1 / 30</span>
             <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.82rem; cursor:pointer;">
               <input type="checkbox" id="cbt-flag-chk" onchange="toggleFlagCurrent()" />
               🚩 後で見直す
@@ -321,6 +328,7 @@
 
         <div style="margin-bottom:0.65rem; display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
           <span id="cbt-badge-id" class="mono nav-pill" style="font-weight:700;"></span>
+          <span id="cbt-badge-chapter" class="nav-pill" style="font-weight:700; background:#e0e7ff; color:#3730a3;"></span>
           <span id="cbt-badge-cat" class="nav-pill" style="font-weight:700; background:var(--brand-primary-soft); color:var(--brand-primary);"></span>
         </div>
 
@@ -329,37 +337,71 @@
         <div id="cbt-choice-container" class="choice-list"></div>
 
         <div id="cbt-answer-feedback" class="feedback-box">
-          選択肢をクリックすると正誤判定を行い、学習履歴（弱点分析）への記録と右側の「教則第5版スマート差分ビューア」を更新します。
+          選択肢をクリックすると正誤判定を行い、学習履歴（弱点分析）への記録と右側の「教則全6章スマート教科書ビューア」を更新します。
         </div>
       </div>
 
-      <!-- Right: 5th Edition Smart Textbook Diff Viewer -->
+      <!-- Right: Universal Core Principle + Version Diff Smart Textbook Viewer -->
       <div class="col-5 card">
         <div class="card-header">
-          <div class="card-title">📖 教則第5版 スマート差分＆根拠条文ビューア</div>
-          <span id="cbt-ref-badge" class="mono" style="font-size:0.75rem; color:var(--text-secondary);"></span>
+          <div class="card-title">📖 教則スマート教科書ビューア（普遍的原則 ＆ 版改訂比較）</div>
+          <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.74rem;" onclick="openKyosokuChapterForCurrentQ()">📚 この章の体系教科書を開く ↓</button>
         </div>
 
-        <div class="diff-box-old">
-          <div style="font-weight:700; color:var(--status-danger); margin-bottom:0.25rem;">❌ 旧・教則第4版までの規定 / 誤答トラップ背景</div>
-          <div id="cbt-diff-old" style="text-decoration:line-through; opacity:0.88;"></div>
+        <div style="margin-bottom:0.55rem; font-size:0.76rem; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+          <span id="cbt-ref-badge" class="mono" style="font-weight:700; color:var(--brand-primary);"></span>
+          <span id="cbt-edition-badge" class="nav-pill" style="font-weight:700;"></span>
         </div>
 
+        <!-- Main Display: Core Principle (普遍的原則・条文根拠) -->
+        <div style="padding:0.9rem; border-radius:var(--radius-sm); background:#eff6ff; border-left:4px solid var(--brand-primary); margin-bottom:0.75rem; font-size:0.86rem;">
+          <div style="font-weight:800; color:#1e40af; margin-bottom:0.3rem;">🏛️ 教則の普遍的原則・条文根拠（Core Principle）</div>
+          <div id="cbt-core-principle" style="color:#1e3a8a; line-height:1.55; font-weight:600;"></div>
+        </div>
+
+        <!-- Edition Comparison: New Rule & Old Rule / Background -->
         <div class="diff-box-new">
-          <div style="font-weight:700; color:var(--status-success); margin-bottom:0.25rem;">✅ 教則第5版（2026年7月14日適用・現行基準）</div>
+          <div id="cbt-diff-new-label" style="font-weight:700; color:var(--status-success); margin-bottom:0.25rem;">✅ 現行基準・正答の根拠（第5版適用基準）</div>
           <div id="cbt-diff-new"></div>
         </div>
 
+        <div class="diff-box-old">
+          <div id="cbt-diff-old-label" style="font-weight:700; color:var(--status-danger); margin-bottom:0.25rem;">📌 旧基準（第4版）からの改訂差分 ／ 前提条文・背景</div>
+          <div id="cbt-diff-old" style="opacity:0.92;"></div>
+        </div>
+
         <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; font-size:0.84rem;">
-          <div style="font-weight:700; margin-bottom:0.3rem;">🎯 試験対策・暗記ポイント</div>
+          <div style="font-weight:700; margin-bottom:0.3rem;">🎯 試験対策・ひっかけ回避ポイント（Tip）</div>
           <p id="cbt-diff-tip" style="color:var(--text-secondary); line-height:1.55;"></p>
         </div>
+      </div>
+
+      <!-- Integrated Full-Width Section: 教則全6章 体系スマート教科書 ＆ バージョン管理機構 (v4/v5/v6拡張) -->
+      <div id="cbt-textbook-section" class="col-12 card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📚 教則全6章（第1章〜第6章）体系スマート教科書 ＆ バージョン管理（v4 / v5 / v6拡張）</div>
+            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+              特定の改訂箇所だけでなく、第1章（操縦者の心得）〜第6章（運航リスク管理・SORA）の体系的カリキュラムと、歴代・将来の教則バージョン管理スキーマを網羅しています。
+            </p>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <button id="kyosoku-tab-ch1_2" class="btn btn-primary" onclick="selectKyosokuTab('ch1_2')">第1・2章：心得</button>
+            <button id="kyosoku-tab-ch3" class="btn" onclick="selectKyosokuTab('ch3')">第3章：規則・法令</button>
+            <button id="kyosoku-tab-ch4" class="btn" onclick="selectKyosokuTab('ch4')">第4章：機体システム</button>
+            <button id="kyosoku-tab-ch5" class="btn" onclick="selectKyosokuTab('ch5')">第5章：気象・運航体制</button>
+            <button id="kyosoku-tab-ch6" class="btn" onclick="selectKyosokuTab('ch6')">第6章：リスク管理(SORA)</button>
+            <button id="kyosoku-tab-versions" class="btn btn-amber" onclick="selectKyosokuTab('versions')">🔄 バージョン管理 (v4/v5/v6拡張)</button>
+          </div>
+        </div>
+
+        <div id="kyosoku-textbook-body"></div>
       </div>
 
       <!-- Bottom Full-Width Section: SEO & Last-Minute 5-Min Cheat Sheet -->
       <div id="cbt-cheatsheet-section" class="col-12 card">
         <div class="card-header">
-          <div class="card-title">⚡ 試験直前5分暗記！「教則第5版 重要改訂一覧表 ＆ 頻出数値・一等公式チートシート」</div>
+          <div class="card-title">⚡ 試験直前5分暗記！「教則改訂一覧表 ＆ 全6章頻出数値・一等公式チートシート」</div>
           <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
             <input id="cheatsheet-search-input" type="text" class="form-control" style="width:240px;" placeholder="キーワード検索 (例: 工業専用, 1000m, 1m)" oninput="renderCheatSheet()" />
             <button id="cs-tab-diff" class="btn btn-primary" onclick="setCheatSheetTab('diff')">① 第5版 改訂早見表 (6項目)</button>

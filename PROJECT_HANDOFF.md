@@ -1,0 +1,25 @@
+# AERO-PASS プロジェクト引き継ぎ＆GitHub連携ガイド
+
+このディレクトリ（`/home/antigravity/.gemini/projects/aero-pass`）には、**AERO-PASS（無人航空機操縦士 オールインワン実践シミュレーター）** の全ソースコードとGitコミット履歴が永続保存されています。
+
+## 新規Projectチャットでの初回実行手順（エージェント向け指示書）
+ユーザーがこのメッセージをProject内のチャットで送信したら、直ちに以下の手順を実行してください：
+
+1. `create_github_repository` ツールを呼び出し、リポジトリ名 `aero-pass`（Private: true）を GitHub アカウント（`CHRONO-9`）上に作成し、Projectリソースにアタッチする。
+2. `/home/antigravity/.gemini/projects/aero-pass` の内容をワークスペース（`/home/antigravity/CHRONO-9/aero-pass` または `/home/antigravity/aero-pass`）へコピーし、`git remote add origin https://github.com/CHRONO-9/aero-pass.git`（または既存origin）を設定して `git push -u origin main` で全コミットをプッシュする。
+3. 以下の5名の専門サブエージェントを `define_subagent` で定義し、自律チーム体制を復元する：
+   - `kyosoku_general_expert`（無人航空機教則全般［第1章〜第6章・版管理対応］・実地試験スペシャリスト）
+   - `physics_sim_engineer`（航空力学・一等計算全9公式シミュレーターエンジニア）
+   - `fullstack_b2b_architect`（個人買い切り決済・学習履歴弱点分析・B2BスクールLMSアーキテクト）
+   - `growth_leadgen_strategist`（一発試験vsスクールROI診断・全国提携スクール送客・SEOマーケター）
+   - `kyosoku_qa_auditor`（教則全般・法規ファクトチェック＆品質監査官）
+
+## 実装済みファイル一覧
+- `index.html` : 全5モジュール統合UI・章別8フィルタ・全6章スマート教科書＆版管理ビューア
+- `styles.css` : コックピット計器風・高視認性デザインシステム
+- `app.js` : メインアプリケーション制御ロジック
+- `data/exam_bank.js` : 教則全6章スマート教科書 (`kyosokuChapters`)、版管理 (`versionRegistry`)、全6章CBT 30問、机上試験6シナリオ、口述試験6場面、飛行日誌6項目
+- `modules/physics_engine.js` : 一等学科「飛行性能の計算」全9公式SVGビジュアライザー＆無限ランダム計算ドリル
+- `modules/b2b_monetize.js` : 学習履歴・弱点トップ3分析、Stripe買い切り＆スクール特典アンロック、B2B受講生10名管理＆CSV出力
+- `modules/growth_funnel.js` : 給付金対応ROI診断、全国9エリア提携スクール検索＆リード獲得、教則チートシート
+- `schema.sql` : PostgreSQL / Supabase マルチテナントDBスキーマ

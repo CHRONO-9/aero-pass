@@ -675,30 +675,42 @@ function sqrtMiniCalc() {
 }
 
 // ============================================================================
-// MODULE 4: 学科CBT完全再現モック(全18問フィルタ付) × 教則第5版差分 ＋ チートシート
+// MODULE 4: 学科CBT完全再現モック(全30問・全6章フィルタ) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書
 // ============================================================================
-let currentCbtFilter = 'all'; // 'all' | 'fifth' | 'nitou' | 'ittou'
+let currentCbtFilter = 'all'; // 'all' | 'ch1_2' | 'ch3' | 'ch4' | 'ch5' | 'ch6' | 'ittou' | 'fifth'
 let filteredCbtQuestions = [];
 let cbtIndex = 0;
 const cbtFlagsById = {};
+let currentKyosokuTab = 'ch1_2'; // 'ch1_2' | 'ch3' | 'ch4' | 'ch5' | 'ch6' | 'versions'
+
+const CHAPTER_LABEL_MAP = {
+  ch1_2: '第1・2章：操縦者の心得',
+  ch3: '第3章：規則・関連法令',
+  ch4: '第4章：機体システム',
+  ch5: '第5章：気象・運航体制',
+  ch6: '第6章：運航リスク管理'
+};
 
 function getFilteredCbtQuestions() {
   const all = (window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.cbtQuestions) || [];
+  if (currentCbtFilter === 'ch1_2' || currentCbtFilter === 'ch3' || currentCbtFilter === 'ch4' || currentCbtFilter === 'ch5' || currentCbtFilter === 'ch6') {
+    return all.filter((q) => q.chapterId === currentCbtFilter);
+  }
   if (currentCbtFilter === 'fifth') {
     return all.filter((q) => q.isFifthEd === true);
   }
-  if (currentCbtFilter === 'nitou') {
-    return all.filter((q) => q.grade === 'nitou');
-  }
   if (currentCbtFilter === 'ittou') {
     return all.filter((q) => q.grade === 'ittou');
+  }
+  if (currentCbtFilter === 'nitou') {
+    return all.filter((q) => q.grade === 'nitou' || q.grade === 'both');
   }
   return all;
 }
 
 function setCbtFilter(filterKey) {
   currentCbtFilter = filterKey;
-  ['all', 'fifth', 'nitou', 'ittou'].forEach((k) => {
+  ['all', 'ch1_2', 'ch3', 'ch4', 'ch5', 'ch6', 'ittou', 'fifth'].forEach((k) => {
     const b = document.getElementById('cbt-filter-' + k);
     if (b) b.className = k === filterKey ? 'btn btn-primary' : 'btn';
   });
@@ -722,15 +734,9 @@ function nextCbtQuestion() {
 function mapQuestionToCategoryId(item) {
   if (item.isFifthEd) return 'cat_4';
   if (item.grade === 'ittou' && item.id === 'CBT-1ST-18') return 'cat_calc';
-  if (item.category && (item.category.includes('システム') || item.category.includes('電波') || item.category.includes('バッテリー'))) {
-    return 'cat_2';
-  }
-  if (item.category && (item.category.includes('義務') || item.category.includes('飲酒'))) {
-    return 'cat_3';
-  }
-  if (item.category && (item.category.includes('気象') || item.category.includes('リスク評価') || item.category.includes('SAIL'))) {
-    return 'cat_4';
-  }
+  if (item.chapterId === 'ch4') return 'cat_2';
+  if (item.chapterId === 'ch1_2') return 'cat_3';
+  if (item.chapterId === 'ch5' || item.chapterId === 'ch6') return 'cat_4';
   return 'cat_1';
 }
 
@@ -747,9 +753,51 @@ function renderCbtQuestion(idx) {
   document.getElementById('cbt-q-title').textContent = `問 ${cbtIndex + 1} / ${filteredCbtQuestions.length}`;
   document.getElementById('cbt-flag-chk').checked = Boolean(cbtFlagsById[qId]);
   document.getElementById('cbt-badge-id').textContent = qId;
+
+  const chBadge = document.getElementById('cbt-badge-chapter');
+  if (chBadge) {
+    chBadge.textContent = CHAPTER_LABEL_MAP[item.chapterId] || '教則全6章';
+  }
+
   document.getElementById('cbt-badge-cat').textContent = item.category || item.cat || '';
   document.getElementById('cbt-question-text').textContent = item.q;
   document.getElementById('cbt-ref-badge').textContent = item.ref;
+
+  const edBadge = document.getElementById('cbt-edition-badge');
+  if (edBadge) {
+    if (item.isFifthEd) {
+      edBadge.textContent = '🔥 第5版改訂重点 (v4→v5差分あり)';
+      edBadge.style.background = 'var(--status-warning-bg)';
+      edBadge.style.color = 'var(--status-warning)';
+    } else if (item.grade === 'ittou') {
+      edBadge.textContent = '👑 一等固有カリキュラム (全6章体系)';
+      edBadge.style.background = '#e0e7ff';
+      edBadge.style.color = '#3730a3';
+    } else {
+      edBadge.textContent = '📘 教則普遍カリキュラム (第1章〜第6章共通)';
+      edBadge.style.background = 'var(--status-success-bg)';
+      edBadge.style.color = 'var(--status-success)';
+    }
+  }
+
+  const coreEl = document.getElementById('cbt-core-principle');
+  if (coreEl) {
+    coreEl.textContent = item.corePrinciple || '無人航空機の航行の安全および地上・水上の人・物件の安全を確保するための教則の普遍的原則に基づきます。';
+  }
+
+  const oldLabelEl = document.getElementById('cbt-diff-old-label');
+  const oldContentEl = document.getElementById('cbt-diff-old');
+  const newLabelEl = document.getElementById('cbt-diff-new-label');
+  if (item.isFifthEd) {
+    if (oldLabelEl) oldLabelEl.textContent = '❌ 旧・教則第4版までの規定（誤答トラップ注意）';
+    if (oldContentEl) oldContentEl.style.textDecoration = 'line-through';
+    if (newLabelEl) newLabelEl.textContent = '✅ 教則第5版（現行最新基準・2026年7月14日適用）';
+  } else {
+    if (oldLabelEl) oldLabelEl.textContent = '📌 関連条文・制度の前提背景';
+    if (oldContentEl) oldContentEl.style.textDecoration = 'none';
+    if (newLabelEl) newLabelEl.textContent = '✅ 教則の体系的規定・正答の根拠';
+  }
+
   document.getElementById('cbt-diff-old').innerHTML = item.oldRule;
   document.getElementById('cbt-diff-new').innerHTML = item.newRule;
   document.getElementById('cbt-diff-tip').textContent = item.tip;
@@ -781,11 +829,11 @@ function renderCbtQuestion(idx) {
       if (isCorrect) {
         btn.classList.add('correct');
         fb.className = 'feedback-box success';
-        fb.innerHTML = `⭕ <strong>正解（選択肢 ${cIdx + 1}）！</strong> 右側の「教則第5版スマート差分ビューア」で根拠条文と暗記ポイントを確認してください。`;
+        fb.innerHTML = `⭕ <strong>正解（選択肢 ${cIdx + 1}）！</strong> 右側の「教則スマート教科書ビューア」で普遍的原則（Core Principle）と条文根拠を確認してください。`;
       } else {
         btn.classList.add('wrong');
         fb.className = 'feedback-box error';
-        fb.innerHTML = `❌ <strong>不正解。正解は (${item.ans + 1}) です。</strong> 旧第4版の規定や誤答トラップと混同していないか右パネルを確認しましょう。`;
+        fb.innerHTML = `❌ <strong>不正解。正解は (${item.ans + 1}) です。</strong> 右パネルの「普遍的原則（Core Principle）」および改訂差分・ひっかけ回避ポイントを確認しましょう。`;
       }
 
       if (window.AERO_MONETIZE_LMS && window.AERO_MONETIZE_LMS.studyTracker) {
@@ -808,6 +856,145 @@ function toggleFlagCurrent() {
   const qId = item.id || `Q-${cbtIndex + 1}`;
   cbtFlagsById[qId] = document.getElementById('cbt-flag-chk').checked;
   renderCbtQuestion(cbtIndex);
+}
+
+// 教則全6章 体系スマート教科書 ＆ バージョン管理機構 (kyosokuChapters + versionRegistry)
+function scrollToKyosokuTextbook() {
+  const el = document.getElementById('cbt-textbook-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openKyosokuChapterForCurrentQ() {
+  if (filteredCbtQuestions.length > 0 && filteredCbtQuestions[cbtIndex]) {
+    const chId = filteredCbtQuestions[cbtIndex].chapterId || 'ch1_2';
+    selectKyosokuTab(chId);
+  }
+  scrollToKyosokuTextbook();
+}
+
+function filterCbtByChapterFromTextbook(chId) {
+  setCbtFilter(chId);
+  const modEl = document.getElementById('mod-cbt');
+  if (modEl) modEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectKyosokuTab(tabKey) {
+  currentKyosokuTab = tabKey;
+  ['ch1_2', 'ch3', 'ch4', 'ch5', 'ch6', 'versions'].forEach((k) => {
+    const b = document.getElementById('kyosoku-tab-' + k);
+    if (!b) return;
+    if (k === tabKey) {
+      b.className = k === 'versions' ? 'btn btn-amber' : 'btn btn-primary';
+    } else {
+      b.className = 'btn';
+    }
+  });
+  renderKyosokuTextbook();
+}
+
+function renderKyosokuTextbook() {
+  const container = document.getElementById('kyosoku-textbook-body');
+  if (!container || !window.AERO_EXAM_BANK) return;
+
+  if (currentKyosokuTab === 'versions') {
+    const reg = window.AERO_EXAM_BANK.versionRegistry;
+    if (!reg || !reg.editions) return;
+    const editions = Object.values(reg.editions);
+    let cardsHtml = '';
+    editions.forEach((ed) => {
+      const isCurrent = ed.id === reg.currentEdition;
+      const borderStyle = isCurrent ? 'border:2px solid var(--brand-primary); background:#f0f9ff;' : 'border:1px solid var(--border-color); background:var(--bg-subtle);';
+      const statusBadge = isCurrent
+        ? `<span class="nav-pill" style="background:var(--status-success-bg); color:var(--status-success); font-weight:800;">● 現行適用基準 (${ed.effectiveDate}〜)</span>`
+        : ed.status === 'archived'
+          ? `<span class="nav-pill" style="background:#fee2e2; color:#991b1b; font-weight:700;">アーカイブ (${ed.effectiveDate})</span>`
+          : `<span class="nav-pill" style="background:#fef3c7; color:#92400e; font-weight:700;">将来改訂拡張スキーマ (${ed.effectiveDate})</span>`;
+
+      const highlightsHtml = (ed.keyHighlights || []).map((h) => `<li style="margin-bottom:0.25rem;">${h}</li>`).join('');
+      let schemaHtml = '';
+      if (ed.diffPatchTemplate) {
+        schemaHtml = `
+          <div class="mono" style="margin-top:0.55rem; background:#0f172a; color:#e2e8f0; padding:0.65rem; border-radius:6px; font-size:0.75rem; line-height:1.45;">
+            <div style="color:#38bdf8; font-weight:700; margin-bottom:0.2rem;">// 将来改訂ホットスワップ用パッチ定義スキーマ</div>
+            targetChapterId: "${ed.diffPatchTemplate.targetChapterId}"<br/>
+            ruleId: "${ed.diffPatchTemplate.ruleId}"<br/>
+            migrationNote: "${ed.diffPatchTemplate.migrationNote}"
+          </div>
+        `;
+      }
+
+      cardsHtml += `
+        <div style="${borderStyle} border-radius:8px; padding:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.45rem;">
+            <strong style="font-size:0.95rem; color:var(--text-main);">${ed.name}</strong>
+            ${statusBadge}
+          </div>
+          <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.6rem; line-height:1.5;">${ed.summary}</p>
+          <ul style="font-size:0.8rem; color:var(--text-main); padding-left:1.15rem; line-height:1.5;">
+            ${highlightsHtml}
+          </ul>
+          ${schemaHtml}
+        </div>
+      `;
+    });
+
+    container.innerHTML = `
+      <div style="margin-bottom:0.75rem; padding:0.75rem 1rem; background:#fffbeb; border:1px solid #fcd34d; border-radius:8px; font-size:0.83rem; color:#92400e;">
+        🔄 <strong>教則バージョン管理機構（Version Registry）：</strong> AERO-PASSは特定の版にハードコードせず、教則全6章の普遍的原則（<code>corePrinciple</code>）と各版の規定差分（<code>oldRule</code> / <code>newRule</code>）を分離管理しているため、第6版以降の法改正・教則改訂にも即座に対応できます。
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:0.85rem;">
+        ${cardsHtml}
+      </div>
+    `;
+    return;
+  }
+
+  const chapters = window.AERO_EXAM_BANK.kyosokuChapters || [];
+  const ch = chapters.find((c) => c.id === currentKyosokuTab) || chapters[0];
+  if (!ch) return;
+
+  const qCount = ((window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.cbtQuestions) || []).filter((q) => q.chapterId === ch.id).length;
+
+  let sectionsHtml = '';
+  (ch.sections || []).forEach((sec) => {
+    const ptsHtml = (sec.keyPoints || []).map((pt) => `<li style="margin-bottom:0.35rem;">${pt}</li>`).join('');
+    sectionsHtml += `
+      <div style="border:1px solid var(--border-color); border-radius:8px; padding:1rem; background:#ffffff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.45rem;">
+          <div style="font-weight:800; font-size:0.92rem; color:var(--brand-primary);">§ ${sec.secNo}　${sec.title}</div>
+          <span class="mono" style="font-size:0.74rem; background:var(--bg-subtle); padding:0.2rem 0.5rem; border-radius:4px; color:var(--text-secondary); font-weight:600;">根拠：${sec.lawOrPrinciple}</span>
+        </div>
+        <div style="background:#eff6ff; border-left:3px solid var(--brand-primary); padding:0.6rem 0.8rem; border-radius:4px; font-size:0.83rem; font-weight:600; color:#1e3a8a; margin-bottom:0.65rem; line-height:1.5;">
+          💡 <strong>体系的要旨：</strong> ${sec.coreSummary}
+        </div>
+        <ul style="font-size:0.82rem; color:var(--text-main); padding-left:1.2rem; line-height:1.55; margin-bottom:0.65rem;">
+          ${ptsHtml}
+        </ul>
+        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:0.55rem 0.75rem; font-size:0.79rem; color:#991b1b; font-weight:600;">
+          ⚠️ <strong>学科・実地試験の頻出ひっかけ注意：</strong> ${sec.trapWarning}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem 1.1rem; margin-bottom:0.9rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+      <div style="flex:1; min-width:260px;">
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+          <span class="nav-pill" style="background:var(--brand-primary); color:#fff; font-weight:800; font-size:0.76rem;">${ch.chapterNumber}</span>
+          <strong style="font-size:0.98rem; color:var(--text-main);">${ch.title}</strong>
+          <span class="mono" style="font-size:0.74rem; color:var(--brand-primary); font-weight:700;">（${ch.weightBadge}）</span>
+        </div>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5;">${ch.overview}</p>
+      </div>
+      <button class="btn btn-primary" onclick="filterCbtByChapterFromTextbook('${ch.id}')">
+        📝 この章のCBT問題（全${qCount}問）を演習する ↑
+      </button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0.85rem;">
+      ${sectionsHtml}
+    </div>
+  `;
 }
 
 // Cheat Sheet Sub-view in Module 4
@@ -1164,6 +1351,7 @@ window.addEventListener('DOMContentLoaded', () => {
   generateNewDrill('all');
 
   setCbtFilter('all');
+  renderKyosokuTextbook();
   renderCheatSheet();
 
   initB2bTenantSelect();
