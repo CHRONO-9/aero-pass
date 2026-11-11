@@ -9,27 +9,45 @@
 // ============================================================================
 
 let currentModule = 'home';
-let currentAccessTier = 'pass'; // 'free' | 'pass'
-
-// Tile portal: home + 4 academic subpages
-const ACADEMIC_MODULES = ['home', 'cbt', 'textbook', 'watcher', 'cheatsheet'];
+let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
 
 function switchModule(mod) {
-  if (!ACADEMIC_MODULES.includes(mod)) mod = 'home';
   currentModule = mod;
-  ACADEMIC_MODULES.forEach((m) => {
+  const mods = ['home', 'cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
+  mods.forEach((m) => {
     const sec = document.getElementById('mod-' + m);
-    if (!sec) return;
-    if (m === mod) sec.classList.remove('hidden');
-    else sec.classList.add('hidden');
+    const tab = document.getElementById('nav-' + m);
+    if (sec) {
+      if (m === mod) sec.classList.remove('hidden');
+      else sec.classList.add('hidden');
+    }
+    if (tab) {
+      if (m === mod) tab.classList.add('active');
+      else tab.classList.remove('active');
+    }
   });
-  // Scroll to top of page cleanly when navigating between pages
+
+  // Scroll to top of page cleanly when navigating between pillars
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (mod === 'calc') {
+    renderCalcVisualizer();
+  } else if (mod === 'portal') {
+    updatePortalMissionSim();
+    renderPortalRoadmap();
+    renderPortalDroneCatalog();
+    renderPortalDirectory();
+  } else if (mod === 'monetize') {
+    renderPersonalAnalytics();
+    updateSchoolComparison();
+    renderMatchedSchools();
+    renderB2bTable();
+  }
 }
 
 function setAccessTier(tier) {
   currentAccessTier = tier;
-  ['free', 'pass'].forEach((t) => {
+  ['free', 'pass', 'b2b'].forEach((t) => {
     const btn = document.getElementById('tier-' + t);
     if (!btn) return;
     if (t === tier) btn.classList.add('active');
@@ -41,10 +59,14 @@ function setAccessTier(tier) {
       window.AERO_MONETIZE_LMS.passManager.setPlanDirect('free');
     } else if (tier === 'pass') {
       window.AERO_MONETIZE_LMS.passManager.setPlanDirect('ittou_pass');
+    } else if (tier === 'b2b') {
+      window.AERO_MONETIZE_LMS.passManager.setPlanDirect('b2b_student');
     }
   }
 
-  if (tier === 'free') {
+  if (tier === 'b2b') {
+    switchModule('monetize');
+  } else if (tier === 'free') {
     openPaywallModal();
   }
 }
@@ -996,7 +1018,8 @@ function toggleFlagCurrent() {
 
 // 教則全6章 体系スマート教科書 ＆ バージョン管理機構 (kyosokuChapters + versionRegistry)
 function scrollToKyosokuTextbook() {
-  switchModule('textbook');
+  const el = document.getElementById('cbt-textbook-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
 
 function openKyosokuChapterForCurrentQ() {
@@ -1004,12 +1027,13 @@ function openKyosokuChapterForCurrentQ() {
     const chId = filteredCbtQuestions[cbtIndex].chapterId || 'ch1_2';
     selectKyosokuTab(chId);
   }
-  switchModule('textbook');
+  scrollToKyosokuTextbook();
 }
 
 function filterCbtByChapterFromTextbook(chId) {
   setCbtFilter(chId);
-  switchModule('cbt');
+  const modEl = document.getElementById('mod-cbt');
+  if (modEl) modEl.scrollIntoView({ behavior: 'smooth' });
 }
 
 function selectKyosokuTab(tabKey) {
@@ -1154,7 +1178,8 @@ function renderKyosokuTextbook() {
 let currentCheatSheetTab = 'diff'; // 'diff' | 'num' | 'form'
 
 function scrollToCheatSheet() {
-  switchModule('cheatsheet');
+  const el = document.getElementById('cbt-cheatsheet-section');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
 
 function setCheatSheetTab(tab) {
@@ -1493,7 +1518,9 @@ function downloadB2bCsv() {
 let currentMlitFeedCategory = 'all';
 
 function openMlitWatcherFromAnywhere() {
-  switchModule('watcher');
+  switchModule('cbt');
+  const sec = document.getElementById('mlit-watcher-section');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth' });
 }
 
 function setMlitFeedFilter(cat) {
@@ -1917,12 +1944,35 @@ function renderPortalDirectory() {
 }
 
 // ============================================================================
-// Initialize Academic Exam Simulator on page load
+// Initialize all 6 modules on page load
 // ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
+  initKijoScenarioSelect();
+  loadKijoScenario(0);
+
+  initOralStageButtons();
+  loadOralStage(0);
+  renderFlightLogTable();
+
+  initCalcFormulaControls();
+  setCalcVisualizer('turn');
+  generateNewDrill('all');
+
   renderMlitLiveFeed();
   setCbtFilter('all');
   renderKyosokuTextbook();
   renderCheatSheet();
+
+  updatePortalMissionSim();
+  renderPortalRoadmap();
+  renderPortalDroneCatalog();
+  renderPortalDirectory();
+
+  initB2bTenantSelect();
+  renderPersonalAnalytics();
+  updateSchoolComparison();
+  renderB2bTable();
+
+  // Ensure 6-pillar top portal is displayed on initial page load
   switchModule('home');
 });
