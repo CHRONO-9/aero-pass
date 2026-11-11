@@ -5,14 +5,15 @@
 //  - window.AERO_PHYSICS_ENGINE (modules/physics_engine.js)
 //  - window.AERO_MONETIZE_LMS (modules/b2b_monetize.js)
 //  - window.AERO_GROWTH_FUNNEL (modules/growth_funnel.js)
+//  - window.AERO_PILOT_PORTAL (modules/pilot_portal.js)
 // ============================================================================
 
-let currentModule = 'kijo';
+let currentModule = 'cbt';
 let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
 
 function switchModule(mod) {
   currentModule = mod;
-  const mods = ['kijo', 'oral', 'calc', 'cbt', 'monetize'];
+  const mods = ['cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
   mods.forEach((m) => {
     const sec = document.getElementById('mod-' + m);
     const tab = document.getElementById('nav-' + m);
@@ -27,6 +28,11 @@ function switchModule(mod) {
   });
   if (mod === 'calc') {
     renderCalcVisualizer();
+  } else if (mod === 'portal') {
+    updatePortalMissionSim();
+    renderPortalRoadmap();
+    renderPortalDroneCatalog();
+    renderPortalDirectory();
   } else if (mod === 'monetize') {
     renderPersonalAnalytics();
     updateSchoolComparison();
@@ -675,12 +681,18 @@ function sqrtMiniCalc() {
 }
 
 // ============================================================================
-// MODULE 4: 学科CBT完全再現モック(全30問・全6章フィルタ) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書
 // ============================================================================
-let currentCbtFilter = 'all'; // 'all' | 'ch1_2' | 'ch3' | 'ch4' | 'ch5' | 'ch6' | 'ittou' | 'fifth'
+// MODULE 1 (Pillar 1): 学科CBT完全再現モック(全30問・全6章フィルタ) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書
+// ============================================================================
+let currentCbtFilter = 'all'; // 'all' | 'ch1_2' | 'ch3' | 'ch4' | 'ch5' | 'ch6' | 'ittou' | 'fifth' | 'nitou'
 let filteredCbtQuestions = [];
 let cbtIndex = 0;
 const cbtFlagsById = {};
+const cbtAnswersById = {};
+let currentCbtExamMode = 'ittou_75m'; // 'nitou_30m' | 'ittou_75m'
+let cbtTimerInterval = null;
+let cbtRemainingSec = 75 * 60;
+let cbtTimerRunning = false;
 let currentKyosokuTab = 'ch1_2'; // 'ch1_2' | 'ch3' | 'ch4' | 'ch5' | 'ch6' | 'versions'
 
 const CHAPTER_LABEL_MAP = {
@@ -690,6 +702,141 @@ const CHAPTER_LABEL_MAP = {
   ch5: '第5章：気象・運航体制',
   ch6: '第6章：運航リスク管理'
 };
+
+function formatCbtTimer(sec) {
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  return `⏱️ ${m}:${s}`;
+}
+
+function changeCbtExamMode(mode) {
+  currentCbtExamMode = mode === 'nitou_30m' ? 'nitou_30m' : 'ittou_75m';
+  if (cbtTimerInterval) {
+    clearInterval(cbtTimerInterval);
+    cbtTimerInterval = null;
+  }
+  cbtTimerRunning = false;
+  cbtRemainingSec = currentCbtExamMode === 'nitou_30m' ? 30 * 60 : 75 * 60;
+
+  const disp = document.getElementById('cbt-timer-display');
+  if (disp) disp.textContent = formatCbtTimer(cbtRemainingSec);
+
+  const btn = document.getElementById('btn-cbt-timer-toggle');
+  if (btn) btn.textContent = '▶️ タイマー開始/リセット';
+
+  if (currentCbtExamMode === 'nitou_30m') {
+    setCbtFilter('nitou');
+  } else {
+    setCbtFilter('all');
+  }
+}
+
+function toggleOrResetCbtTimer() {
+  const disp = document.getElementById('cbt-timer-display');
+  const btn = document.getElementById('btn-cbt-timer-toggle');
+  const defaultSec = currentCbtExamMode === 'nitou_30m' ? 30 * 60 : 75 * 60;
+
+  if (cbtTimerRunning) {
+    clearInterval(cbtTimerInterval);
+    cbtTimerInterval = null;
+    cbtTimerRunning = false;
+    cbtRemainingSec = defaultSec;
+    if (disp) disp.textContent = formatCbtTimer(cbtRemainingSec);
+    if (btn) btn.textContent = '▶️ タイマー開始/リセット';
+    return;
+  }
+
+  cbtRemainingSec = defaultSec;
+  cbtTimerRunning = true;
+  if (disp) disp.textContent = formatCbtTimer(cbtRemainingSec);
+  if (btn) btn.textContent = '⏹️ リセット (稼働中)';
+
+  cbtTimerInterval = setInterval(() => {
+    cbtRemainingSec--;
+    if (cbtRemainingSec <= 0) {
+      clearInterval(cbtTimerInterval);
+      cbtTimerInterval = null;
+      cbtTimerRunning = false;
+      if (disp) disp.textContent = '⏱️ 00:00 (試験終了)';
+      if (btn) btn.textContent = '▶️ タイマー開始/リセット';
+      gradeCbtSession();
+      return;
+    }
+    if (disp) disp.textContent = formatCbtTimer(cbtRemainingSec);
+  }, 1000);
+}
+
+function gradeCbtSession() {
+  const box = document.getElementById('cbt-session-grade-summary');
+  if (!box) return;
+  box.classList.remove('hidden');
+
+  const pool = filteredCbtQuestions.length > 0 ? filteredCbtQuestions : getFilteredCbtQuestions();
+  let answeredCount = 0;
+  let correctCount = 0;
+  let flaggedCount = 0;
+  const chapterStats = {};
+
+  pool.forEach((q, idx) => {
+    const qId = q.id || `Q-${idx + 1}`;
+    const chKey = q.chapterId || 'ch3';
+    if (!chapterStats[chKey]) {
+      chapterStats[chKey] = { total: 0, answered: 0, correct: 0 };
+    }
+    chapterStats[chKey].total++;
+    if (cbtFlagsById[qId]) flaggedCount++;
+
+    const rec = cbtAnswersById[qId];
+    if (rec !== undefined) {
+      answeredCount++;
+      chapterStats[chKey].answered++;
+      if (rec.isCorrect) {
+        correctCount++;
+        chapterStats[chKey].correct++;
+      }
+    }
+  });
+
+  const baseCount = answeredCount > 0 ? answeredCount : pool.length;
+  const accuracy = answeredCount > 0 ? Math.round((correctCount / baseCount) * 100) : 0;
+  const isPass = answeredCount > 0 && accuracy >= 80;
+
+  const weakChapters = [];
+  Object.keys(chapterStats).forEach((chKey) => {
+    const st = chapterStats[chKey];
+    if (st.answered > 0) {
+      const chAcc = Math.round((st.correct / st.answered) * 100);
+      if (chAcc < 80) {
+        weakChapters.push(`${CHAPTER_LABEL_MAP[chKey] || chKey}（正答率 ${chAcc}%）`);
+      }
+    }
+  });
+
+  const modeLabel = currentCbtExamMode === 'nitou_30m' ? '二等学科モード（制限30分・合格基準80%）' : '一等学科フルモード（制限75分・合格基準80%）';
+
+  if (answeredCount === 0) {
+    box.className = 'feedback-box warning';
+    box.innerHTML = `
+      <div>📊 <strong>【${modeLabel}】現在まだ回答済みの問題がありません（対象：全${pool.length}問 ／ 見直しフラグ：${flaggedCount}件）</strong></div>
+      <div style="font-size:0.8rem; margin-top:0.25rem;">下の問題パネルで選択肢をクリックして回答すると、正答数・正答率・合否判定（80%基準）および章別アドバイスが即時算出されます。</div>
+    `;
+    return;
+  }
+
+  const adviceText =
+    weakChapters.length > 0
+      ? `⚠️ 要復習チャプター：<strong>${weakChapters.join(' ／ ')}</strong>。下の「📚 教則全6章 体系スマート教科書」で該当章の条文根拠とひっかけ注意点を復習しましょう。`
+      : `✅ 回答済みのすべての章で合格基準（80%以上）を達成しています！未回答問題（残り ${pool.length - answeredCount} 問）や見直しフラグ（${flaggedCount} 件）も仕上げましょう。`;
+
+  box.className = isPass ? 'feedback-box success' : 'feedback-box error';
+  box.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <strong>${isPass ? '🎉 【合格圏到達（80%以上クリア）】' : '🚨 【要復習（合格基準80%未達）】'} ${modeLabel}</strong>
+      <span class="mono" style="font-weight:800; font-size:0.9rem;">正答 ${correctCount} / 回答 ${answeredCount} 問（対象全${pool.length}問）｜ 正答率 ${accuracy}% ｜ 🚩フラグ ${flaggedCount}件</span>
+    </div>
+    <div style="font-size:0.81rem; margin-top:0.35rem; line-height:1.5;">${adviceText}</div>
+  `;
+}
 
 function getFilteredCbtQuestions() {
   const all = (window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.cbtQuestions) || [];
@@ -807,11 +954,13 @@ function renderCbtQuestion(idx) {
   pal.innerHTML = '';
   filteredCbtQuestions.forEach((qItem, i) => {
     const idKey = qItem.id || `Q-${i + 1}`;
+    const ansRec = cbtAnswersById[idKey];
+    const mark = ansRec ? (ansRec.isCorrect ? '⭕' : '❌') : '';
     const b = document.createElement('button');
     b.className = i === cbtIndex ? 'btn btn-primary mono' : 'btn mono';
     b.style.padding = '0.22rem 0.5rem';
     b.style.fontSize = '0.75rem';
-    b.textContent = `${i + 1}${cbtFlagsById[idKey] ? '🚩' : ''}`;
+    b.textContent = `${i + 1}${mark}${cbtFlagsById[idKey] ? '🚩' : ''}`;
     b.onclick = () => renderCbtQuestion(i);
     pal.appendChild(b);
   });
@@ -825,6 +974,11 @@ function renderCbtQuestion(idx) {
     btn.innerHTML = `<strong>(${cIdx + 1})</strong> <span>${cText}</span>`;
     btn.onclick = () => {
       const isCorrect = cIdx === item.ans;
+      cbtAnswersById[qId] = {
+        selectedIdx: cIdx,
+        isCorrect: isCorrect,
+        chapterId: item.chapterId || 'ch3'
+      };
       const fb = document.getElementById('cbt-answer-feedback');
       if (isCorrect) {
         btn.classList.add('correct');
@@ -1515,7 +1669,278 @@ function renderMlitLiveFeed() {
 }
 
 // ============================================================================
-// Initialize all 5 modules on page load
+// MODULE 5 (Pillar 5): 合格後：機体図鑑・実務カテゴリー判定・国交省＆公的機関ポータル (window.AERO_PILOT_PORTAL)
+// ============================================================================
+let currentPortalRoadmapStep = 1;
+let currentPortalDroneCat = 'all';
+let currentPortalDirCat = 'all';
+
+function updatePortalMissionSim() {
+  if (!window.AERO_PILOT_PORTAL || !window.AERO_PILOT_PORTAL.evaluateFlightMission) return;
+  const licEl = document.getElementById('portal-sim-license');
+  const airEl = document.getElementById('portal-sim-aircraft');
+  const spcEl = document.getElementById('portal-sim-airspace');
+  const resBox = document.getElementById('portal-sim-result-box');
+  if (!resBox) return;
+
+  const res = window.AERO_PILOT_PORTAL.evaluateFlightMission({
+    license: licEl ? licEl.value : 'nitou',
+    aircraftCert: airEl ? airEl.value : 'type2',
+    airspaceAndMethod: spcEl ? spcEl.value : 'did_night_bvlos_30m'
+  });
+
+  let badgeStyle = 'background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7;';
+  if (res.badgeColor === 'amber') {
+    badgeStyle = 'background:#fffbeb; color:#92400e; border:1px solid #fcd34d;';
+  } else if (res.badgeColor === 'rose') {
+    badgeStyle = 'background:#fef2f2; color:#991b1b; border:1px solid #fca5a5;';
+  } else if (res.badgeColor === 'blue' || res.badgeColor === 'cyan' || res.badgeColor === 'teal') {
+    badgeStyle = 'background:#f0f9ff; color:#0369a1; border:1px solid #7dd3fc;';
+  }
+
+  const procHtml = (res.requiredProcedures || [])
+    .map((p) => `<li style="margin-bottom:0.25rem;">${p}</li>`)
+    .join('');
+  const chkHtml = (res.checklist || [])
+    .map((c) => `<li style="margin-bottom:0.25rem;">☑️ ${c}</li>`)
+    .join('');
+
+  resBox.innerHTML = `
+    <div style="border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; background:var(--bg-subtle);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.45rem;">
+        <strong style="font-size:0.94rem; color:var(--brand-primary);">${res.categoryName}</strong>
+        <span class="nav-pill" style="background:#e0e7ff; color:#3730a3; font-weight:700;">${res.levelName}</span>
+      </div>
+      <div style="${badgeStyle} padding:0.5rem 0.75rem; border-radius:6px; font-weight:800; font-size:0.84rem; margin-bottom:0.6rem;">
+        ⚖️ 飛行許可・承認判定：${res.permissionRequired}
+      </div>
+      <p style="font-size:0.81rem; color:var(--text-main); line-height:1.55; margin-bottom:0.65rem;">
+        ${res.summary}
+      </p>
+      <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:6px; padding:0.65rem 0.8rem; margin-bottom:0.55rem;">
+        <div style="font-weight:800; font-size:0.8rem; color:var(--brand-primary); margin-bottom:0.3rem;">📋 必須手続き・DIPS 2.0アクション</div>
+        <ul style="font-size:0.78rem; color:var(--text-main); padding-left:1.15rem; line-height:1.5;">
+          ${procHtml}
+        </ul>
+      </div>
+      <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:6px; padding:0.65rem 0.8rem;">
+        <div style="font-weight:800; font-size:0.8rem; color:#065f46; margin-bottom:0.3rem;">🛡️ 出発前・現場実務チェックリスト</div>
+        <ul style="font-size:0.77rem; color:var(--text-secondary); list-style:none; padding-left:0; line-height:1.5;">
+          ${chkHtml}
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+function selectPortalRoadmapStep(stepNum) {
+  currentPortalRoadmapStep = stepNum;
+  renderPortalRoadmap();
+}
+
+function renderPortalRoadmap() {
+  if (!window.AERO_PILOT_PORTAL || !Array.isArray(window.AERO_PILOT_PORTAL.postPassRoadmap)) return;
+  const steps = window.AERO_PILOT_PORTAL.postPassRoadmap;
+  const tabsEl = document.getElementById('portal-roadmap-tabs');
+  const bodyEl = document.getElementById('portal-roadmap-body');
+  if (!tabsEl || !bodyEl || steps.length === 0) return;
+
+  tabsEl.innerHTML = '';
+  steps.forEach((st) => {
+    const btn = document.createElement('button');
+    btn.className = st.step === currentPortalRoadmapStep ? 'btn btn-primary' : 'btn';
+    btn.style.fontSize = '0.76rem';
+    btn.style.padding = '0.3rem 0.65rem';
+    btn.textContent = `Step ${st.step}: ${st.phase.replace(/^STEP 0\d\s*—\s*/, '')}`;
+    btn.onclick = () => selectPortalRoadmapStep(st.step);
+    tabsEl.appendChild(btn);
+  });
+
+  const active = steps.find((s) => s.step === currentPortalRoadmapStep) || steps[0];
+  const actionsHtml = (active.actionItems || [])
+    .map((a) => `<li style="margin-bottom:0.35rem;">${a}</li>`)
+    .join('');
+
+  bodyEl.innerHTML = `
+    <div style="border:1px solid var(--border-color); border-radius:8px; padding:0.95rem; background:var(--bg-subtle);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.35rem;">
+        <span class="mono nav-pill" style="background:var(--brand-primary); color:#ffffff; font-weight:800;">${active.phase}</span>
+        <span class="mono" style="font-size:0.74rem; color:var(--text-secondary); font-weight:700;">根拠条文：${active.legalBasis}</span>
+      </div>
+      <div style="font-weight:800; font-size:0.96rem; color:var(--text-main); margin-bottom:0.3rem;">
+        ${active.title}
+      </div>
+      <div style="font-size:0.77rem; color:#0369a1; font-weight:700; margin-bottom:0.55rem;">
+        ⏰ 実施タイミング：${active.timing}
+      </div>
+      <p style="font-size:0.81rem; color:var(--text-secondary); line-height:1.55; margin-bottom:0.7rem;">
+        ${active.summary}
+      </p>
+      <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:6px; padding:0.7rem 0.85rem;">
+        <div style="font-weight:800; font-size:0.8rem; color:var(--brand-primary); margin-bottom:0.35rem;">✅ 実務アクション＆注意点</div>
+        <ul style="font-size:0.79rem; color:var(--text-main); padding-left:1.15rem; line-height:1.55;">
+          ${actionsHtml}
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+function setPortalDroneCategory(catKey) {
+  currentPortalDroneCat = catKey;
+  ['all', 'type1_cert', 'type2_cert', 'enterprise', 'agri_logistics', 'training_compact'].forEach((k) => {
+    const b = document.getElementById('portal-drone-cat-' + k);
+    if (b) b.className = k === catKey ? 'btn btn-primary' : 'btn';
+  });
+  renderPortalDroneCatalog();
+}
+
+function renderPortalDroneCatalog() {
+  if (!window.AERO_PILOT_PORTAL || !Array.isArray(window.AERO_PILOT_PORTAL.droneCatalog)) return;
+  const allDrones = window.AERO_PILOT_PORTAL.droneCatalog;
+  const query = ((document.getElementById('portal-drone-search') || {}).value || '').trim().toLowerCase();
+  const grid = document.getElementById('portal-drone-grid');
+  if (!grid) return;
+
+  const filtered = allDrones.filter((d) => {
+    if (currentPortalDroneCat !== 'all' && d.category !== currentPortalDroneCat) return false;
+    if (!query) return true;
+    const hay = [
+      d.name,
+      d.manufacturer,
+      d.categoryLabel,
+      d.certificationBadge,
+      d.regulatoryAdvantage,
+      d.specSummary,
+      ...(d.useCases || []),
+      ...(d.supportedLevels || [])
+    ]
+      .join(' ')
+      .toLowerCase();
+    return hay.includes(query);
+  });
+
+  grid.innerHTML = '';
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="feedback-box warning" style="grid-column:1/-1;">該当する機体が見つかりませんでした。検索条件を変更してください。</div>`;
+    return;
+  }
+
+  filtered.forEach((d) => {
+    let certStyle = 'background:#f1f5f9; color:#334155;';
+    if (d.category === 'type1_cert') {
+      certStyle = 'background:#fef3c7; color:#92400e; border:1px solid #fcd34d;';
+    } else if (d.category === 'type2_cert') {
+      certStyle = 'background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7;';
+    } else if (d.weightClass === 'over25kg') {
+      certStyle = 'background:#fef2f2; color:#991b1b; border:1px solid #fca5a5;';
+    }
+
+    const useTags = (d.useCases || [])
+      .map((u) => `<span class="nav-pill" style="background:var(--bg-subtle); color:var(--text-secondary); font-size:0.7rem; border:1px solid var(--border-color);">${u}</span>`)
+      .join(' ');
+    const lvTags = (d.supportedLevels || [])
+      .map((lv) => `<span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-size:0.7rem; font-weight:700;">${lv}</span>`)
+      .join(' ');
+
+    const card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border-color); border-radius:8px; padding:0.95rem; background:#ffffff; display:flex; flex-direction:column; justify-content:space-between; gap:0.6rem; box-shadow:0 1px 2px rgba(15,23,42,0.04);';
+    card.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.3rem;">
+          <div>
+            <div style="font-size:0.73rem; font-weight:700; color:var(--text-secondary);">${d.manufacturer}｜${d.categoryLabel}</div>
+            <div style="font-size:1rem; font-weight:800; color:var(--text-main);">${d.name}</div>
+          </div>
+          <span class="nav-pill" style="${certStyle} font-weight:800; font-size:0.7rem;">${d.certificationBadge}</span>
+        </div>
+
+        <div class="metric-grid" style="grid-template-columns:repeat(2, 1fr); margin-top:0.45rem; margin-bottom:0.55rem; gap:0.4rem;">
+          <div class="metric-item" style="padding:0.4rem 0.55rem; text-align:left;">
+            <div class="metric-label" style="font-size:0.68rem;">最大離陸重量 / 区分</div>
+            <div class="metric-value mono" style="font-size:0.78rem;">${d.mtowDisplay}</div>
+          </div>
+          <div class="metric-item" style="padding:0.4rem 0.55rem; text-align:left;">
+            <div class="metric-label" style="font-size:0.68rem;">耐風速 / 最大飛行時間</div>
+            <div class="metric-value mono" style="font-size:0.78rem;">耐風 ${d.maxWindSpeed} / ${d.maxFlightTime}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.45rem;">
+          <span class="nav-pill" style="background:#ede9fe; color:#5b21b6; font-size:0.7rem; font-weight:700;">📡 リモートID: ${d.remoteId}</span>
+          ${lvTags}
+        </div>
+
+        <div style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.55rem;">
+          ${useTags}
+        </div>
+
+        <div style="background:#eff6ff; border-left:3px solid var(--brand-primary); padding:0.55rem 0.7rem; border-radius:4px; font-size:0.78rem; color:#1e3a8a; line-height:1.5; margin-bottom:0.45rem;">
+          ⚖️ <strong>技能証明×法規メリット：</strong> ${d.regulatoryAdvantage}
+        </div>
+
+        <div style="font-size:0.77rem; color:var(--text-secondary); line-height:1.5;">
+          🔧 <strong>機体仕様・特徴：</strong> ${d.specSummary}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function setPortalDirectoryCategory(catKey) {
+  currentPortalDirCat = catKey;
+  ['all', 'mlit_core', 'dips_exam', 'airspace_map', 'radio_safety'].forEach((k) => {
+    const b = document.getElementById('portal-dir-cat-' + k);
+    if (b) b.className = k === catKey ? 'btn btn-primary' : 'btn';
+  });
+  renderPortalDirectory();
+}
+
+function renderPortalDirectory() {
+  if (!window.AERO_PILOT_PORTAL || !Array.isArray(window.AERO_PILOT_PORTAL.officialPortalDirectory)) return;
+  const allLinks = window.AERO_PILOT_PORTAL.officialPortalDirectory;
+  const grid = document.getElementById('portal-directory-grid');
+  if (!grid) return;
+
+  const filtered =
+    currentPortalDirCat === 'all'
+      ? allLinks
+      : allLinks.filter((item) => item.category === currentPortalDirCat);
+
+  grid.innerHTML = '';
+  filtered.forEach((item) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; background:#ffffff; display:flex; flex-direction:column; justify-content:space-between; gap:0.55rem; box-shadow:0 1px 2px rgba(15,23,42,0.04);';
+    card.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.3rem;">
+          <span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.7rem;">${item.categoryLabel}</span>
+          <span class="nav-pill" style="background:#fef3c7; color:#92400e; font-weight:800; font-size:0.7rem;">${item.badge}</span>
+        </div>
+        <div style="font-size:0.73rem; color:var(--text-secondary); font-weight:700; margin-bottom:0.15rem;">🏛️ ${item.org}</div>
+        <div style="font-size:0.9rem; font-weight:800; color:var(--text-main); line-height:1.45; margin-bottom:0.4rem;">
+          ${item.title}
+        </div>
+        <p style="font-size:0.78rem; color:var(--text-secondary); line-height:1.5; margin-bottom:0.45rem;">
+          ${item.description}
+        </p>
+        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:6px; padding:0.5rem 0.65rem; font-size:0.76rem; color:var(--text-main); line-height:1.45;">
+          💡 <strong>実務で使うタイミング：</strong> ${item.whenToUse}
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:0.2rem;">
+        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size:0.76rem; padding:0.3rem 0.7rem; text-decoration:none;">
+          🌐 公式ポータルを開く ↗
+        </a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================================
+// Initialize all 6 modules on page load
 // ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
   initKijoScenarioSelect();
@@ -1533,6 +1958,11 @@ window.addEventListener('DOMContentLoaded', () => {
   setCbtFilter('all');
   renderKyosokuTextbook();
   renderCheatSheet();
+
+  updatePortalMissionSim();
+  renderPortalRoadmap();
+  renderPortalDroneCatalog();
+  renderPortalDirectory();
 
   initB2bTenantSelect();
   renderPersonalAnalytics();
