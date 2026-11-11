@@ -27,7 +27,10 @@ window.AERO_EXAM_BANK = {
         id: "v4",
         name: "第4版（旧基準）",
         effectiveDate: "2025-02-01",
+        publishedDate: "2025-02-03",
         status: "archived",
+        officialPdfUrl: "https://www.mlit.go.jp/koku/content/001860311.pdf",
+        portalUrl: "https://www.mlit.go.jp/koku/license.html",
         summary: "レベル4飛行（カテゴリーⅢ）・技能証明制度・機体認証制度・登録制度の体系化版",
         keyHighlights: [
           "国勢調査DID内は工業専用地域や水面であっても一律にDID飛行許可が必要",
@@ -39,14 +42,19 @@ window.AERO_EXAM_BANK = {
         id: "v5",
         name: "第5版（現行最新基準）",
         effectiveDate: "2026-07-14",
+        publishedDate: "2026-07-07",
         status: "active",
+        officialPdfUrl: "https://www.mlit.go.jp/common/002010809.pdf",
+        changelogPdfUrl: "https://www.mlit.go.jp/common/002010810.pdf",
+        practicalExamStandardUrl: "https://www.mlit.go.jp/koku/content/001971373.pdf",
+        portalUrl: "https://www.mlit.go.jp/koku/license.html",
         summary: "規制合理化（DID工業専用地域特例・農薬散布5承認不要特例）、小型無人機等飛行禁止法の対象拡大（最大1,000m）、賠償保険付保勧奨強化を反映した現行基準",
         keyHighlights: [
           "都市計画法上の「工業専用地域（水面含む）」はDID内でもDID飛行許可が不要に合理化",
           "一定の安全措置を講じた農薬等の空中散布において5つの飛行方法（夜間・目視外・30m未満・危険物・物件投下）の承認が不要に",
           "技能証明の更新申請期間（有効期間満了日の6月前〜1月前まで）の明確化",
-          "小型無人機等飛行禁止法における特定重要施設・防衛施設周辺の規制対象が最大周囲おおむね1,000mへ拡大",
-          "対人・対物の損害賠償責任保険への加入（付保）勧奨と飛行計画通報時の確認徹底"
+          "小型無人機等飛行禁止法における特定重要施設・防衛施設・対象空港周辺の規制対象が最大周囲おおむね1,000mへ拡大",
+          "対人・対物の損害賠償責任保険への加入（付保）勧奨と25kg以上機の第三者賠償責任保険加入義務化"
         ]
       },
       v6_ready: {
@@ -54,6 +62,8 @@ window.AERO_EXAM_BANK = {
         name: "第6版以降（将来改訂拡張スロット）",
         effectiveDate: "TBD",
         status: "extensible_schema",
+        officialPdfUrl: "https://www.mlit.go.jp/koku/license.html",
+        portalUrl: "https://www.mlit.go.jp/koku/koku_tk10_000003.html",
         summary: "将来の航空法改正・UTM（無人航空機運航管理システム）統合・DAA（探知と回避）技術基準・SORA 2.5以降へのシームレス移行用スキーマ",
         diffPatchTemplate: {
           targetChapterId: "ch3 | ch4 | ch6",
@@ -69,6 +79,183 @@ window.AERO_EXAM_BANK = {
         ]
       }
     }
+  },
+
+  /**
+   * 0-A2. 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー＆通達フィード（mlitLiveFeed）
+   * 監視対象：
+   *  - 無人航空機の飛行ルール（航空局ポータル）: https://www.mlit.go.jp/koku/koku_tk10_000003.html
+   *  - 無人航空機操縦者技能証明等: https://www.mlit.go.jp/koku/license.html
+   *  - 飛行許可・承認手続（レベル4 / 3.5飛行等）: https://www.mlit.go.jp/koku/koku_fr10_000042.html
+   */
+  mlitLiveFeed: {
+    lastVerifiedAt: "2026-11-11",
+    watchedSources: [
+      {
+        id: "mlit_portal",
+        name: "国交省 航空局 無人航空機ポータル（飛行ルール・新着通達）",
+        url: "https://www.mlit.go.jp/koku/koku_tk10_000003.html",
+        status: "ONLINE_VERIFIED"
+      },
+      {
+        id: "mlit_license",
+        name: "無人航空機操縦者技能証明等（教則第5版・実地試験基準・更新講習）",
+        url: "https://www.mlit.go.jp/koku/license.html",
+        status: "ONLINE_VERIFIED"
+      },
+      {
+        id: "mlit_permission",
+        name: "無人航空機の飛行許可・承認手続（審査要領・レベル3.5・25kg保険義務）",
+        url: "https://www.mlit.go.jp/koku/koku_fr10_000042.html",
+        status: "ONLINE_VERIFIED"
+      }
+    ],
+    items: [
+      {
+        id: "MLIT-2026-1021",
+        publishedDate: "2026-10-21",
+        effectiveDate: "2026-10-21",
+        category: "koshin",
+        categoryLabel: "技能証明・更新",
+        badgeText: "NEW 通達",
+        title: "無人航空機操縦者技能証明等の有効期間の弾力的運用について（追加措置）",
+        sourceDocName: "航空局安全部無人航空機安全課 公示（特定非常災害特別措置法第3条第2項関連）",
+        officialUrl: "https://www.mlit.go.jp/koku/content/002019684.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/koku/koku_tk10_000003.html",
+        examImpactSummary: "原則として技能証明の有効期間は「3年間（更新申請は満了6か月前〜1か月前）」ですが、特定非常災害（令和8年熊本地震等）の特定被災地域に住所を有する者は、技能証明・機体認証・機体登録および各種試験の有効期間が特例延長されます。",
+        targetChapterId: "ch1_2",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第1・2章（技能証明・有効期間）解説に反映済"
+      },
+      {
+        id: "MLIT-2026-0929",
+        publishedDate: "2026-09-29",
+        effectiveDate: "2026-09-29",
+        category: "kyoka",
+        categoryLabel: "許可承認・DIPS2.0",
+        badgeText: "重要改正",
+        title: "カテゴリーII飛行に関する許可・承認の審査要領等の改正（補助者なし目視外・DID経路及びレベル3.5事例集更新）",
+        sourceDocName: "無人航空機の飛行に関する許可・承認の審査要領（カテゴリーII飛行） / レベル3.5飛行事例集",
+        officialUrl: "https://www.mlit.go.jp/koku/content/001866503.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/koku/content/001880036.pdf",
+        examImpactSummary: "補助者を配置しない目視外飛行（レベル3・レベル3.5相当）において、人又は家屋の密集している地域（DID）上空を飛行経路として設定する場合の安全審査基準が明確化されました。学科第3章・第6章（目視外飛行・立入管理措置）および机上試験シナリオ⑤に直結します。",
+        targetChapterId: "ch6",
+        targetModule: "kijo",
+        aeroPassSyncStatus: "✅ 第6章（リスク管理・レベル3.5）＆机上シナリオ⑤に反映済"
+      },
+      {
+        id: "MLIT-2026-0728",
+        publishedDate: "2026-07-28",
+        effectiveDate: "2026-07-28",
+        category: "kyoka",
+        categoryLabel: "許可承認・DIPS2.0",
+        badgeText: "IMPORTANT",
+        title: "航空法第132条の92（捜索・救助等の特例）適用の対象となり得る事例の再周知と補足説明（獣害予防の緊急飛行）",
+        sourceDocName: "航空法第132条の92の特例適用の対象となり得る事例に関する周知通達",
+        officialUrl: "https://www.mlit.go.jp/koku/koku_tk10_000003.html",
+        secondaryUrl: "https://www.mlit.go.jp/koku/koku_fr10_000042.html",
+        examImpactSummary: "国・自治体またはその依頼を受けた者が行う捜索・救助等の特例（第132条の92）について、クマ目撃時だけでなく「クマ出没の蓋然性が高く、予防的措置のため緊急性がある飛行」も特例適用対象となり得ることが明確化されました（学科第3章の特例問題で頻出）。",
+        targetChapterId: "ch3",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第3章（航空法第132条の92 捜索・救助特例）に反映済"
+      },
+      {
+        id: "MLIT-2026-0707",
+        publishedDate: "2026-07-07",
+        effectiveDate: "2026-07-14",
+        category: "kyosoku",
+        categoryLabel: "教則・学科試験",
+        badgeText: "現行試験基準",
+        title: "「無人航空機の飛行の安全に関する教則（第5版）」公開および令和8年7月14日からの学科試験適用開始",
+        sourceDocName: "無人航空機の飛行の安全に関する教則（第5版） / 第4版からの変更履歴【参照用】",
+        officialUrl: "https://www.mlit.go.jp/common/002010809.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/common/002010810.pdf",
+        examImpactSummary: "2026年7月14日以降の学科試験（CBT）は第5版に完全準拠。①DID内の工業専用地域（水面含む）の許可不要特例、②一定の安全措置を講じた農薬空中散布の5承認不要特例、③技能証明更新期間（6月前〜1月前）、④小型無人機等飛行禁止法の対象拡大（最大1,000m）が最重要出題ポイントです。",
+        targetChapterId: "ch3",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 全6章スマート教科書・CBT全30問・改訂早見表に100%反映済"
+      },
+      {
+        id: "MLIT-2026-0703",
+        publishedDate: "2026-07-03",
+        effectiveDate: "2026-07-14",
+        category: "kyosoku",
+        categoryLabel: "教則・学科試験",
+        badgeText: "IMPORTANT 法改正",
+        title: "小型無人機等飛行禁止法の一部改正に伴う対象空港周辺地域・防衛施設周辺の拡大（令和8年国交省告示第813号）",
+        sourceDocName: "令和8年度国土交通省告示第813号（対象空港周辺地域拡大・DIPS2.0イエローゾーン入替）",
+        officialUrl: "https://www.mlit.go.jp/common/002010453.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/koku/koku_tk10_000003.html",
+        examImpactSummary: "小型無人機等飛行禁止法のイエローゾーンについて、従来の「対象施設の敷地・区域の周囲おおむね300m」原則に加え、特定重要施設・対象空港・防衛施設等では「最大周囲おおむね1,000m（滑走路端等からの拡大領域）」まで規制対象が拡大されました。",
+        targetChapterId: "ch3",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第3章（関係法令・小型無人機等飛行禁止法）＆CBT問に反映済"
+      },
+      {
+        id: "MLIT-2026-0605",
+        publishedDate: "2026-06-05",
+        effectiveDate: "2026-06-05",
+        category: "jicchi",
+        categoryLabel: "実地試験",
+        badgeText: "実地基準改正",
+        title: "「無人航空機操縦士実地試験実施基準」及び「一等・二等実地試験実施細則（マルチ・ヘリ・飛行機）」の一部改正",
+        sourceDocName: "無人航空機操縦士実地試験実施基準（令和8年6月5日適用） / 実地試験実施細則",
+        officialUrl: "https://www.mlit.go.jp/koku/content/001971373.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/koku/content/001971374.pdf",
+        examImpactSummary: "令和8年6月5日より実地試験実施基準・実施細則が改定適用。机上試験（飛行計画の策定とリスク評価・20点満点）、口述試験（飛行前点検・異常事態対応・事故/重大インシデント報告）、実技および飛行日誌（様式1〜3）の採点基準が厳格化されています。",
+        targetChapterId: "ch5",
+        targetModule: "kijo",
+        aeroPassSyncStatus: "✅ モジュール①机上試験6シナリオ＆モジュール②口述・飛行日誌に反映済"
+      },
+      {
+        id: "MLIT-2026-0602",
+        publishedDate: "2026-06-02",
+        effectiveDate: "2026-06-02",
+        category: "kyoka",
+        categoryLabel: "許可承認・DIPS2.0",
+        badgeText: "ガイドライン第2版",
+        title: "「無人航空機の多数機同時運航を安全に行うためのガイドライン（第二版）」及びカテゴリーⅢ（レベル4）留意事項（第2版）公開",
+        sourceDocName: "多数機同時運航ガイドライン（第二版） / エリア単位でのカテゴリーⅢ飛行留意事項（第2版）",
+        officialUrl: "https://www.mlit.go.jp/koku/content/001880139.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/common/001997564.pdf",
+        examImpactSummary: "1人の操縦者が複数の無人航空機を同時に運航する「多数機同時運航」の安全体制、およびエリア単位でのカテゴリーⅢ（レベル4）飛行における運航管理・フェイルセーフ要件が整理されました。一等学科（第4章・第6章 SORA/OSO）の重要トピックです。",
+        targetChapterId: "ch6",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第6章（SORA/カテゴリーⅢ）＆机上シナリオ⑥に反映済"
+      },
+      {
+        id: "MLIT-2026-0120",
+        publishedDate: "2026-01-20",
+        effectiveDate: "2026-01-20",
+        category: "koshin",
+        categoryLabel: "技能証明・更新",
+        badgeText: "更新・講習要領",
+        title: "「無人航空機操縦士更新講習及び技能証明書返納証明書交付者講習実施要領」及び身体検査等実施要領の改正",
+        sourceDocName: "無人航空機操縦士更新講習及び技能証明書返納証明書交付者講習実施要領 / 身体検査等実施要領",
+        officialUrl: "https://www.mlit.go.jp/koku/content/001972144.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/common/002019472.pdf",
+        examImpactSummary: "技能証明の有効期間（3年）満了に伴う更新講習（満了日の6か月前〜1か月前までにDIPS2.0で更新申請）、および失効後に再取得する際の「技能証明書返納証明書交付者講習」の手続き・身体検査自己申告確認要領が整備されました。",
+        targetChapterId: "ch1_2",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第1・2章（技能証明更新・身体検査）＆チートシートに反映済"
+      },
+      {
+        id: "MLIT-2025-1218",
+        publishedDate: "2025-12-09",
+        effectiveDate: "2025-12-18",
+        category: "kyoka",
+        categoryLabel: "許可承認・DIPS2.0",
+        badgeText: "重要制度移行",
+        title: "民間技能認証・HP掲載機の許可承認申請時における一部書類省略運用の廃止、及び総重量25kg以上機の賠償保険加入義務化",
+        sourceDocName: "カテゴリーII飛行審査要領改正 / 総重量25kg以上の無人航空機における第三者賠償責任保険加入義務",
+        officialUrl: "https://www.mlit.go.jp/common/001909323.pdf",
+        secondaryUrl: "https://www.mlit.go.jp/koku/koku_fr10_000042.html",
+        examImpactSummary: "2025年12月18日より民間技能認証・HP掲載機による申請書類省略が廃止され、国家資格（技能証明）と機体認証への一本化が完了。また総重量25kg以上の無人航空機を特定飛行させる場合は「第三者賠償責任保険への加入」が許可承認の必須要件となりました。",
+        targetChapterId: "ch1_2",
+        targetModule: "cbt",
+        aeroPassSyncStatus: "✅ 第1・2章（賠償保険・技能証明制度）＆B2BスクールROI診断に反映済"
+      }
+    ]
   },
 
   /**

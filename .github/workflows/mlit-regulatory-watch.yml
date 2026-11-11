@@ -1,0 +1,56 @@
+name: MLIT Civil Aviation Bureau Regulatory Watcher
+
+on:
+  schedule:
+    # 毎週月曜・木曜 00:00 UTC (09:00 JST) に国土交通省 航空局の公式ページ更新を自動監視
+    - cron: '0 0 * * 1,4'
+  workflow_dispatch:
+
+jobs:
+  watch-mlit-pages:
+    name: 国交省 航空局 公式HP・教則・実地試験基準 監視ジョブ
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check MLIT Official Pages & Compute Content Hashes
+        run: |
+          python3 - << 'EOF'
+          import urllib.request
+          import hashlib
+          import re
+          import os
+
+          targets = [
+              ("航空局 無人航空機ポータル", "https://www.mlit.go.jp/koku/koku_tk10_000003.html"),
+              ("無人航空機操縦者技能証明等（教則・実地試験・更新）", "https://www.mlit.go.jp/koku/license.html"),
+              ("無人航空機の飛行許可・承認手続（審査要領・レベル3.5/4）", "https://www.mlit.go.jp/koku/koku_fr10_000042.html")
+          ]
+
+          summary_lines = [
+              "## 📡 国土交通省（航空局）公式HP リアルタイム監視レポート",
+              "",
+              "| 監視対象ページ | URL | SHA-256 (先頭16桁) | 教則・基準リンク検出 |",
+              "|---|---|---|---|"
+          ]
+
+          for name, url in targets:
+              req = urllib.request.Request(url, headers={"User-Agent": "AERO-PASS-Regulatory-Watcher/1.0"})
+              html = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", errors="ignore")
+              digest = hashlib.sha256(html.encode("utf-8")).hexdigest()[:16]
+              found_pdfs = re.findall(r"(?:002010809|002010810|001971373|001866503|001880036)\.pdf", html)
+              detected_str = ", ".join(sorted(set(found_pdfs))) if found_pdfs else "正常取得"
+              print(f"[OK] {name}: sha256={digest} detected={detected_str}")
+              summary_lines.append(f"| {name} | {url} | `{digest}` | `{detected_str}` |")
+
+          step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary:
+              with open(step_summary, "a", encoding="utf-8") as f:
+                  f.write("\n".join(summary_lines) + "\n")
+          EOF
+
+      - name: Validate AERO-PASS JavaScript Syntax
+        run: |
+          node -c data/exam_bank.js
+          node -c app.js

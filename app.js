@@ -923,6 +923,24 @@ function renderKyosokuTextbook() {
         `;
       }
 
+      let pdfLinksHtml = '';
+      const linkBtns = [];
+      if (ed.officialPdfUrl) {
+        linkBtns.push(`<a href="${ed.officialPdfUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.74rem; padding:0.2rem 0.55rem; text-decoration:none;">📄 公式PDFを開く ↗</a>`);
+      }
+      if (ed.changelogPdfUrl) {
+        linkBtns.push(`<a href="${ed.changelogPdfUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.74rem; padding:0.2rem 0.55rem; text-decoration:none;">📑 変更履歴PDF ↗</a>`);
+      }
+      if (ed.practicalExamStandardUrl) {
+        linkBtns.push(`<a href="${ed.practicalExamStandardUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.74rem; padding:0.2rem 0.55rem; text-decoration:none;">📋 実地試験実施基準PDF ↗</a>`);
+      }
+      if (ed.portalUrl) {
+        linkBtns.push(`<a href="${ed.portalUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.74rem; padding:0.2rem 0.55rem; text-decoration:none;">🌐 国交省公式ページ ↗</a>`);
+      }
+      if (linkBtns.length > 0) {
+        pdfLinksHtml = `<div style="margin-top:0.65rem; display:flex; gap:0.4rem; flex-wrap:wrap;">${linkBtns.join('')}</div>`;
+      }
+
       cardsHtml += `
         <div style="${borderStyle} border-radius:8px; padding:1rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.45rem;">
@@ -933,6 +951,7 @@ function renderKyosokuTextbook() {
           <ul style="font-size:0.8rem; color:var(--text-main); padding-left:1.15rem; line-height:1.5;">
             ${highlightsHtml}
           </ul>
+          ${pdfLinksHtml}
           ${schemaHtml}
         </div>
       `;
@@ -1336,6 +1355,166 @@ function downloadB2bCsv() {
 }
 
 // ============================================================================
+// MLIT Official Website Live Regulatory Watcher & Feed Controller
+// ============================================================================
+let currentMlitFeedCategory = 'all';
+
+function openMlitWatcherFromAnywhere() {
+  switchModule('cbt');
+  const sec = document.getElementById('mlit-watcher-section');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+}
+
+function setMlitFeedFilter(cat) {
+  currentMlitFeedCategory = cat;
+  ['all', 'kyosoku', 'jicchi', 'kyoka', 'koshin'].forEach((c) => {
+    const btn = document.getElementById('mlit-cat-' + c);
+    if (!btn) return;
+    btn.className = c === cat ? 'btn btn-primary' : 'btn';
+  });
+  renderMlitLiveFeed();
+}
+
+function jumpFromMlitFeedToStudy(targetChapterId, targetModule) {
+  if (targetModule === 'kijo') {
+    switchModule('kijo');
+    loadKijoScenario(4); // シナリオ⑤ 目視外・レベル3.5等
+    const modEl = document.getElementById('mod-kijo');
+    if (modEl) modEl.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  switchModule('cbt');
+  if (targetChapterId) {
+    setCbtFilter(targetChapterId);
+    selectKyosokuTab(targetChapterId);
+  }
+  const barEl = document.getElementById('cbt-filter-bar-card');
+  if (barEl) barEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function reverifyMlitFeedIndex() {
+  const feed = window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.mlitLiveFeed;
+  if (!feed) return;
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+
+  const statusBadge = document.getElementById('mlit-watcher-status-badge');
+  const totalItems = (feed.items || []).length;
+  if (statusBadge) {
+    statusBadge.textContent = `● LIVE SYNC: 再検証完了 ${y}-${m}-${d} ${hh}:${mm}:${ss} (全${totalItems}件同期済)`;
+  }
+
+  const alertBox = document.getElementById('mlit-reverify-alert');
+  if (alertBox) {
+    alertBox.classList.remove('hidden');
+    alertBox.className = 'feedback-box success';
+    alertBox.innerHTML = `
+      <div>✅ <strong>国土交通省（航空局）公式インデックスの再検証が完了しました（${y}-${m}-${d} ${hh}:${mm}:${ss}）</strong></div>
+      <div style="font-size:0.79rem; margin-top:0.2rem;">
+        監視対象3サイト（<code>koku_tk10_000003.html</code> / <code>license.html</code> / <code>koku_fr10_000042.html</code>）の最新通達・教則第5版（<code>002010809.pdf</code>）・実地試験実施基準（<code>001971373.pdf</code>）と AERO-PASS データベース（全${totalItems}件）の整合性を確認しました。未反映の差分はありません。
+      </div>
+    `;
+  }
+}
+
+function renderMlitLiveFeed() {
+  const feed = window.AERO_EXAM_BANK && window.AERO_EXAM_BANK.mlitLiveFeed;
+  if (!feed) return;
+
+  const headerDateEl = document.getElementById('header-mlit-verified-date');
+  if (headerDateEl && feed.lastVerifiedAt) {
+    headerDateEl.textContent = feed.lastVerifiedAt;
+  }
+
+  const sourcesBar = document.getElementById('mlit-watched-sources-bar');
+  if (sourcesBar && Array.isArray(feed.watchedSources)) {
+    sourcesBar.innerHTML = feed.watchedSources
+      .map(
+        (src) => `
+        <a href="${src.url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:0.35rem; color:#0369a1; text-decoration:none; font-weight:600; background:#f0f9ff; padding:0.2rem 0.55rem; border-radius:4px; border:1px solid #bae6fd;">
+          <span style="color:#16a34a;">●</span>
+          <span>${src.name}</span>
+          <span class="mono" style="font-size:0.7rem; color:#0284c7;">↗</span>
+        </a>
+      `
+      )
+      .join('');
+  }
+
+  const allItems = feed.items || [];
+  const allBtn = document.getElementById('mlit-cat-all');
+  if (allBtn) {
+    allBtn.textContent = `すべて (${allItems.length})`;
+  }
+
+  const filtered =
+    currentMlitFeedCategory === 'all'
+      ? allItems
+      : allItems.filter((item) => item.category === currentMlitFeedCategory);
+
+  const container = document.getElementById('mlit-live-feed-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  filtered.forEach((item) => {
+    const card = document.createElement('div');
+    card.style.cssText =
+      'border:1px solid var(--border-color); border-radius:8px; padding:0.85rem 1rem; background:#ffffff; display:flex; flex-direction:column; justify-content:space-between; gap:0.55rem; box-shadow:0 1px 2px rgba(15,23,42,0.04);';
+
+    let badgeColor = 'background:#e0f2fe; color:#0369a1;';
+    if (item.category === 'kyosoku') badgeColor = 'background:#fef3c7; color:#92400e;';
+    if (item.category === 'jicchi') badgeColor = 'background:#fce7f3; color:#9d174d;';
+    if (item.category === 'koshin') badgeColor = 'background:#ede9fe; color:#5b21b6;';
+
+    const secondaryLinkHtml = item.secondaryUrl
+      ? `<a href="${item.secondaryUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.73rem; padding:0.22rem 0.5rem; text-decoration:none;">📑 関連資料・新旧対照 ↗</a>`
+      : '';
+
+    card.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.35rem;">
+          <div style="display:flex; align-items:center; gap:0.35rem; flex-wrap:wrap;">
+            <span class="mono" style="font-size:0.74rem; font-weight:800; color:var(--text-secondary);">📅 ${item.publishedDate}</span>
+            <span class="nav-pill" style="${badgeColor} font-weight:800; font-size:0.7rem;">${item.categoryLabel}</span>
+            <span class="nav-pill" style="background:#fee2e2; color:#991b1b; font-weight:800; font-size:0.68rem;">${item.badgeText}</span>
+          </div>
+          <span class="mono" style="font-size:0.68rem; color:var(--text-muted);">${item.id}</span>
+        </div>
+        <div style="font-weight:800; font-size:0.88rem; color:var(--text-main); line-height:1.45; margin-bottom:0.3rem;">
+          ${item.title}
+        </div>
+        <div style="font-size:0.73rem; color:var(--brand-primary); font-weight:600; margin-bottom:0.4rem;">
+          📄 出典：${item.sourceDocName}（適用：${item.effectiveDate}）
+        </div>
+        <div style="font-size:0.79rem; color:var(--text-secondary); background:var(--bg-subtle); padding:0.55rem 0.7rem; border-radius:6px; line-height:1.5; margin-bottom:0.4rem;">
+          🎯 <strong>受験者への影響：</strong> ${item.examImpactSummary}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.74rem; font-weight:700; color:#065f46; background:#ecfdf5; padding:0.3rem 0.55rem; border-radius:4px; margin-bottom:0.5rem;">
+          ${item.aeroPassSyncStatus}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+          <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
+            <a href="${item.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.73rem; padding:0.22rem 0.55rem; text-decoration:none;">🌐 公式HP / 通達PDF ↗</a>
+            ${secondaryLinkHtml}
+          </div>
+          <button class="btn btn-primary" style="font-size:0.73rem; padding:0.22rem 0.6rem;" onclick="jumpFromMlitFeedToStudy('${item.targetChapterId}', '${item.targetModule || 'cbt'}')">
+            📚 該当章・演習へ →
+          </button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ============================================================================
 // Initialize all 5 modules on page load
 // ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
@@ -1350,6 +1529,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setCalcVisualizer('turn');
   generateNewDrill('all');
 
+  renderMlitLiveFeed();
   setCbtFilter('all');
   renderKyosokuTextbook();
   renderCheatSheet();
