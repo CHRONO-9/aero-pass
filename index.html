@@ -34,26 +34,29 @@
     </div>
   </header>
 
-  <!-- Main Module Navigation (6 Pillars: 学科①② → 実地③④ → 合格後実務⑤ → スクール・LMS⑥) -->
+  <!-- Main Module Navigation (Home + 6 Pillars) -->
   <nav class="nav-bar" aria-label="学習モジュール選択">
     <div class="nav-inner">
-      <button id="nav-cbt" class="nav-tab active" onclick="switchModule('cbt')">
-        💻 ① 学科：全6章CBT × 体系教科書＆国交省同期 <span class="nav-pill">全30問・全6章</span>
+      <button id="nav-home" class="nav-tab active nav-tab-home" onclick="switchModule('home')">
+        🏠 トップ：6本柱ポータル
+      </button>
+      <button id="nav-cbt" class="nav-tab" onclick="switchModule('cbt')">
+        💻 ① 学科：CBT模試＆全6章教科書 <span class="nav-pill">全30問</span>
       </button>
       <button id="nav-calc" class="nav-tab" onclick="switchModule('calc')">
-        📐 ② 学科(一等)：計算ビジュアライザー＆無限ドリル <span class="nav-pill">全9公式</span>
+        📐 ② 一等：計算シミュレーター <span class="nav-pill">全9公式</span>
       </button>
       <button id="nav-kijo" class="nav-tab" onclick="switchModule('kijo')">
-        🗺️ ③ 実地：机上試験マップ演習 <span class="nav-pill">全6シナリオ</span>
+        🗺️ ③ 実地：机上マップ演習 <span class="nav-pill">全6シナリオ</span>
       </button>
       <button id="nav-oral" class="nav-tab" onclick="switchModule('oral')">
-        🎙️ ④ 実地：口述＆飛行日誌チェッカー <span class="nav-pill">6場面×6日誌</span>
+        🎙️ ④ 実地：口述＆飛行日誌 <span class="nav-pill">6場面×6日誌</span>
       </button>
       <button id="nav-portal" class="nav-tab" onclick="switchModule('portal')">
-        🚁 ⑤ 合格後：機体図鑑・実務判定・国交省ポータル <span class="nav-pill">10機種・14公的機関</span>
+        🚁 ⑤ 合格後：実務・機体＆国交省 <span class="nav-pill">10機種・14機関</span>
       </button>
       <button id="nav-monetize" class="nav-tab" onclick="switchModule('monetize')">
-        🏫 ⑥ スクールROI・弱点分析・B2B管理 <span class="nav-pill">給付金＆LMS</span>
+        🏫 ⑥ スクールROI＆LMS管理 <span class="nav-pill">給付金</span>
       </button>
     </div>
   </nav>
@@ -62,9 +65,211 @@
   <main class="main-container">
 
     <!-- =====================================================================
+         HOME PORTAL: トップページ — 核となる「6つの柱」タイルポータル
+         ===================================================================== -->
+    <section id="mod-home">
+      <!-- Hero Banner -->
+      <div class="home-hero">
+        <div class="home-hero-badge">
+          <span>🚁 国家資格（一等・二等）総合操縦士プラットフォーム</span>
+          <span>● 国交省HP同期済（教則第5版完全準拠）</span>
+        </div>
+        <h2 class="home-hero-title">
+          無人航空機操縦士 オールインワン実践シミュレーター
+        </h2>
+        <p class="home-hero-subtitle">
+          学科CBT試験・一等物理計算・実地試験（机上/口述/飛行日誌）の合格対策から、合格後の機体選定・飛行許可申請・国交省公的ポータルまでを完全網羅。目的の柱をクリックして学習・実務をスタートしてください。
+        </p>
+
+        <div class="home-hero-stats">
+          <div class="home-stat-item">
+            <span class="home-stat-val">30問 + 6章</span>
+            <span class="home-stat-lbl">学科CBT・体系スマート教科書</span>
+          </div>
+          <div class="home-stat-item">
+            <span class="home-stat-val">全9公式</span>
+            <span class="home-stat-lbl">一等計算SVGシミュレーター＆無限ドリル</span>
+          </div>
+          <div class="home-stat-item">
+            <span class="home-stat-val">6場面 × 6日誌</span>
+            <span class="home-stat-lbl">実地机上マップ・口述・飛行日誌</span>
+          </div>
+          <div class="home-stat-item">
+            <span class="home-stat-val">10機種 × 14機関</span>
+            <span class="home-stat-lbl">型式認証機体図鑑・公的機関ポータル</span>
+          </div>
+          <div class="home-stat-item">
+            <span class="home-stat-val">全国9エリア</span>
+            <span class="home-stat-lbl">給付金ROI診断・提携スクール送客</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-Pillar Heading -->
+      <div class="pillar-section-heading">
+        <div class="pillar-section-title">
+          <span>🏛️ AERO-PASS を構成する「6つの柱」</span>
+        </div>
+        <span style="font-size:0.82rem; color:var(--text-secondary);">
+          各タイルをクリックすると、専用の演習・シミュレーター画面へ移動します
+        </span>
+      </div>
+
+      <!-- 6-Pillar Tile Grid -->
+      <div class="pillar-grid">
+
+        <!-- Pillar 1 Tile -->
+        <div class="pillar-tile pillar-accent-blue" onclick="switchModule('cbt')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">💻</div>
+            <span class="pillar-num-badge">第1の柱・入口最重要</span>
+          </div>
+          <h3 class="pillar-title">① 学科：全6章CBT模試 ＆ スマート教科書</h3>
+          <p class="pillar-desc">
+            二等（30分）／一等（75分）の本番カウントダウン模試と即時合否判定。国交省HPリアルタイム改訂ウォッチャーおよび教則全6章の条文解説・版改訂（第4版／第5版）差分を網羅。
+          </p>
+          <ul class="pillar-features">
+            <li>全6章網羅 30問CBT模擬試験（見直しフラグ対応）</li>
+            <li>二等（30分）／一等（75分）タイマー＆80%即時合否判定</li>
+            <li>国交省公式HPリアルタイム通達同期（全9件）</li>
+            <li>教則第4版・第5版・第6版拡張の版管理ビューア</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>学科CBT演習をはじめる</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Pillar 2 Tile -->
+        <div class="pillar-tile pillar-accent-cyan" onclick="switchModule('calc')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">📐</div>
+            <span class="pillar-num-badge">第2の柱・一等最難関</span>
+          </div>
+          <h3 class="pillar-title">② 一等学科：計算ビジュアライザー ＆ 無限ドリル</h3>
+          <p class="pillar-desc">
+            一等学科最大の難関「飛行性能の計算」全9公式をインタラクティブSVGで視覚化。数値を毎回ランダム生成する無限計算ドリルと途中式ステップ解説で完全攻略。
+          </p>
+          <ul class="pillar-features">
+            <li>揚力・荷重倍数・失速速度など全9公式SVG物理モデル</li>
+            <li>リアルタイムスライダー連動＆パラメータ同期</li>
+            <li>乱数シードによる無限ランダム計算問題生成</li>
+            <li>途中式・誤答トラップ解説＆CBT画面内電卓完備</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>計算シミュレーターを開く</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Pillar 3 Tile -->
+        <div class="pillar-tile pillar-accent-amber" onclick="switchModule('kijo')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">🗺️</div>
+            <span class="pillar-num-badge">第3の柱・実地減点防止</span>
+          </div>
+          <h3 class="pillar-title">③ 実地：机上試験マップ演習（全6シナリオ）</h3>
+          <p class="pillar-desc">
+            実地試験の最初に行われる「用紙A（飛行計画書・飛行経路マップ）」の矛盾点検証と「用紙B（4問20点）」の解答演習。橋梁・農薬・進入表面・一等SORAまで完全収録。
+          </p>
+          <ul class="pillar-features">
+            <li>二等〜一等（SORA/GRC含む）全6シナリオ収録</li>
+            <li>SVGインタラクティブ飛行経路マップ上のホットスポット検証</li>
+            <li>10分カウントダウンタイマー＆用紙B（20点）自動採点</li>
+            <li>RTH高度・送電線・離隔距離・気象限界の判定</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>机上マップ演習を開始する</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Pillar 4 Tile -->
+        <div class="pillar-tile pillar-accent-violet" onclick="switchModule('oral')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">🎙️</div>
+            <span class="pillar-num-badge">第4の柱・口頭試問即応</span>
+          </div>
+          <h3 class="pillar-title">④ 実地：口述試験ロールプレイ ＆ 飛行日誌</h3>
+          <p class="pillar-desc">
+            試験官との問答を100点減点方式でシミュレートする全6場面ロールプレイと、実地試験で減点頻出の「飛行日誌（様式1・2・3）全6ケース」不備チェッカー。
+          </p>
+          <ul class="pillar-features">
+            <li>日常点検・フェイルセーフ・事故報告など全6場面ロールプレイ</li>
+            <li>減点スコア追跡＆試験本番用満点発声スクリプト</li>
+            <li>飛行日誌様式1・2・3の60進法計算ミス即時判定</li>
+            <li>日常点検記録と点検整備記録の連動不備検証</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>口述＆日誌チェッカーを開く</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Pillar 5 Tile -->
+        <div class="pillar-tile pillar-accent-emerald" onclick="switchModule('portal')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">🚁</div>
+            <span class="pillar-num-badge">第5の柱・合格後実務NEW</span>
+          </div>
+          <h3 class="pillar-title">⑤ 合格後：実務カテゴリー判定・機体図鑑 ＆ 公的ポータル</h3>
+          <p class="pillar-desc">
+            試験合格後の現場で役立つ実践ポータル。飛行ミッション別のカテゴリー（Ⅰ/Ⅱ/Ⅲ/Lv3.5）自動判定、第一種・第二種型式認証機を含む全10機種図鑑、国交省等14公的ポータル。
+          </p>
+          <ul class="pillar-features">
+            <li>ライセンス×機体×空域の飛行カテゴリー・手続き自動判定</li>
+            <li>合格後のDIPS 2.0・運航実務5ステップロードマップ</li>
+            <li>型式認証機・産業主力機全10機種スペック＆法規メリット</li>
+            <li>国交省航空局・DIPS2.0・空域マップなど公式14機関リンク</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>合格後ポータルへ進む</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Pillar 6 Tile -->
+        <div class="pillar-tile pillar-accent-rose" onclick="switchModule('monetize')">
+          <div class="pillar-tile-top">
+            <div class="pillar-icon-box">🏫</div>
+            <span class="pillar-num-badge">第6の柱・送客＆スクール</span>
+          </div>
+          <h3 class="pillar-title">⑥ スクール送客ROI診断 ＆ B2B受講生LMS管理</h3>
+          <p class="pillar-desc">
+            一発試験と登録講習機関（実地免除）の総費用・合格率・給付金を比較するROI診断シミュレーター、全国提携スクール送客、および登録講習機関向け受講生10名管理コンソール。
+          </p>
+          <ul class="pillar-features">
+            <li>学習履歴・推定合格確率＆弱点トップ3自動分析</li>
+            <li>教育訓練給付金・人材開発助成金対応のROI比較診断</li>
+            <li>全国9エリア提携ドローンスクール検索＆資料請求</li>
+            <li>B2Bスクール受講生進捗管理・要補習判定・監査CSV出力</li>
+          </ul>
+          <div class="pillar-cta">
+            <span>ROI診断・スクール管理を見る</span>
+            <span class="pillar-cta-arrow">→</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
          MODULE 3 (Pillar 3): 実地試験 — 机上試験（飛行計画マップ＆用紙B 4問20点演習・全6シナリオ）
          ===================================================================== -->
     <section id="mod-kijo" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">🗺️ 第3の柱：実地試験 — 机上試験マップ演習（用紙A/B 全6シナリオ）</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#fef3c7; color:#92400e; font-weight:700;">用紙B 20点満点</span>
+          <span class="nav-pill">全6シナリオ</span>
+        </div>
+      </div>
+
       <div class="col-7 card">
         <div class="card-header">
           <div class="card-title">
@@ -132,9 +337,22 @@
     </section>
 
     <!-- =====================================================================
-         MODULE 2: 実地試験 — 口述試験AIロールプレイ(全6場面) ＆ 飛行日誌チェッカー(全6項目)
+         MODULE 4 (Pillar 4): 実地試験 — 口述試験AIロールプレイ(全6場面) ＆ 飛行日誌チェッカー(全6項目)
          ===================================================================== -->
     <section id="mod-oral" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">🎙️ 第4の柱：実地試験 — 口述試験ロールプレイ ＆ 飛行日誌チェッカー</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#ede9fe; color:#5b21b6; font-weight:700;">100点減点方式</span>
+          <span class="nav-pill">6場面 × 6日誌</span>
+        </div>
+      </div>
+
       <!-- Left: Oral Exam Simulator (6 Stages) -->
       <div class="col-6 card">
         <div class="card-header">
@@ -194,9 +412,22 @@
     </section>
 
     <!-- =====================================================================
-         MODULE 3: 一等学科 — 計算ビジュアライザー(全9公式) ＆ 無限ランダム生成ドリル
+         MODULE 2 (Pillar 2): 一等学科 — 計算ビジュアライザー(全9公式) ＆ 無限ランダム生成ドリル
          ===================================================================== -->
     <section id="mod-calc" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">📐 第2の柱：一等学科 — 飛行性能の計算 全9公式ビジュアライザー＆無限ドリル</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#cffafe; color:#0e7490; font-weight:700;">一等学科専用</span>
+          <span class="nav-pill">全9公式SVGモデル</span>
+        </div>
+      </div>
+
       <!-- Left: Interactive Physics Visualizer (All 9 Formulas) -->
       <div class="col-7 card">
         <div class="card-header">
@@ -292,7 +523,20 @@
     <!-- =====================================================================
          MODULE 1 (Pillar 1): 学科CBT完全再現モック(全30問・全6章フィルタ付) × 普遍的原則・版改訂ビューア ＋ 全6章スマート教科書＆チートシート
          ===================================================================== -->
-    <section id="mod-cbt" class="grid-12">
+    <section id="mod-cbt" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">💻 第1の柱：学科試験 — 全6章CBT模試 × 体系教科書＆国交省同期</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">教則第5版現行基準</span>
+          <span class="nav-pill">CBT全30問</span>
+        </div>
+      </div>
+
       <!-- MLIT Live Regulatory Watcher & Sync Status Section -->
       <div id="mlit-watcher-section" class="col-12 card" style="border:2px solid #0284c7; background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);">
         <div class="card-header" style="margin-bottom:0.65rem;">
@@ -494,6 +738,19 @@
          MODULE 5 (Pillar 5): 合格後：機体図鑑・実務カテゴリー判定・国交省＆公的機関ポータル
          ===================================================================== -->
     <section id="mod-portal" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">🚁 第5の柱：合格後実務ポータル — 機体図鑑・飛行カテゴリー判定・公的機関リンク</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#d1fae5; color:#065f46; font-weight:700;">実務・機体選定</span>
+          <span class="nav-pill">10機種 × 14機関</span>
+        </div>
+      </div>
+
       <!-- Top Left: 飛行ミッション別・必要手続き＆カテゴリー（Ⅰ/ⅡB/ⅡA/Lv3.5/Ⅲ）自動判定シミュレーター -->
       <div class="col-6 card">
         <div class="card-header">
@@ -602,6 +859,19 @@
          MODULE 6 (Pillar 6): スクール送客・個人弱点トップ3分析・B2B LMS管理画面
          ===================================================================== -->
     <section id="mod-monetize" class="grid-12 hidden">
+      <!-- Breadcrumb Bar -->
+      <div class="col-12 page-breadcrumb-bar">
+        <div class="page-breadcrumb-left">
+          <button class="btn-back-home" onclick="switchModule('home')">🏠 トップ（6つの柱）へ戻る</button>
+          <span style="color:var(--border-strong);">/</span>
+          <span class="page-breadcrumb-title">🏫 第6の柱：スクール送客・弱点分析・B2B受講生LMS管理</span>
+        </div>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="nav-pill" style="background:#ffe4e6; color:#9f1239; font-weight:700;">ROI＆LMS</span>
+          <span class="nav-pill">全国9エリア</span>
+        </div>
+      </div>
+
       <!-- Top Row: Personal Weakness Top 3 & Pass Probability Analytics -->
       <div class="col-12 card">
         <div class="card-header">

@@ -8,24 +8,28 @@
 //  - window.AERO_PILOT_PORTAL (modules/pilot_portal.js)
 // ============================================================================
 
-let currentModule = 'cbt';
+let currentModule = 'home';
 let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
 
 function switchModule(mod) {
   currentModule = mod;
-  const mods = ['cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
+  const mods = ['home', 'cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
   mods.forEach((m) => {
     const sec = document.getElementById('mod-' + m);
     const tab = document.getElementById('nav-' + m);
-    if (!sec || !tab) return;
-    if (m === mod) {
-      sec.classList.remove('hidden');
-      tab.classList.add('active');
-    } else {
-      sec.classList.add('hidden');
-      tab.classList.remove('active');
+    if (sec) {
+      if (m === mod) sec.classList.remove('hidden');
+      else sec.classList.add('hidden');
+    }
+    if (tab) {
+      if (m === mod) tab.classList.add('active');
+      else tab.classList.remove('active');
     }
   });
+
+  // Scroll to top of page cleanly when navigating between pillars
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
   if (mod === 'calc') {
     renderCalcVisualizer();
   } else if (mod === 'portal') {
