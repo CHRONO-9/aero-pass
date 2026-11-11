@@ -11,11 +11,11 @@
   <!-- Cockpit Header -->
   <header class="app-header">
     <div class="header-inner">
-      <div class="brand-group">
+      <div class="brand-group" style="cursor:pointer;" onclick="switchModule('home')" title="トップ（6つの柱ポータル）へ戻る">
         <span class="brand-badge">AERO-PASS</span>
         <h1 class="brand-title">無人航空機操縦士 オールインワン実践シミュレーター</h1>
         <span class="edition-tag">教則全6章体系 ＆ 版管理対応（現行：第5版）</span>
-        <button class="btn" style="padding:0.22rem 0.6rem; font-size:0.75rem; background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:800;" onclick="openMlitWatcherFromAnywhere()" title="国土交通省（航空局）公式HP リアルタイム改訂ウォッチャーを開く">
+        <button class="btn" style="padding:0.22rem 0.6rem; font-size:0.75rem; background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:800;" onclick="event.stopPropagation(); openMlitWatcherFromAnywhere();" title="国土交通省（航空局）公式HP リアルタイム改訂ウォッチャーを開く">
           📡 国交省HP同期済 (<span id="header-mlit-verified-date">2026-11-11</span>)
         </button>
       </div>
@@ -33,33 +33,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Main Module Navigation (Home + 6 Pillars) -->
-  <nav class="nav-bar" aria-label="学習モジュール選択">
-    <div class="nav-inner">
-      <button id="nav-home" class="nav-tab active nav-tab-home" onclick="switchModule('home')">
-        🏠 トップ：6本柱ポータル
-      </button>
-      <button id="nav-cbt" class="nav-tab" onclick="switchModule('cbt')">
-        💻 ① 学科：CBT模試＆全6章教科書 <span class="nav-pill">全30問</span>
-      </button>
-      <button id="nav-calc" class="nav-tab" onclick="switchModule('calc')">
-        📐 ② 一等：計算シミュレーター <span class="nav-pill">全9公式</span>
-      </button>
-      <button id="nav-kijo" class="nav-tab" onclick="switchModule('kijo')">
-        🗺️ ③ 実地：机上マップ演習 <span class="nav-pill">全6シナリオ</span>
-      </button>
-      <button id="nav-oral" class="nav-tab" onclick="switchModule('oral')">
-        🎙️ ④ 実地：口述＆飛行日誌 <span class="nav-pill">6場面×6日誌</span>
-      </button>
-      <button id="nav-portal" class="nav-tab" onclick="switchModule('portal')">
-        🚁 ⑤ 合格後：実務・機体＆国交省 <span class="nav-pill">10機種・14機関</span>
-      </button>
-      <button id="nav-monetize" class="nav-tab" onclick="switchModule('monetize')">
-        🏫 ⑥ スクールROI＆LMS管理
-      </button>
-    </div>
-  </nav>
 
   <!-- Main Workspace -->
   <main class="main-container">
