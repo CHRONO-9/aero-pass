@@ -374,153 +374,206 @@ body {
   }
 }
 
-/* Pillar Tile Card (BizHack AI Inspired Design) */
+/* Pillar Tile Card (BizHack AI Full Visual Design) */
 .pillar-tile {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: var(--radius-lg);
-  padding: 1.45rem 1.3rem;
+  border-radius: var(--radius-lg, 14px);
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
 }
 
 .pillar-tile:hover {
   transform: translateY(-5px);
-  box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.14);
+  border-color: #cbd5e1;
 }
 
 .pillar-tile.pillar-hidden {
   display: none !important;
 }
 
-/* Tile Top Header */
-.pillar-tile-top {
+/* Card Thumbnail Graphic Header (BizHack AI Style) */
+.card-thumb {
+  height: 145px;
+  position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.85rem;
+  padding: 0.85rem 1.05rem;
+  overflow: hidden;
+  box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.18);
 }
 
-.pillar-icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+.thumb-pattern {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.16;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.95) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+  z-index: 1;
+}
+
+.thumb-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  filter: blur(40px);
+  background: rgba(255, 255, 255, 0.28);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.thumb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  width: 100%;
+}
+
+.thumb-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.series-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.70rem;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.thumb-tag-right {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.02em;
+}
+
+.thumb-visual {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.65rem;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
+  text-align: center;
+  z-index: 2;
+  margin: auto 0;
 }
 
-.pillar-tile:hover .pillar-icon-box {
-  transform: scale(1.08);
-}
-
-.pillar-badges-group {
+.thumb-main-title {
+  color: #ffffff;
+  font-weight: 850;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.3rem;
-}
-
-.pillar-hot-tag {
-  font-size: 0.68rem;
-  font-weight: 800;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  letter-spacing: 0.02em;
-}
-
-.pillar-hot-tag.hot-danger {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.pillar-hot-tag.hot-warning {
-  background: #fffbeb;
-  color: #b45309;
-}
-
-.pillar-hot-tag.hot-info {
-  background: #f5f3ff;
-  color: #7c3aed;
-}
-
-.pillar-hot-tag.hot-success {
-  background: #ecfdf5;
-  color: #059669;
-}
-
-.pillar-hot-tag.hot-b2b {
-  background: #fff1f2;
-  color: #e11d48;
-}
-
-.pillar-num-badge {
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-  letter-spacing: 0.02em;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   white-space: nowrap;
 }
 
-/* Tile Titles & Lead */
-.pillar-title {
-  font-size: 1.14rem;
+.thumb-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 2;
+  width: 100%;
+}
+
+.thumb-date {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.95);
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.02em;
+}
+
+/* Card Body (BizHack AI Style) */
+.card-body {
+  padding: 1.25rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 1.12rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.35;
-  margin-bottom: 0.35rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
   letter-spacing: -0.01em;
 }
 
-.pillar-lead-phrase {
+.card-excerpt {
   font-size: 0.81rem;
-  font-weight: 700;
-  color: var(--brand-primary);
-  margin-bottom: 0.85rem;
-  line-height: 1.4;
-}
-
-/* BizHack風 「こんな方に」 課題提示 */
-.pillar-target-need {
-  font-size: 0.80rem;
   color: #475569;
   line-height: 1.55;
-  background: #f8fafc;
-  border-left: 3px solid #cbd5e1;
-  padding: 0.55rem 0.75rem;
-  border-radius: 0 8px 8px 0;
   margin-bottom: 0.85rem;
-  font-style: normal;
+  flex-grow: 1;
 }
 
-/* BizHack風 「おすすめ第1歩」 ピック枠 */
-.pillar-card-pick {
-  background: #f1f5f9;
+/* BizHack AI 「おすすめ第1歩」 Pick枠 */
+.roadmap-card-pick {
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 0.6rem 0.75rem;
-  margin-bottom: 0.95rem;
+  margin-bottom: 0.85rem;
   line-height: 1.45;
   transition: border-color 0.18s ease;
 }
 
-.pillar-tile:hover .pillar-card-pick {
+.pillar-tile:hover .roadmap-card-pick {
   border-color: #cbd5e1;
 }
 
-.pillar-pick-label {
+.roadmap-pick-label {
   display: block;
   font-size: 0.71rem;
   font-weight: 800;
@@ -529,7 +582,7 @@ body {
   letter-spacing: 0.02em;
 }
 
-.pillar-pick-text {
+.roadmap-pick-text {
   display: block;
   font-size: 0.81rem;
   font-weight: 700;
@@ -537,57 +590,31 @@ body {
   line-height: 1.4;
 }
 
-/* Features checklist */
-.pillar-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.pillar-features li {
-  font-size: 0.77rem;
-  color: #334155;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.45rem;
-  line-height: 1.45;
-}
-
-.pillar-features li::before {
-  content: "✓";
-  font-weight: 800;
-  color: var(--status-success);
-  flex-shrink: 0;
-  margin-top: -1px;
-}
-
-/* BizHack風 メタ情報バッジ群 */
-.pillar-meta-tags {
+/* BizHack AI メタタグ群 */
+.card-meta-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.95rem;
 }
 
-.pillar-meta-badge {
+.card-meta-tag {
+  background: #f1f5f9;
+  color: #475569;
   font-size: 0.70rem;
   font-weight: 600;
-  color: #475569;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  padding: 0.18rem 0.48rem;
+  border: 1px solid #e2e8f0;
   white-space: nowrap;
 }
 
-/* BizHack風 CTA Button */
-.pillar-cta {
+/* BizHack AI カード下部CTAボタン */
+.card-cta-btn {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   padding: 0.65rem 0.85rem;
   background: #f8fafc;
   border: 1px solid #cbd5e1;
@@ -599,65 +626,51 @@ body {
   margin-top: auto;
 }
 
-.pillar-cta-arrow {
+.card-cta-arrow {
   font-size: 1.05rem;
   transition: transform 0.2s ease;
-  color: var(--brand-primary);
+  color: #0284c7;
 }
 
-.pillar-tile:hover .pillar-cta {
-  background: var(--brand-primary);
+.pillar-tile:hover .card-cta-btn {
+  background: #0284c7;
   color: #ffffff;
-  border-color: var(--brand-primary);
+  border-color: #0284c7;
 }
 
-.pillar-tile:hover .pillar-cta-arrow {
+.pillar-tile:hover .card-cta-arrow {
   transform: translateX(4px);
   color: #ffffff;
 }
 
-/* Pillar Specific Accents */
-.pillar-accent-blue { border-top: 4px solid #0284c7; }
+/* 各柱ごとのテーマカラーホバー時スタイル */
 .pillar-accent-blue:hover { border-color: #0284c7; }
-.pillar-accent-blue .pillar-icon-box { background: #e0f2fe; }
-.pillar-accent-blue .pillar-num-badge { background: #e0f2fe; color: #0369a1; }
-.pillar-accent-blue .pillar-target-need { border-left-color: #0284c7; }
-.pillar-accent-blue .pillar-pick-label { color: #0284c7; }
+.pillar-accent-blue:hover .card-cta-btn { background: #0284c7; border-color: #0284c7; }
 
-.pillar-accent-cyan { border-top: 4px solid #0891b2; }
 .pillar-accent-cyan:hover { border-color: #0891b2; }
-.pillar-accent-cyan .pillar-icon-box { background: #cffafe; }
-.pillar-accent-cyan .pillar-num-badge { background: #cffafe; color: #0e7490; }
-.pillar-accent-cyan .pillar-target-need { border-left-color: #0891b2; }
-.pillar-accent-cyan .pillar-pick-label { color: #0891b2; }
+.pillar-accent-cyan:hover .card-cta-btn { background: #0891b2; border-color: #0891b2; }
+.pillar-accent-cyan .roadmap-pick-label { color: #0891b2; }
+.pillar-accent-cyan .card-cta-arrow { color: #0891b2; }
 
-.pillar-accent-amber { border-top: 4px solid #d97706; }
 .pillar-accent-amber:hover { border-color: #d97706; }
-.pillar-accent-amber .pillar-icon-box { background: #fef3c7; }
-.pillar-accent-amber .pillar-num-badge { background: #fef3c7; color: #92400e; }
-.pillar-accent-amber .pillar-target-need { border-left-color: #d97706; }
-.pillar-accent-amber .pillar-pick-label { color: #d97706; }
+.pillar-accent-amber:hover .card-cta-btn { background: #d97706; border-color: #d97706; }
+.pillar-accent-amber .roadmap-pick-label { color: #d97706; }
+.pillar-accent-amber .card-cta-arrow { color: #d97706; }
 
-.pillar-accent-violet { border-top: 4px solid #7c3aed; }
 .pillar-accent-violet:hover { border-color: #7c3aed; }
-.pillar-accent-violet .pillar-icon-box { background: #ede9fe; }
-.pillar-accent-violet .pillar-num-badge { background: #ede9fe; color: #5b21b6; }
-.pillar-accent-violet .pillar-target-need { border-left-color: #7c3aed; }
-.pillar-accent-violet .pillar-pick-label { color: #7c3aed; }
+.pillar-accent-violet:hover .card-cta-btn { background: #7c3aed; border-color: #7c3aed; }
+.pillar-accent-violet .roadmap-pick-label { color: #7c3aed; }
+.pillar-accent-violet .card-cta-arrow { color: #7c3aed; }
 
-.pillar-accent-emerald { border-top: 4px solid #059669; }
 .pillar-accent-emerald:hover { border-color: #059669; }
-.pillar-accent-emerald .pillar-icon-box { background: #d1fae5; }
-.pillar-accent-emerald .pillar-num-badge { background: #d1fae5; color: #065f46; }
-.pillar-accent-emerald .pillar-target-need { border-left-color: #059669; }
-.pillar-accent-emerald .pillar-pick-label { color: #059669; }
+.pillar-accent-emerald:hover .card-cta-btn { background: #059669; border-color: #059669; }
+.pillar-accent-emerald .roadmap-pick-label { color: #059669; }
+.pillar-accent-emerald .card-cta-arrow { color: #059669; }
 
-.pillar-accent-rose { border-top: 4px solid #e11d48; }
 .pillar-accent-rose:hover { border-color: #e11d48; }
-.pillar-accent-rose .pillar-icon-box { background: #ffe4e6; }
-.pillar-accent-rose .pillar-num-badge { background: #ffe4e6; color: #9f1239; }
-.pillar-accent-rose .pillar-target-need { border-left-color: #e11d48; }
-.pillar-accent-rose .pillar-pick-label { color: #e11d48; }
+.pillar-accent-rose:hover .card-cta-btn { background: #e11d48; border-color: #e11d48; }
+.pillar-accent-rose .roadmap-pick-label { color: #e11d48; }
+.pillar-accent-rose .card-cta-arrow { color: #e11d48; }
 
 /* Sub-page Breadcrumb / Header */
 .page-breadcrumb-bar {
