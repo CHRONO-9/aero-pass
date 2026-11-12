@@ -1976,3 +1976,27 @@ window.addEventListener('DOMContentLoaded', () => {
   // Ensure 6-pillar top portal is displayed on initial page load
   switchModule('home');
 });
+
+// =========================================================================
+// Top Page Navigation Roadmap & Pillar Filter (BizHack AI Inspired)
+// =========================================================================
+function filterPillars(cat, btn) {
+  // Update active state of filter buttons
+  const buttons = document.querySelectorAll('.roadmap-filter-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  }
+
+  // Filter pillar tiles
+  const tiles = document.querySelectorAll('#pillar-grid-container .pillar-tile');
+  tiles.forEach(tile => {
+    const tileCat = tile.getAttribute('data-category');
+    if (cat === 'all' || tileCat === cat) {
+      tile.classList.remove('pillar-hidden');
+    } else {
+      tile.classList.add('pillar-hidden');
+    }
+  });
+}
+

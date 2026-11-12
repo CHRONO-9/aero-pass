@@ -43,145 +43,280 @@
     <section id="mod-home">
 
 
-      <!-- 6-Pillar Heading -->
-      <div class="pillar-section-heading">
-        <div class="pillar-section-title">
-          <span>🏛️ AERO-PASS を構成する「6つの柱」</span>
+      <!-- NAVIGATION ROADMAP Header (BizHack AI Inspired) -->
+      <div class="roadmap-header">
+        <div class="roadmap-badge-top">
+          <span>🧭 NAVIGATION ROADMAP</span>
         </div>
-        <span style="font-size:0.82rem; color:var(--text-secondary);">
-          各タイルをクリックすると、専用の演習・シミュレーター画面へ移動します
-        </span>
+        <h2 class="roadmap-title">「どこから始めればいい？」あなたの目標・課題から探す</h2>
+        <p class="roadmap-subtitle">
+          全6本の合格・実務モジュールをあなたの受検ステージや直面する課題に合わせて整理。最短ルートで合格と現場実務を始めましょう。
+        </p>
+
+        <!-- Category Quick Filter Tabs -->
+        <div class="roadmap-filter-tabs" role="tablist" aria-label="目的別絞り込み">
+          <button class="roadmap-filter-btn active" onclick="filterPillars('all', this)">すべて表示（全6本）</button>
+          <button class="roadmap-filter-btn" onclick="filterPillars('gakka', this)">💻 学科試験から（二等・一等）</button>
+          <button class="roadmap-filter-btn" onclick="filterPillars('jitchi', this)">🎯 実地試験・減点対策</button>
+          <button class="roadmap-filter-btn" onclick="filterPillars('business', this)">🚁 合格後実務・スクール</button>
+        </div>
       </div>
 
       <!-- 6-Pillar Tile Grid -->
-      <div class="pillar-grid">
+      <div class="pillar-grid" id="pillar-grid-container">
 
-        <!-- Pillar 1 Tile -->
-        <div class="pillar-tile pillar-accent-blue" onclick="switchModule('cbt')">
+        <!-- Pillar 1 Tile: 学科CBT模試 ＆ スマート教科書 -->
+        <div class="pillar-tile pillar-accent-blue" data-category="gakka" onclick="switchModule('cbt')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">💻</div>
-            <span class="pillar-num-badge">第1の柱・入口最重要</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag">入門・必修</span>
+              <span class="pillar-num-badge">🔰 はじめての学科対策</span>
+            </div>
           </div>
           <h3 class="pillar-title">① 学科：全6章CBT模試 ＆ スマート教科書</h3>
-          <p class="pillar-desc">
-            二等（30分）／一等（75分）の本番カウントダウン模試と即時合否判定。国交省HPリアルタイム改訂ウォッチャーおよび教則全6章の条文解説・版改訂（第4版／第5版）差分を網羅。
-          </p>
+          <div class="pillar-lead-phrase">本番同等のCBT操作感で80%合格ラインを一発突破</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「学科試験を最短で一発合格したい」「本番の30問/75分カウントダウンと画面操作に慣れておきたい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">二等30問カウントダウン模試（見直しフラグ対応）</span>
+          </div>
+
           <ul class="pillar-features">
-            <li>全6章網羅 30問CBT模擬試験（見直しフラグ対応）</li>
             <li>二等（30分）／一等（75分）タイマー＆80%即時合否判定</li>
-            <li>国交省公式HPリアルタイム通達同期（全9件）</li>
-            <li>教則第4版・第5版・第6版拡張の版管理ビューア</li>
+            <li>全6章ランダム出題 ＆ 教則第5版・通達改訂差分を完全反映</li>
+            <li>国交省公式HPリアルタイム通達同期ビューア（全9件）</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 目安15〜30分</span>
+            <span class="pillar-meta-badge">💯 80%即時合否</span>
+            <span class="pillar-meta-badge">📡 国交省通達同期</span>
+            <span class="pillar-meta-badge">🆓 無料体験枠あり</span>
+          </div>
+
           <div class="pillar-cta">
             <span>学科CBT演習をはじめる</span>
             <span class="pillar-cta-arrow">→</span>
           </div>
         </div>
 
-        <!-- Pillar 2 Tile -->
-        <div class="pillar-tile pillar-accent-cyan" onclick="switchModule('calc')">
+        <!-- Pillar 2 Tile: 一等学科 計算ビジュアライザー ＆ 無限ドリル -->
+        <div class="pillar-tile pillar-accent-cyan" data-category="gakka" onclick="switchModule('calc')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">📐</div>
-            <span class="pillar-num-badge">第2の柱・一等最難関</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag hot-danger">一等最難関</span>
+              <span class="pillar-num-badge">🔥 計算問題の完全攻略</span>
+            </div>
           </div>
           <h3 class="pillar-title">② 一等学科：計算ビジュアライザー ＆ 無限ドリル</h3>
-          <p class="pillar-desc">
-            一等学科最大の難関「飛行性能の計算」全9公式をインタラクティブSVGで視覚化。数値を毎回ランダム生成する無限計算ドリルと途中式ステップ解説で完全攻略。
-          </p>
+          <div class="pillar-lead-phrase">揚力・失速速度など全9公式を動かして直感理解</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「公式の丸暗記では数字が変わると解けない」「途中式の展開や誤答トラップを徹底克服したい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">揚力・失速速度のSVG物理スライダー＆途中式解説</span>
+          </div>
+
           <ul class="pillar-features">
             <li>揚力・荷重倍数・失速速度など全9公式SVG物理モデル</li>
-            <li>リアルタイムスライダー連動＆パラメータ同期</li>
-            <li>乱数シードによる無限ランダム計算問題生成</li>
-            <li>途中式・誤答トラップ解説＆CBT画面内電卓完備</li>
+            <li>数値が毎回変わる乱数生成の無限ランダム計算ドリル</li>
+            <li>途中式ステップ解説＆CBT本番同様の画面内電卓完備</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 1問5分ドリル</span>
+            <span class="pillar-meta-badge">🧮 途中式ステップ解説</span>
+            <span class="pillar-meta-badge">🔄 毎回ランダム数値</span>
+            <span class="pillar-meta-badge">👑 合格パス専用</span>
+          </div>
+
           <div class="pillar-cta">
             <span>計算シミュレーターを開く</span>
             <span class="pillar-cta-arrow">→</span>
           </div>
         </div>
 
-        <!-- Pillar 3 Tile -->
-        <div class="pillar-tile pillar-accent-amber" onclick="switchModule('kijo')">
+        <!-- Pillar 3 Tile: 実地 机上試験マップ演習 -->
+        <div class="pillar-tile pillar-accent-amber" data-category="jitchi" onclick="switchModule('kijo')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">🗺️</div>
-            <span class="pillar-num-badge">第3の柱・実地減点防止</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag hot-warning">実地配点20点</span>
+              <span class="pillar-num-badge">⭐ 実地減点ゼロ直結</span>
+            </div>
           </div>
           <h3 class="pillar-title">③ 実地：机上試験マップ演習（全6シナリオ）</h3>
-          <p class="pillar-desc">
-            実地試験の最初に行われる「用紙A（飛行計画書・飛行経路マップ）」の矛盾点検証と「用紙B（4問20点）」の解答演習。橋梁・農薬・進入表面・一等SORAまで完全収録。
-          </p>
+          <div class="pillar-lead-phrase">飛行計画マップの矛盾を見抜き、用紙B（4問20点）を満点化</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「実地試験の最初で減点されたくない」「飛行計画書・地図の落とし穴（RTH・送電線・離隔）を事前確認したい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">シナリオ①「橋梁定期点検（二等基本）」用紙A/B点検</span>
+          </div>
+
           <ul class="pillar-features">
-            <li>二等〜一等（SORA/GRC含む）全6シナリオ収録</li>
-            <li>SVGインタラクティブ飛行経路マップ上のホットスポット検証</li>
+            <li>二等〜一等（SORA/GRC含む）全6シナリオを実戦収録</li>
+            <li>SVG飛行経路マップ上のホットスポット検証＆矛盾指摘</li>
             <li>10分カウントダウンタイマー＆用紙B（20点）自動採点</li>
-            <li>RTH高度・送電線・離隔距離・気象限界の判定</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 制限時間10分</span>
+            <span class="pillar-meta-badge">📝 用紙B(20点)自動採点</span>
+            <span class="pillar-meta-badge">🗺️ SVGマップ検証</span>
+            <span class="pillar-meta-badge">🎯 二等・一等対応</span>
+          </div>
+
           <div class="pillar-cta">
             <span>机上マップ演習を開始する</span>
             <span class="pillar-cta-arrow">→</span>
           </div>
         </div>
 
-        <!-- Pillar 4 Tile -->
-        <div class="pillar-tile pillar-accent-violet" onclick="switchModule('oral')">
+        <!-- Pillar 4 Tile: 実地 口述試験ロールプレイ ＆ 飛行日誌 -->
+        <div class="pillar-tile pillar-accent-violet" data-category="jitchi" onclick="switchModule('oral')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">🎙️</div>
-            <span class="pillar-num-badge">第4の柱・口頭試問即応</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag hot-info">減点頻出対策</span>
+              <span class="pillar-num-badge">🎙️ 口頭問答＆日誌ミス防止</span>
+            </div>
           </div>
           <h3 class="pillar-title">④ 実地：口述試験ロールプレイ ＆ 飛行日誌</h3>
-          <p class="pillar-desc">
-            試験官との問答を100点減点方式でシミュレートする全6場面ロールプレイと、実地試験で減点頻出の「飛行日誌（様式1・2・3）全6ケース」不備チェッカー。
-          </p>
+          <div class="pillar-lead-phrase">試験官の口述試問に即答し、日誌の60進法ミスを一掃</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「口述試問で試験官に突っ込まれて焦りたくない」「減点頻出の飛行日誌様式1・2・3の計算ミスを防ぎたい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">場面①「日常点検・飛行前確認」の口頭試問ロールプレイ</span>
+          </div>
+
           <ul class="pillar-features">
-            <li>日常点検・フェイルセーフ・事故報告など全6場面ロールプレイ</li>
-            <li>減点スコア追跡＆試験本番用満点発声スクリプト</li>
-            <li>飛行日誌様式1・2・3の60進法計算ミス即時判定</li>
-            <li>日常点検記録と点検整備記録の連動不備検証</li>
+            <li>日常点検・フェイルセーフ・事故報告など全6場面問答</li>
+            <li>減点スコア追跡＆本番で使える試験官納得の満点スクリプト</li>
+            <li>飛行日誌様式1・2・3の60進法計算ミス・不整合を即時検知</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 1問5分問答</span>
+            <span class="pillar-meta-badge">💯 100点減点法追跡</span>
+            <span class="pillar-meta-badge">📖 日誌様式1〜3対応</span>
+            <span class="pillar-meta-badge">🎙️ 模範発声原稿付</span>
+          </div>
+
           <div class="pillar-cta">
             <span>口述＆日誌チェッカーを開く</span>
             <span class="pillar-cta-arrow">→</span>
           </div>
         </div>
 
-        <!-- Pillar 5 Tile -->
-        <div class="pillar-tile pillar-accent-emerald" onclick="switchModule('portal')">
+        <!-- Pillar 5 Tile: 合格後 実務カテゴリー判定・機体図鑑 ＆ 公的ポータル -->
+        <div class="pillar-tile pillar-accent-emerald" data-category="business" onclick="switchModule('portal')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">🚁</div>
-            <span class="pillar-num-badge">第5の柱・合格後実務NEW</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag hot-success">実務直結</span>
+              <span class="pillar-num-badge">🚁 合格後・現場実務ナビ</span>
+            </div>
           </div>
           <h3 class="pillar-title">⑤ 合格後：実務カテゴリー判定・機体図鑑 ＆ 公的ポータル</h3>
-          <p class="pillar-desc">
-            試験合格後の現場で役立つ実践ポータル。飛行ミッション別のカテゴリー（Ⅰ/Ⅱ/Ⅲ/Lv3.5）自動判定、第一種・第二種型式認証機を含む全10機種図鑑、国交省等14公的ポータル。
-          </p>
+          <div class="pillar-lead-phrase">飛行承認・DIPS申請・型式認証機選定の現場手続きナビ</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「免許取得後、飛ばしたい空域がカテゴリーⅡかⅢか迷う」「DIPS 2.0手続きや実務に必要な機体スペックを知りたい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">飛行ミッション診断（空域×機体×立入管理の自動判定）</span>
+          </div>
+
           <ul class="pillar-features">
-            <li>ライセンス×機体×空域の飛行カテゴリー・手続き自動判定</li>
+            <li>カテゴリーⅠ/Ⅱ/Ⅲ/Lv3.5の自動判定＆許可承認ステップ</li>
             <li>合格後のDIPS 2.0・運航実務5ステップロードマップ</li>
             <li>型式認証機・産業主力機全10機種スペック＆法規メリット</li>
-            <li>国交省航空局・DIPS2.0・空域マップなど公式14機関リンク</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 即時シミュレート</span>
+            <span class="pillar-meta-badge">📋 DIPS 2.0対応</span>
+            <span class="pillar-meta-badge">🔍 産業機10種図鑑</span>
+            <span class="pillar-meta-badge">🌐 公的14機関リンク</span>
+          </div>
+
           <div class="pillar-cta">
             <span>合格後ポータルへ進む</span>
             <span class="pillar-cta-arrow">→</span>
           </div>
         </div>
 
-        <!-- Pillar 6 Tile -->
-        <div class="pillar-tile pillar-accent-rose" onclick="switchModule('monetize')">
+        <!-- Pillar 6 Tile: スクール送客ROI診断 ＆ B2B受講生LMS管理 -->
+        <div class="pillar-tile pillar-accent-rose" data-category="business" onclick="switchModule('monetize')">
           <div class="pillar-tile-top">
             <div class="pillar-icon-box">🏫</div>
-            <span class="pillar-num-badge">第6の柱・送客＆スクール</span>
+            <div class="pillar-badges-group">
+              <span class="pillar-hot-tag hot-b2b">受講生＆スクール</span>
+              <span class="pillar-num-badge">🏫 スクールROI＆LMS管理</span>
+            </div>
           </div>
           <h3 class="pillar-title">⑥ スクール送客ROI診断 ＆ B2B受講生LMS管理</h3>
-          <p class="pillar-desc">
-            一発試験と登録講習機関（実地免除）の総費用・合格率・給付金を比較するROI診断シミュレーター、全国提携スクール送客、および登録講習機関向け受講生10名管理コンソール。
-          </p>
+          <div class="pillar-lead-phrase">一発試験 vs スクール費用のROI診断と講習機関LMS</div>
+
+          <!-- こんな方に (BizHack風 読者課題) -->
+          <div class="pillar-target-need">
+            「一発試験か登録スクール（実地免除）か費用対効果を比べたい」「登録講習機関として受講生10名の合否進捗を管理したい」方に。
+          </div>
+
+          <!-- おすすめ第1歩 (BizHack風 Pick枠) -->
+          <div class="pillar-card-pick">
+            <span class="pillar-pick-label">おすすめ第1歩：</span>
+            <span class="pillar-pick-text">個別合格ROI診断（合格確率・費用・給付金の比較）</span>
+          </div>
+
           <ul class="pillar-features">
-            <li>学習履歴・推定合格確率＆弱点トップ3自動分析</li>
-            <li>教育訓練給付金・人材開発助成金対応のROI比較診断</li>
-            <li>全国9エリア提携ドローンスクール検索＆資料請求</li>
-            <li>B2Bスクール受講生進捗管理・要補習判定・監査CSV出力</li>
+            <li>学習履歴・推定合格率＆給付金（最大70%）考慮のROI診断</li>
+            <li>全国9エリア提携ドローンスクール検索＆無料資料請求</li>
+            <li>登録講習機関向け受講生進捗管理・要補習判定・監査CSV出力</li>
           </ul>
+
+          <!-- メタタグ群 (BizHack風 メタ情報) -->
+          <div class="pillar-meta-tags">
+            <span class="pillar-meta-badge">⏱ 1分でROI診断</span>
+            <span class="pillar-meta-badge">💰 給付金・助成金対応</span>
+            <span class="pillar-meta-badge">👥 受講生進捗管理</span>
+            <span class="pillar-meta-badge">📑 監査CSV出力</span>
+          </div>
+
           <div class="pillar-cta">
             <span>ROI診断・スクール管理を見る</span>
             <span class="pillar-cta-arrow">→</span>
