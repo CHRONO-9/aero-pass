@@ -12,8 +12,12 @@ let currentModule = 'home';
 let currentAccessTier = 'pass'; // 'free' | 'pass' | 'b2b'
 
 function switchModule(mod) {
+  if (mod === 'cbt') {
+    window.location.href = 'cbt.html';
+    return;
+  }
   currentModule = mod;
-  const mods = ['home', 'cbt', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
+  const mods = ['home', 'calc', 'kijo', 'oral', 'portal', 'monetize'];
   mods.forEach((m) => {
     const sec = document.getElementById('mod-' + m);
     const tab = document.getElementById('nav-' + m);
@@ -1518,9 +1522,7 @@ function downloadB2bCsv() {
 let currentMlitFeedCategory = 'all';
 
 function openMlitWatcherFromAnywhere() {
-  switchModule('cbt');
-  const sec = document.getElementById('mlit-watcher-section');
-  if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+  window.location.href = 'cbt.html#section-mlit-watcher';
 }
 
 function setMlitFeedFilter(cat) {
@@ -1958,10 +1960,12 @@ window.addEventListener('DOMContentLoaded', () => {
   setCalcVisualizer('turn');
   generateNewDrill('all');
 
-  renderMlitLiveFeed();
-  setCbtFilter('all');
-  renderKyosokuTextbook();
-  renderCheatSheet();
+  if (document.getElementById('cbt-question-text')) {
+    renderMlitLiveFeed();
+    setCbtFilter('all');
+    renderKyosokuTextbook();
+    renderCheatSheet();
+  }
 
   updatePortalMissionSim();
   renderPortalRoadmap();

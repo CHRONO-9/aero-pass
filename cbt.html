@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学科CBT模試 ＆ 教則体系スマート教科書 | AERO-PASS</title>
+  <meta name="description" content="AERO-PASS 第1の柱：無人航空機操縦士（一等・二等）学科CBT完全再現模試、教則全6章スマート教科書、普遍的原則＆版改訂（第4版→第5版）比較ビューア、国交省リアルタイム改訂ウォッチャー、直前チートシート。" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Cockpit Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group" style="cursor:pointer;" onclick="location.href='index.html'" title="トップ（6つの柱ポータル）へ戻る">
+        <span class="brand-badge">AERO-PASS</span>
+        <h1 class="brand-title">国家資格ドローン操縦士 合格＆実務ナビ</h1>
+        <span class="edition-tag">教則全6章体系 ＆ 版管理対応（現行：第5版）</span>
+        <button class="btn" style="padding:0.22rem 0.6rem; font-size:0.75rem; background:#ecfdf5; border-color:#6ee7b7; color:#065f46; font-weight:800;" onclick="event.stopPropagation(); launchMlitWatcher('all');" title="国土交通省（航空局）公式HP リアルタイム改訂ウォッチャーへジャンプ">
+          📡 国交省HP同期済 (<span id="header-mlit-verified-date">2026-11-11</span>)
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="location.href='index.html'" style="font-weight:700;">
+          🏠 トップへ戻る
+        </button>
+        <!-- User Tier Simulator -->
+        <div class="tier-switcher" role="group" aria-label="表示モード切替">
+          <button id="tier-free" onclick="setAccessTier('free')">無料体験枠</button>
+          <button id="tier-pass" class="active" onclick="setAccessTier('pass')">一等・合格パス (¥2,980)</button>
+          <button id="tier-b2b" onclick="setAccessTier('b2b')">B2Bスクール管理画面</button>
+        </div>
+        <button id="btn-open-paywall" class="btn btn-amber" onclick="openPaywallModal()">
+          👑 特典アンロック
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="main-container">
+
+    <!-- Breadcrumb Bar -->
+    <div class="page-breadcrumb-bar" style="margin-bottom:1.25rem;">
+      <div class="page-breadcrumb-left">
+        <a href="index.html" class="btn-back-home" style="text-decoration:none; display:inline-flex; align-items:center;">🏠 トップ（6つの柱）へ戻る</a>
+        <span style="color:var(--border-strong);">/</span>
+        <span class="page-breadcrumb-title">💻 第1の柱：学科試験対策 — CBT模試 × 体系教科書 × 国交省同期</span>
+      </div>
+      <div style="display:flex; gap:0.4rem; align-items:center;">
+        <span class="nav-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">教則第5版完全準拠</span>
+        <span class="nav-pill">CBT全30問</span>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         NAVIGATION ROADMAP HEADER (BizHack AI Inspired)
+         ===================================================================== -->
+    <div id="cbt-roadmap" class="roadmap-header">
+      <div class="roadmap-badge-top">
+        <span>🧭 CBT &amp; TEXTBOOK ROADMAP</span>
+      </div>
+      <h2 class="roadmap-title">「どこから始める？」学科試験対策で出来ること</h2>
+      <p class="roadmap-subtitle">
+        本番プロメトリック同等のカウントダウン模試から、教則全6章の条文根拠の体系理解、国交省最新通達の確認、試験直前の頻出数値暗記まで。あなたの学習スタイルに合わせてメニューを選択してください。
+      </p>
+
+      <!-- Category Quick Filter Tabs -->
+      <div class="roadmap-filter-tabs" role="tablist" aria-label="目的別絞り込み">
+        <button class="roadmap-filter-btn active" onclick="filterCbtTiles('all', this)">すべて表示（全6メニュー）</button>
+        <button class="roadmap-filter-btn" onclick="filterCbtTiles('exam', this)">💻 CBT本番模試・演習</button>
+        <button class="roadmap-filter-btn" onclick="filterCbtTiles('textbook', this)">📖 教則条文・改訂差分</button>
+        <button class="roadmap-filter-btn" onclick="filterCbtTiles('live', this)">📡 国交省通達・直前暗記</button>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         6-PILLAR TILE GRID (BizHack AI Style Design)
+         ===================================================================== -->
+    <div class="pillar-grid" id="cbt-tile-grid" style="margin-bottom:2.25rem;">
+
+      <!-- Tile 1: 本番CBT完全再現模試 -->
+      <div class="pillar-tile pillar-accent-blue" data-cbt-category="exam" onclick="launchCbtExamMode('ittou_75m')">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #0284c7, #2563eb);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge">メニュー ①</span>
+              <span class="category-tag">CBT模試</span>
+            </div>
+            <span class="thumb-tag-right">二等・一等</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">⏱️ 本番CBT模試</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">制限タイマー ＆ 即時合否判定</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">① 本番CBT完全再現模試（制限タイマー・即時合否）</h3>
+          <p class="card-excerpt">
+            「本番の画面操作や制限時間の感覚に慣れておきたい」「現在の実力で80%の合格基準に達しているか試したい」方に最適。一等75分／二等30分のカウントダウン、見直しフラグ（🚩）、全30問パレット、即時合否判定を完全再現。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">二等30分モード（または一等75分）で本番同様に腕試し</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">⏱️ 30分/75分制限</span>
+            <span class="card-meta-tag">💯 80%即時合否</span>
+            <span class="card-meta-tag">🚩 見直しフラグ</span>
+            <span class="card-meta-tag">💻 全30問パレット</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>CBT本番模試をはじめる</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 2: 教則全6章 体系スマート教科書 -->
+      <div class="pillar-tile pillar-accent-blue" data-cbt-category="textbook" onclick="launchTextbook('ch3')">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #3730a3, #4f46e5);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge" style="background:linear-gradient(135deg, #312e81, #4338ca);">メニュー ②</span>
+              <span class="category-tag">体系教科書</span>
+            </div>
+            <span class="thumb-tag-right">第1章〜第6章</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">📚 体系スマート教科書</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">条文根拠 ＆ ひっかけ注意</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">② 教則全6章（心得〜SORA）体系スマート教科書</h3>
+          <p class="card-excerpt">
+            「問題の丸暗記ではなく条文の体系を理解したい」「各章の頻出ポイントとひっかけトラップを整理したい」方に最適。第1・2章（心得）、第3章（法令）、第4章（システム）、第5章（運航）、第6章（リスク管理/SORA）を完全網羅。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">出題比率が最も高い「第3章：規則・関連法令」の条文要旨を確認</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">📖 全6章完全網羅</span>
+            <span class="card-meta-tag">🏛️ 体系的要旨</span>
+            <span class="card-meta-tag">⚠️ ひっかけ注意</span>
+            <span class="card-meta-tag">🗂️ 章別タブ切替</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>体系スマート教科書を開く</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 3: 普遍的原則 ＆ 版改訂比較ビューア -->
+      <div class="pillar-tile pillar-accent-cyan" data-cbt-category="textbook" onclick="launchDiffViewer()">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge" style="background:linear-gradient(135deg, #b45309, #d97706);">メニュー ③</span>
+              <span class="category-tag">版改訂特化</span>
+            </div>
+            <span class="thumb-tag-right">第4版 vs 第5版</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">🔄 普遍的原則＆版改訂</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">旧基準差分 ＆ ひっかけ回避</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">③ 普遍的原則（Core Principle）＆ 版改訂比較ビューア</h3>
+          <p class="card-excerpt">
+            「なぜそのルールなのか普遍的な原則を知りたい」「旧基準（第4版）と現行第5版の違いを確実に整理したい」方に最適。表面的な暗記を脱却する普遍的原則と、新旧の差分対比ボックス（赤・緑）で誤答トラップを完全回避。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">工業専用地域や1000m基準など重点改訂5箇所の差分を総点検</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">🔥 第5版完全対応</span>
+            <span class="card-meta-tag">📌 旧基準差分比較</span>
+            <span class="card-meta-tag">🏛️ Core Principle</span>
+            <span class="card-meta-tag">🎯 ひっかけTip</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>版改訂比較ビューアを開く</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 4: 国交省公式HP リアルタイム改訂ウォッチャー -->
+      <div class="pillar-tile pillar-accent-cyan" data-cbt-category="live" onclick="launchMlitWatcher('all')">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #0891b2, #0284c7);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge" style="background:linear-gradient(135deg, #0369a1, #0891b2);">メニュー ④</span>
+              <span class="category-tag">国交省同期</span>
+            </div>
+            <span class="thumb-tag-right">一次情報監視</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">📡 航空局ウォッチャー</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">最新通達9件 ＆ 公式PDF直リンク</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">④ 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー</h3>
+          <p class="card-excerpt">
+            航空局公式「飛行ルール」「技能証明」「飛行許可承認」の3大ページを常時巡回。通達発出や実施基準改訂が試験や実務に与える影響度を即座に判定・同期。公式PDF原文への直リンクも完備。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">最新通達9件の概要と教則第5版公式PDF・新旧対照表を確認</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">📡 リアルタイム同期</span>
+            <span class="card-meta-tag">📄 公式PDF直リンク</span>
+            <span class="card-meta-tag">⚠️ 試験影響度判定</span>
+            <span class="card-meta-tag">🔄 ワンクリック再検証</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>国交省ウォッチャーを見る</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 5: 試験直前5分暗記！頻出数値カード＆チートシート -->
+      <div class="pillar-tile pillar-accent-blue" data-cbt-category="live" onclick="launchCheatSheet('num')">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #e11d48, #f43f5e);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge" style="background:linear-gradient(135deg, #be123c, #e11d48);">メニュー ⑤</span>
+              <span class="category-tag">直前対策</span>
+            </div>
+            <span class="thumb-tag-right">即効5分暗記</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">⚡ 直前チートシート</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">頻出数値10選 ＆ 一等秒殺公式</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">⑤ 試験直前5分暗記！頻出数値カード＆改訂早見チートシート</h3>
+          <p class="card-excerpt">
+            「試験会場に入る直前に点数を上乗せしたい」「数値を瞬時に引き出せるようにしたい」方に最適。工業専用地域、1000m、1mなど落とせない頻出数値カード10枚と第5版改訂早見表をインクリメンタル検索可能。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">頻出数値カード10枚の高速フラッシュ暗記</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">⚡ 5分で総復習</span>
+            <span class="card-meta-tag">🔢 頻出数値10選</span>
+            <span class="card-meta-tag">🔍 インクリメンタル検索</span>
+            <span class="card-meta-tag">📋 秒殺チートシート</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>直前チートシートを開く</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tile 6: 教則章別・改訂重点 ピンポイント集中特訓ドリル -->
+      <div class="pillar-tile pillar-accent-blue" data-cbt-category="exam" onclick="launchFocusDrill('ch3')">
+        <div class="card-thumb" style="background: linear-gradient(135deg, #059669, #10b981);">
+          <div class="thumb-pattern"></div>
+          <div class="thumb-glow"></div>
+          <div class="thumb-header">
+            <div class="thumb-header-left">
+              <span class="series-badge" style="background:linear-gradient(135deg, #047857, #059669);">メニュー ⑥</span>
+              <span class="category-tag">弱点特訓</span>
+            </div>
+            <span class="thumb-tag-right">分野別演習</span>
+          </div>
+          <div class="thumb-visual">
+            <div class="thumb-main-title">🎯 章別特訓ドリル</div>
+          </div>
+          <div class="thumb-footer">
+            <span class="thumb-date">全6章・一等固有・第5版絞込</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">⑥ 教則章別・改訂重点 ピンポイント集中特訓ドリル</h3>
+          <p class="card-excerpt">
+            「特定の苦手な章だけを集中して解きたい」「一等固有問題や第5版改訂問題だけを反復演習したい」方に最適。教則各章フィルターで絞り込み、間違えた問題は弱点分析へ即座に記録。
+          </p>
+          <div class="roadmap-card-pick">
+            <span class="roadmap-pick-label">おすすめ第1歩：</span>
+            <span class="roadmap-pick-text">出題比率が最も高い「第3章 規則・法令（10問）」からスタート</span>
+          </div>
+          <div class="card-meta-tags">
+            <span class="card-meta-tag">🎯 章別6カテゴリ</span>
+            <span class="card-meta-tag">👑 一等固有問題</span>
+            <span class="card-meta-tag">🔥 改訂重点5問</span>
+            <span class="card-meta-tag">📊 弱点分析連動</span>
+          </div>
+          <div class="card-cta-btn">
+            <span>集中特訓ドリルを開始する</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =====================================================================
+         SECTION 1: CBT問題演習 ＆ 本番シミュレーター ＆ スマート教科書ビューア
+         ===================================================================== -->
+    <div id="section-cbt-exam" class="grid-12" style="margin-bottom:2.25rem;">
+
+      <!-- Top Filter Bar for CBT Questions + Exam Mode Timer & Instant Grading Bar -->
+      <div id="cbt-filter-bar-card" class="col-12 card" style="padding:0.85rem 1.25rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+            <span style="font-weight:700; font-size:0.84rem;">📚 教則全6章フィルタ：</span>
+            <button id="cbt-filter-all" class="btn btn-primary" onclick="setCbtFilter('all')">全30問</button>
+            <button id="cbt-filter-ch1_2" class="btn" onclick="setCbtFilter('ch1_2')">第1・2章：心得(4)</button>
+            <button id="cbt-filter-ch3" class="btn" onclick="setCbtFilter('ch3')">第3章：規則・法令(10)</button>
+            <button id="cbt-filter-ch4" class="btn" onclick="setCbtFilter('ch4')">第4章：機体システム(6)</button>
+            <button id="cbt-filter-ch5" class="btn" onclick="setCbtFilter('ch5')">第5章：気象・運航(4)</button>
+            <button id="cbt-filter-ch6" class="btn" onclick="setCbtFilter('ch6')">第6章：リスク管理(6)</button>
+            <button id="cbt-filter-ittou" class="btn" onclick="setCbtFilter('ittou')">👑 一等固有(6)</button>
+            <button id="cbt-filter-fifth" class="btn" onclick="setCbtFilter('fifth')">🔥 改訂重点(5)</button>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <button class="btn" onclick="scrollToCbtSection('cbt-roadmap')">↑ 出来ること一覧（タイル）へ</button>
+            <button class="btn btn-amber" onclick="scrollToCbtSection('section-textbook')">📖 教則体系教科書 ↓</button>
+          </div>
+        </div>
+
+        <!-- ⏱️ 本番CBT試験モード切替・カウントダウンタイマー＆即時合否判定バー -->
+        <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border-strong); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <span style="font-weight:800; font-size:0.82rem; color:var(--brand-primary);">⏱️ 本番CBT試験モード：</span>
+            <select id="cbt-exam-mode-select" class="form-control" style="width:auto; font-size:0.8rem; font-weight:700;" onchange="changeCbtExamMode(this.value)">
+              <option value="nitou_30m">二等学科モード［制限30分・計算除外可］</option>
+              <option value="ittou_75m" selected>一等学科フルモード［制限75分・全範囲］</option>
+            </select>
+            <span id="cbt-timer-display" class="mono" style="background:var(--bg-subtle); padding:0.32rem 0.7rem; border-radius:6px; font-weight:800; font-size:0.9rem; border:1px solid var(--border-strong); color:var(--text-main);">
+              ⏱️ 75:00
+            </span>
+            <button id="btn-cbt-timer-toggle" class="btn" style="font-size:0.78rem;" onclick="toggleOrResetCbtTimer()">
+              ▶️ タイマー開始/リセット
+            </button>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <button id="btn-cbt-grade-now" class="btn btn-primary" style="font-size:0.8rem;" onclick="gradeCbtSession()">
+              📊 現在の回答状況を採点・合否判定（合格基準80%以上）
+            </button>
+          </div>
+        </div>
+        <div id="cbt-session-grade-summary" class="feedback-box hidden" style="margin-top:0.65rem;"></div>
+      </div>
+
+      <!-- Left: Prometric CBT Mock -->
+      <div class="col-7 card">
+        <div class="card-header">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span id="cbt-q-title" class="card-title">問 1 / 30</span>
+            <label style="display:flex; align-items:center; gap:0.35rem; font-size:0.82rem; cursor:pointer;">
+              <input type="checkbox" id="cbt-flag-chk" onchange="toggleFlagCurrent()" />
+              🚩 後で見直す
+            </label>
+          </div>
+          <div style="display:flex; gap:0.4rem;">
+            <button class="btn" style="padding:0.25rem 0.6rem;" onclick="prevCbtQuestion()">◀ 前へ</button>
+            <button class="btn" style="padding:0.25rem 0.6rem;" onclick="nextCbtQuestion()">次へ ▶</button>
+          </div>
+        </div>
+
+        <div id="cbt-palette" style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.75rem;"></div>
+
+        <div style="margin-bottom:0.65rem; display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+          <span id="cbt-badge-id" class="mono nav-pill" style="font-weight:700;"></span>
+          <span id="cbt-badge-chapter" class="nav-pill" style="font-weight:700; background:#e0e7ff; color:#3730a3;"></span>
+          <span id="cbt-badge-cat" class="nav-pill" style="font-weight:700; background:var(--brand-primary-soft); color:var(--brand-primary);"></span>
+        </div>
+
+        <p id="cbt-question-text" style="font-size:0.96rem; font-weight:700; margin-bottom:1rem; line-height:1.6;"></p>
+
+        <div id="cbt-choice-container" class="choice-list"></div>
+
+        <div id="cbt-answer-feedback" class="feedback-box">
+          選択肢をクリックすると正誤判定を行い、学習履歴（弱点分析）への記録と右側の「教則全6章スマート教科書ビューア」を更新します。
+        </div>
+      </div>
+
+      <!-- Right: Universal Core Principle + Version Diff Smart Textbook Viewer -->
+      <div class="col-5 card">
+        <div class="card-header">
+          <div class="card-title">📖 教則スマート教科書ビューア（普遍的原則 ＆ 版改訂比較）</div>
+          <button class="btn" style="padding:0.2rem 0.55rem; font-size:0.74rem;" onclick="openKyosokuChapterForCurrentQ()">📚 この章の体系教科書を開く ↓</button>
+        </div>
+
+        <div style="margin-bottom:0.55rem; font-size:0.76rem; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+          <span id="cbt-ref-badge" class="mono" style="font-weight:700; color:var(--brand-primary);"></span>
+          <span id="cbt-edition-badge" class="nav-pill" style="font-weight:700;"></span>
+        </div>
+
+        <!-- Main Display: Core Principle (普遍的原則・条文根拠) -->
+        <div style="padding:0.9rem; border-radius:var(--radius-sm); background:#eff6ff; border-left:4px solid var(--brand-primary); margin-bottom:0.75rem; font-size:0.86rem;">
+          <div style="font-weight:800; color:#1e40af; margin-bottom:0.3rem;">🏛️ 教則の普遍的原則・条文根拠（Core Principle）</div>
+          <div id="cbt-core-principle" style="color:#1e3a8a; line-height:1.55; font-weight:600;"></div>
+        </div>
+
+        <!-- Edition Comparison: New Rule & Old Rule / Background -->
+        <div class="diff-box-new">
+          <div id="cbt-diff-new-label" style="font-weight:700; color:var(--status-success); margin-bottom:0.25rem;">✅ 現行基準・正答の根拠（第5版適用基準）</div>
+          <div id="cbt-diff-new"></div>
+        </div>
+
+        <div class="diff-box-old">
+          <div id="cbt-diff-old-label" style="font-weight:700; color:var(--status-danger); margin-bottom:0.25rem;">📌 旧基準（第4版）からの改訂差分 ／ 前提条文・背景</div>
+          <div id="cbt-diff-old" style="opacity:0.92;"></div>
+        </div>
+
+        <div style="background:var(--bg-subtle); border:1px solid var(--border-color); border-radius:8px; padding:0.9rem; font-size:0.84rem;">
+          <div style="font-weight:700; margin-bottom:0.3rem;">🎯 試験対策・ひっかけ回避ポイント（Tip）</div>
+          <p id="cbt-diff-tip" style="color:var(--text-secondary); line-height:1.55;"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =====================================================================
+         SECTION 2: 教則全6章（第1章〜第6章）体系スマート教科書 ＆ バージョン管理機構
+         ===================================================================== -->
+    <div id="section-textbook" class="grid-12" style="margin-bottom:2.25rem;">
+      <div id="cbt-textbook-section" class="col-12 card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📚 教則全6章（第1章〜第6章）体系スマート教科書 ＆ バージョン管理（v4 / v5 / v6拡張）</div>
+            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+              第1章（操縦者の心得）〜第6章（運航リスク管理・SORA）の公式カリキュラムと、歴代・将来の教則バージョン管理スキーマを網羅しています。
+            </p>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;">
+            <button class="btn" style="font-size:0.75rem; padding:0.2rem 0.55rem;" onclick="scrollToCbtSection('cbt-roadmap')">↑ 出来ること一覧（タイル）へ</button>
+            <button id="kyosoku-tab-ch1_2" class="btn btn-primary" onclick="selectKyosokuTab('ch1_2')">第1・2章：心得</button>
+            <button id="kyosoku-tab-ch3" class="btn" onclick="selectKyosokuTab('ch3')">第3章：規則・法令</button>
+            <button id="kyosoku-tab-ch4" class="btn" onclick="selectKyosokuTab('ch4')">第4章：機体システム</button>
+            <button id="kyosoku-tab-ch5" class="btn" onclick="selectKyosokuTab('ch5')">第5章：気象・運航体制</button>
+            <button id="kyosoku-tab-ch6" class="btn" onclick="selectKyosokuTab('ch6')">第6章：リスク管理(SORA)</button>
+            <button id="kyosoku-tab-versions" class="btn btn-amber" onclick="selectKyosokuTab('versions')">🔄 バージョン管理 (v4/v5/v6拡張)</button>
+          </div>
+        </div>
+
+        <div id="kyosoku-textbook-body"></div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         SECTION 3: MLIT Live Regulatory Watcher & Sync Status Section
+         ===================================================================== -->
+    <div id="section-mlit-watcher" class="grid-12" style="margin-bottom:2.25rem;">
+      <div id="mlit-watcher-section" class="col-12 card" style="border:2px solid #0284c7; background:linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);">
+        <div class="card-header" style="margin-bottom:0.65rem;">
+          <div>
+            <div class="card-title" style="color:#0369a1; font-size:1rem;">
+              📡 国土交通省（航空局）公式HP リアルタイム改訂ウォッチャー ＆ AERO-PASS反映ステータス
+            </div>
+            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+              航空局「無人航空機の飛行ルール」「無人航空機操縦者技能証明等」「飛行許可・承認手続」の一次情報（教則第5版・実地試験実施基準・審査要領・更新講習等）を常時監視し、試験への影響を即座に教材へ同期しています。
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn" style="font-size:0.75rem; padding:0.2rem 0.55rem;" onclick="scrollToCbtSection('cbt-roadmap')">↑ 出来ること一覧（タイル）へ</button>
+            <span id="mlit-watcher-status-badge" class="mono nav-pill" style="background:#dcfce7; color:#166534; font-weight:800; padding:0.3rem 0.65rem; border:1px solid #86efac;">
+              ● LIVE SYNC: 最終検証 2026-11-11 (全9件反映済)
+            </span>
+            <button id="btn-mlit-reverify" class="btn btn-primary" style="font-size:0.78rem;" onclick="reverifyMlitFeedIndex()">
+              🔄 最新インデックス再検証
+            </button>
+          </div>
+        </div>
+
+        <!-- Watched Official Sources Bar -->
+        <div id="mlit-watched-sources-bar" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem; padding:0.55rem 0.75rem; background:#ffffff; border:1px solid var(--border-color); border-radius:6px; font-size:0.76rem;"></div>
+
+        <!-- Category Filters for MLIT Feed -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+            <span style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">🔍 通達・改訂カテゴリ：</span>
+            <button id="mlit-cat-all" class="btn btn-primary" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('all')">すべて (9)</button>
+            <button id="mlit-cat-kyosoku" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyosoku')">📘 教則・学科試験</button>
+            <button id="mlit-cat-jicchi" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('jicchi')">🗺️ 実地試験基準</button>
+            <button id="mlit-cat-kyoka" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('kyoka')">✈️ 許可承認・DIPS2.0・レベル3.5/4</button>
+            <button id="mlit-cat-koshin" class="btn" style="font-size:0.76rem; padding:0.25rem 0.65rem;" onclick="setMlitFeedFilter('koshin')">🪪 技能証明・更新・身体検査</button>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <a href="https://www.mlit.go.jp/common/002010809.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📄 教則第5版 (公式PDF) ↗</a>
+            <a href="https://www.mlit.go.jp/common/002010810.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📑 第4版→第5版 変更履歴PDF ↗</a>
+            <a href="https://www.mlit.go.jp/koku/content/001971373.pdf" target="_blank" rel="noopener noreferrer" class="btn" style="font-size:0.75rem; padding:0.22rem 0.55rem; text-decoration:none;">📋 実地試験実施基準PDF ↗</a>
+          </div>
+        </div>
+
+        <div id="mlit-reverify-alert" class="feedback-box hidden" style="margin-bottom:0.75rem;"></div>
+
+        <!-- Feed Cards Grid -->
+        <div id="mlit-live-feed-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:0.75rem;"></div>
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         SECTION 4: SEO & Last-Minute 5-Min Cheat Sheet
+         ===================================================================== -->
+    <div id="section-cheatsheet" class="grid-12" style="margin-bottom:3rem;">
+      <div id="cbt-cheatsheet-section" class="col-12 card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⚡ 試験直前5分暗記！「教則改訂一覧表 ＆ 全6章頻出数値・一等公式チートシート」</div>
+            <p style="font-size:0.79rem; color:var(--text-secondary); margin-top:0.2rem;">
+              試験直前に点数を上乗せする重要数値カード10枚と第5版改訂早見表を瞬時インクリメンタル検索。
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <button class="btn" style="font-size:0.75rem; padding:0.2rem 0.55rem;" onclick="scrollToCbtSection('cbt-roadmap')">↑ 出来ること一覧（タイル）へ</button>
+            <input id="cheatsheet-search-input" type="text" class="form-control" style="width:240px;" placeholder="キーワード検索 (例: 工業専用, 1000m, 1m)" oninput="renderCheatSheet()" />
+            <button id="cs-tab-diff" class="btn btn-primary" onclick="setCheatSheetTab('diff')">① 第5版 改訂早見表 (6項目)</button>
+            <button id="cs-tab-num" class="btn" onclick="setCheatSheetTab('num')">② 頻出数値カード (10枚)</button>
+            <button id="cs-tab-form" class="btn" onclick="setCheatSheetTab('form')">③ 一等公式秒殺シート (4枚)</button>
+          </div>
+        </div>
+
+        <div id="cheatsheet-body"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Paywall Modal (Pass Unlock) -->
+  <div id="paywall-modal" class="modal-overlay hidden" onclick="closePaywallModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--brand-primary);">👑 AERO-PASS 一等・二等 合格パス</h3>
+        <button class="btn" onclick="closePaywallModal()">✕ 閉じる</button>
+      </div>
+      <p style="font-size:0.86rem; color:var(--text-secondary); line-height:1.5; margin-bottom:1rem;">
+        全問解説・全6章スマート教科書・計算全9公式シミュレーター・実地6シナリオが使い放題になる買い切りプランです。
+      </p>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:1rem; margin-bottom:1rem; text-align:center;">
+        <span style="font-size:1.4rem; font-weight:800; color:#1e40af;">¥2,980（買い切り・追加課金なし）</span>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn" onclick="closePaywallModal()">閉じる</button>
+        <button class="btn btn-amber" onclick="setAccessTier('pass'); closePaywallModal();">合格パスを有効化する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data/exam_bank.js"></script>
+  <script src="modules/growth_funnel.js"></script>
+  <script src="modules/b2b_monetize.js"></script>
+  <script src="cbt.js"></script>
+</body>
+</html>
